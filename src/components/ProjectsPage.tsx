@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { SvgHBarChart, SvgLineChart } from './ui/SharedComponents';
 import { useConfirm } from './ui/ConfirmModal';
 import { useApp, add as addDoc, update as updateDoc, remove as removeDoc } from '../context/AppContext';
 import { Icon, Modal, Field, Input, Textarea, Select, StatusBadge, WorkerCheckboxList, useIsMobile } from './ui/SharedComponents';
@@ -22,7 +23,12 @@ export function ProjectsPage({ workerFilterId }) {
     const isWorker = !!workerFilterId;
     const activeWorkers = workers.filter(w => w.active !== false && w.role !== 'admin');
 
-    const blankForm = () => ({ name: '', description: '', location: '', siteLat: '', siteLng: '', status: 'aktivan', startDate: today(), endDate: '', notes: '', workers: [], client: '', teamLeader: '', engineer: '', details: '', files: [] });
+    const defaultPhases = [
+        { id: genId(), name: 'Pripremni radovi', description: 'Dovoz materijala, postavljanje ograde, čišćenje terena', status: 'pending', completedAt: null, completedBy: null },
+        { id: genId(), name: 'Glavni radovi', description: 'Konstrukcija, betoniranje, zidanje, instalacije', status: 'pending', completedAt: null, completedBy: null },
+        { id: genId(), name: 'Završni radovi', description: 'Fasada, unutarnje uređenje, čišćenje, primopredaja', status: 'pending', completedAt: null, completedBy: null },
+    ];
+    const blankForm = () => ({ name: '', description: '', location: '', siteLat: '', siteLng: '', status: 'aktivan', startDate: today(), endDate: '', notes: '', workers: [], client: '', teamLeader: '', engineer: '', details: '', files: [], phases: defaultPhases });
     const [form, setForm] = useState(blankForm());
     const update = (k, v) => setForm(f => ({ ...f, [k]: v }));
     const [geocoding, setGeocoding] = useState(false);
@@ -68,7 +74,7 @@ export function ProjectsPage({ workerFilterId }) {
 
     const openAdd = () => { setForm(blankForm()); setEditId(null); setShowForm(true); };
     const openEdit = (p) => {
-        setForm({ name: p.name || '', description: p.description || '', location: p.location || '', siteLat: p.siteLat || '', siteLng: p.siteLng || '', status: p.status || 'aktivan', startDate: p.startDate || '', endDate: p.endDate || '', notes: p.notes || '', workers: p.workers || [], client: p.client || '', teamLeader: p.teamLeader || '', engineer: p.engineer || '', details: p.details || '', files: p.files || [] });
+        setForm({ name: p.name || '', description: p.description || '', location: p.location || '', siteLat: p.siteLat || '', siteLng: p.siteLng || '', status: p.status || 'aktivan', startDate: p.startDate || '', endDate: p.endDate || '', notes: p.notes || '', workers: p.workers || [], client: p.client || '', teamLeader: p.teamLeader || '', engineer: p.engineer || '', details: p.details || '', files: p.files || [], phases: p.phases || [] });
         setEditId(p.id); setShowForm(true);
     };
 
@@ -108,6 +114,45 @@ export function ProjectsPage({ workerFilterId }) {
     const totalHours = detailTimesheets.reduce((s, t) => s + diffMins(t.startTime, t.endTime), 0);
     const detailOtpremnice = detailProject ? otpremnice.filter(o => o.projectId === detailProject.id) : [];
     const detailObaveze = detailProject ? obaveze.filter(o => (o.projectId === detailProject.id) || (o.projectIds || []).includes(detailProject?.id)) : [];
+    const detailPhases = detailProject?.phases || [];
+    const canManagePhases = currentUser?.role === 'admin' || currentUser?.role === 'leader';
+
+    // Phase management
+    const togglePhase = async (phaseId) => {
+        if (!canManagePhases || !detailProject) return;
+        const updatedPhases = detailPhases.map(ph => ph.id === phaseId ? { ...ph, status: ph.status === 'done' ? 'pending' : 'done', completedAt: ph.status === 'done' ? null : new Date().toISOString(), completedBy: ph.status === 'done' ? null : currentUser?.name } : ph);
+        await updateDoc('projects', detailProject.id, { phases: updatedPhases });
+    };
+    const addPhase = async (name) => {
+        if (!canManagePhases || !detailProject || !name.trim()) return;
+        const newPhase = { id: genId(), name: name.trim(), description: '', status: 'pending', completedAt: null, completedBy: null };
+        await updateDoc('projects', detailProject.id, { phases: [...detailPhases, newPhase] });
+    };
+    const removePhase = async (phaseId) => {
+        if (!canManagePhases || !detailProject) return;
+        await updateDoc('projects', detailProject.id, { phases: detailPhases.filter(ph => ph.id !== phaseId) });
+    };
+
+    // Charts data for detail view
+    const hoursByWorker = useMemo(() => {
+        if (!detailProject) return [];
+        return detailWorkers.map(w => ({
+            name: w.name?.split(' ')[0] || '?',
+            hours: +(detailTimesheets.filter(t => t.workerId === w.id).reduce((s, t) => s + diffMins(t.startTime, t.endTime), 0) / 60).toFixed(1)
+        })).filter(w => w.hours > 0).sort((a, b) => b.hours - a.hours);
+    }, [detailProject, detailWorkers, detailTimesheets]);
+
+    const hoursByDay = useMemo(() => {
+        if (!detailProject || detailTimesheets.length === 0) return [];
+        const dayMap = {};
+        detailTimesheets.forEach(t => {
+            if (!t.date) return;
+            dayMap[t.date] = (dayMap[t.date] || 0) + diffMins(t.startTime, t.endTime) / 60;
+        });
+        return Object.entries(dayMap).sort(([a], [b]) => a.localeCompare(b)).slice(-14).map(([day, hours]) => ({ dan: day.slice(5), hours: +hours.toFixed(1) }));
+    }, [detailProject, detailTimesheets]);
+
+    const [newPhaseName, setNewPhaseName] = useState('');
 
     const getWorkerName = (id) => { const w = workers.find(x => x.id === id); return w ? w.name : '—'; };
 
@@ -288,6 +333,72 @@ export function ProjectsPage({ workerFilterId }) {
                         </div>
                     )}
                 </div>
+
+                {/* Faze rada (Work Phases) */}
+                <div style={{ ...styles.card, marginBottom: 20 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="check" size={16} /> Faze rada ({detailPhases.filter(p => p.status === 'done').length}/{detailPhases.length})</div>
+                    </div>
+                    {/* Progress bar */}
+                    {detailPhases.length > 0 && (
+                        <div style={{ marginBottom: 16 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: C.textMuted, marginBottom: 4 }}>
+                                <span>Napredak</span>
+                                <span style={{ fontWeight: 700, color: detailPhases.every(p => p.status === 'done') ? C.green : C.accent }}>{Math.round(detailPhases.filter(p => p.status === 'done').length / detailPhases.length * 100)}%</span>
+                            </div>
+                            <div style={{ height: 8, background: 'var(--border)', borderRadius: 4, overflow: 'hidden' }}>
+                                <div style={{ height: '100%', width: `${detailPhases.filter(p => p.status === 'done').length / detailPhases.length * 100}%`, background: detailPhases.every(p => p.status === 'done') ? C.green : C.accent, borderRadius: 4, transition: 'width 0.4s ease' }} />
+                            </div>
+                        </div>
+                    )}
+                    {detailPhases.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13 }}>Nema definiranih faza</div> : (
+                        <div>
+                            {detailPhases.map((ph, i) => (
+                                <div key={ph.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 0', borderBottom: i < detailPhases.length - 1 ? `1px solid ${C.border}7A` : 'none' }}>
+                                    <button onClick={() => togglePhase(ph.id)} disabled={!canManagePhases} style={{ background: 'none', border: `2px solid ${ph.status === 'done' ? C.green : C.accent}`, borderRadius: 5, width: 22, height: 22, cursor: canManagePhases ? 'pointer' : 'default', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 2, background: ph.status === 'done' ? C.green : 'transparent' }}>
+                                        {ph.status === 'done' && <span style={{ color: '#fff', fontSize: 12, fontWeight: 800 }}>✓</span>}
+                                    </button>
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontWeight: 600, fontSize: 14, color: ph.status === 'done' ? C.textMuted : C.text, textDecoration: ph.status === 'done' ? 'line-through' : 'none' }}>
+                                            <span style={{ fontSize: 12, fontWeight: 700, color: C.accent, marginRight: 6 }}>{i + 1}.</span>{ph.name}
+                                        </div>
+                                        {ph.description && <div style={{ fontSize: 12, color: C.textMuted, marginTop: 2 }}>{ph.description}</div>}
+                                        {ph.status === 'done' && ph.completedBy && (
+                                            <div style={{ fontSize: 11, color: C.green, marginTop: 4 }}>✓ Završio: {ph.completedBy} • {fmtDate(ph.completedAt)}</div>
+                                        )}
+                                    </div>
+                                    {canManagePhases && (
+                                        <button onClick={() => removePhase(ph.id)} style={{ background: 'none', border: 'none', color: C.textMuted, cursor: 'pointer', fontSize: 14, padding: 4, opacity: 0.5 }} title="Ukloni fazu">✕</button>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    {canManagePhases && (
+                        <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                            <input value={newPhaseName} onChange={e => setNewPhaseName(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && newPhaseName.trim()) { addPhase(newPhaseName); setNewPhaseName(''); } }} placeholder="Nova faza rada..." style={{ ...styles.input, flex: 1, marginBottom: 0, fontSize: 13 }} />
+                            <button onClick={() => { if (newPhaseName.trim()) { addPhase(newPhaseName); setNewPhaseName(''); } }} disabled={!newPhaseName.trim()} style={{ ...styles.btnSmall, opacity: newPhaseName.trim() ? 1 : 0.4 }}><Icon name="plus" size={12} /> Dodaj</button>
+                        </div>
+                    )}
+                </div>
+
+                {/* Charts: Hours by worker + Hours by day */}
+                {detailTimesheets.length > 0 && (
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16, marginBottom: 20 }}>
+                        {hoursByWorker.length > 0 && (
+                            <div style={styles.card}>
+                                <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="workers" size={16} /> Sati po radniku</div>
+                                <SvgHBarChart data={hoursByWorker} dataKey="hours" color={C.accent} height={Math.max(150, hoursByWorker.length * 32)} />
+                            </div>
+                        )}
+                        {hoursByDay.length > 1 && (
+                            <div style={styles.card}>
+                                <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="clock" size={16} /> Sati po danu (zadnjih {hoursByDay.length} dana)</div>
+                                <SvgLineChart data={hoursByDay} dataKey="hours" color="#3B82F6" height={200} />
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {/* Add Obligation Modal */}
                 {showObForm && (

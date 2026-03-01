@@ -89,6 +89,35 @@ export function WorkersPage() {
         const wSmjestaj = smjestaj.filter(s => (s.workerIds || []).includes(detailWorker.id));
         const totalMins = wTimesheets.reduce((s, t) => s + diffMins(t.startTime, t.endTime), 0);
 
+        // This month stats
+        const now = new Date();
+        const monthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        const monthTimesheets = wTimesheets.filter(t => (t.date || '').startsWith(monthStr));
+        const monthMins = monthTimesheets.reduce((s, t) => s + diffMins(t.startTime, t.endTime), 0);
+
+        // Average arrival time
+        const arrivals = wTimesheets.map(t => t.startTime).filter(Boolean);
+        const avgArrival = arrivals.length > 0 ? (() => {
+            const totalMinutes = arrivals.reduce((s, t) => {
+                const [h, m] = t.split(':').map(Number);
+                return s + h * 60 + (m || 0);
+            }, 0) / arrivals.length;
+            return `${String(Math.floor(totalMinutes / 60)).padStart(2, '0')}:${String(Math.round(totalMinutes % 60)).padStart(2, '0')}`;
+        })() : '—';
+
+        // Hours by day (last 14 days)
+        const dayMap = {};
+        wTimesheets.forEach(t => { if (t.date) dayMap[t.date] = (dayMap[t.date] || 0) + diffMins(t.startTime, t.endTime) / 60; });
+        const hoursByDay = Object.entries(dayMap).sort(([a], [b]) => a.localeCompare(b)).slice(-14).map(([day, hours]) => ({ dan: day.slice(5), hours: +hours.toFixed(1) }));
+
+        // Hours per project
+        const projectHours = wProjects.map(p => ({
+            name: p.name,
+            status: p.status,
+            hours: +(wTimesheets.filter(t => t.projectId === p.id).reduce((s, t) => s + diffMins(t.startTime, t.endTime), 0) / 60).toFixed(1)
+        })).sort((a, b) => b.hours - a.hours);
+        const maxProjectHours = Math.max(...projectHours.map(p => p.hours), 1);
+
         return (
             <div>
                 <button onClick={() => setDetailId(null)} style={{ ...styles.btnSecondary, marginBottom: 20, display: 'inline-flex' }}><Icon name="back" size={16} /> Natrag</button>
@@ -100,10 +129,12 @@ export function WorkersPage() {
                             <div style={{ color: C.textMuted, fontSize: 13 }}>{detailWorker.position || 'Radnik'} • {detailWorker.active !== false ? '🟢 Aktivan' : '🔴 Neaktivan'}</div>
                         </div>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', gap: 12, marginBottom: 16 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(6, 1fr)', gap: 10, marginBottom: 16 }}>
                         <div style={{ padding: '12px 16px', borderRadius: 10, background: C.accentLight }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Projekti</div><div style={{ fontSize: 20, fontWeight: 800, color: C.accent }}>{wProjects.length}</div></div>
                         <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(29,78,216,0.08)' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Ukupno sati</div><div style={{ fontSize: 20, fontWeight: 800, color: C.blue }}>{Math.round(totalMins / 60)}h</div></div>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(4,120,87,0.08)' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Unosi</div><div style={{ fontSize: 20, fontWeight: 800, color: C.green }}>{wTimesheets.length}</div></div>
+                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(16,185,129,0.08)' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Ovaj mjesec</div><div style={{ fontSize: 20, fontWeight: 800, color: C.green }}>{Math.round(monthMins / 60)}h</div></div>
+                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(4,120,87,0.08)' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Unosi</div><div style={{ fontSize: 20, fontWeight: 800, color: '#047857' }}>{wTimesheets.length}</div></div>
+                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(245,158,11,0.08)' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Prosjek dolaska</div><div style={{ fontSize: 20, fontWeight: 800, color: '#F59E0B' }}>{avgArrival}</div></div>
                         <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(124,58,237,0.08)' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Vozilo</div><div style={{ fontSize: 20, fontWeight: 800, color: '#7C3AED' }}>{wVehicle ? '✔️' : '—'}</div></div>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 8, fontSize: 13 }}>
@@ -117,9 +148,40 @@ export function WorkersPage() {
                         <EditableField label="📝 Napomene" value={detailWorker.notes} onSave={v => updateDoc('workers', detailWorker.id, { notes: v })} placeholder="Dodaj napomenu..." />
                     </div>
                 </div>
+
+                {/* Hours by day chart */}
+                {hoursByDay.length > 1 && (
+                    <div style={{ ...styles.card, marginBottom: 20 }}>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="clock" size={16} /> Sati po danu (zadnjih {hoursByDay.length} dana)</div>
+                        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 120 }}>
+                            {hoursByDay.map((d, i) => (
+                                <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                                    <div style={{ fontSize: 10, fontWeight: 700, color: C.accent }}>{d.hours > 0 ? `${d.hours}` : ''}</div>
+                                    <div style={{ width: '100%', minHeight: 4, height: `${Math.max(4, d.hours / Math.max(...hoursByDay.map(x => x.hours), 1) * 80)}px`, background: C.accent, borderRadius: '4px 4px 0 0', transition: 'height 0.3s ease' }} />
+                                    <div style={{ fontSize: 9, color: C.textMuted, transform: 'rotate(-45deg)', transformOrigin: 'top', whiteSpace: 'nowrap' }}>{d.dan}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Projects with hours */}
                 {wProjects.length > 0 && <div style={{ ...styles.card, marginBottom: 20 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Projekti ({wProjects.length})</div>
-                    {wProjects.map(p => <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: `1px solid ${C.border}7A`, fontSize: 13 }}><span style={{ fontWeight: 600, color: C.textDim }}>{p.name}</span><StatusBadge status={p.status} /></div>)}
+                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="project" size={16} /> Projekti ({wProjects.length})</div>
+                    {projectHours.map(p => (
+                        <div key={p.name} style={{ padding: '10px 0', borderBottom: `1px solid ${C.border}7A` }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                                <span style={{ fontWeight: 600, fontSize: 13, color: C.text }}>{p.name}</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <span style={{ fontSize: 13, fontWeight: 700, color: C.accent }}>{p.hours}h</span>
+                                    <StatusBadge status={p.status} />
+                                </div>
+                            </div>
+                            <div style={{ height: 4, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
+                                <div style={{ height: '100%', width: `${p.hours / maxProjectHours * 100}%`, background: C.accent, borderRadius: 2, transition: 'width 0.3s ease' }} />
+                            </div>
+                        </div>
+                    ))}
                 </div>}
             </div>
         );
