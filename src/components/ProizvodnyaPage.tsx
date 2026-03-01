@@ -68,12 +68,19 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
             : activeOrders;
         const totalCost = orders.reduce((s, o) => s + (o.totalCost || 0), 0);
         const thisMonth = new Date().toISOString().slice(0, 7);
-        const doneThisMonth = allOrders.filter(o => o.stage === 'zavrseno' && (o.stages || []).find(s => s.stage === 'zavrseno' && (s.completedAt || '').startsWith(thisMonth)));
+        // Count all orders currently at 'zavrseno' stage (regardless of month)
+        const allDone = allOrders.filter(o => o.stage === 'zavrseno');
+        // Count orders that entered 'zavrseno' this month
+        const doneThisMonth = allDone.filter(o => {
+            const entry = (o.stages || []).find(s => s.stage === 'zavrseno');
+            return entry && (entry.enteredAt || '').startsWith(thisMonth);
+        });
         return {
             total: orders.length,
-            inProgress: orders.filter(o => o.stage === 'proizvodnja').length,
+            inProgress: orders.filter(o => ['proizvodnja', 'kontrola', 'isporuka'].includes(o.stage)).length,
             waiting: orders.filter(o => o.stage === 'narudzba' || o.stage === 'priprema').length,
-            done: doneThisMonth.length,
+            doneTotal: allDone.length,
+            doneMonth: doneThisMonth.length,
             totalCost,
         };
     }, [activeOrders, allOrders, leaderProjectIds]);
@@ -172,6 +179,17 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
         const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a'); a.href = url; a.download = `proizvodnja-${today()}.csv`; a.click();
+    };
+
+    // Export PDF (browser print)
+    const exportPDF = () => {
+        const data = (activeTab === 'archive' ? archivedOrders : filtered);
+        const rows = data.map(o => `<tr><td>${o.orderNumber}</td><td>${o.name}</td><td>${o.client || '—'}</td><td>${STAGES.find(s => s.id === o.stage)?.label || '—'}</td><td>${o.priority}</td><td>${o.quantity} ${o.unit}</td><td>${o.deadline || '—'}</td><td>${(o.totalCost || 0).toFixed(2)}€</td></tr>`).join('');
+        const html = `<!DOCTYPE html><html><head><title>Proizvodnja - ${today()}</title><style>body{font-family:Arial,sans-serif;padding:20px}h1{font-size:18px}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{border:1px solid #ddd;padding:8px 10px;text-align:left;font-size:12px}th{background:#f5f5f5;font-weight:700}tr:nth-child(even){background:#fafafa}.footer{margin-top:20px;font-size:10px;color:#999}</style></head><body><h1>🏭 Proizvodnja — Izvještaj</h1><p>Datum: ${fmtDate(new Date().toISOString())} • Ukupno: ${data.length} narudžbi</p><table><thead><tr><th>Broj</th><th>Naziv</th><th>Naručitelj</th><th>Faza</th><th>Prioritet</th><th>Količina</th><th>Rok</th><th>Trošak</th></tr></thead><tbody>${rows}</tbody></table><div class="footer">Generirano iz Vi-Di-Sef • ${new Date().toLocaleString('hr-HR')}</div></body></html>`;
+        const w = window.open('', '_blank');
+        w.document.write(html);
+        w.document.close();
+        setTimeout(() => { w.print(); }, 500);
     };
 
     // ── Detail View ──
@@ -471,16 +489,17 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
                     {canManage && <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> Nova narudžba</button>}
-                    <button onClick={exportCSV} style={styles.btnSecondary}>📊 Export</button>
+                    <button onClick={exportCSV} style={styles.btnSecondary}>📊 CSV</button>
+                    <button onClick={exportPDF} style={styles.btnSecondary}>📄 PDF</button>
                 </div>
             </div>
 
             {/* Stats */}
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)', gap: 10, marginBottom: 20 }}>
                 <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Ukupno</div><div style={{ fontSize: 22, fontWeight: 800, color: C.accent }}>{stats.total}</div></div>
-                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>U proizvodnji</div><div style={{ fontSize: 22, fontWeight: 800, color: '#3B82F6' }}>{stats.inProgress}</div></div>
+                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>U tijeku</div><div style={{ fontSize: 22, fontWeight: 800, color: '#3B82F6' }}>{stats.inProgress}</div></div>
                 <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Na čekanju</div><div style={{ fontSize: 22, fontWeight: 800, color: '#F59E0B' }}>{stats.waiting}</div></div>
-                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Završeno (mj)</div><div style={{ fontSize: 22, fontWeight: 800, color: C.green }}>{stats.done}</div></div>
+                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Završeno</div><div style={{ fontSize: 22, fontWeight: 800, color: C.green }}>{stats.doneTotal}</div><div style={{ fontSize: 10, color: C.textMuted }}>{stats.doneMonth > 0 ? `+${stats.doneMonth} ovaj mj.` : ''}</div></div>
                 <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Troškovi</div><div style={{ fontSize: 22, fontWeight: 800, color: '#EF4444' }}>{stats.totalCost > 0 ? `${stats.totalCost.toFixed(0)}€` : '0€'}</div></div>
             </div>
 
