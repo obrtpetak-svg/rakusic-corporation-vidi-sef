@@ -38,6 +38,7 @@ const SmjestajPage = lazy(() => import('./SmjestajPage').then(m => ({ default: m
 const QrCheckInPage = lazy(() => import('./QrCheckIn').then(m => ({ default: m.QrCheckIn })));
 const QrAdminPage = lazy(() => import('./QrCheckIn').then(m => ({ default: m.QrAdminPage })));
 const LeaveTrackerPage = lazy(() => import('./LeaveTracker').then(m => ({ default: m.LeaveTracker })));
+const ProizvodnyaPage = lazy(() => import('./ProizvodnyaPage').then(m => ({ default: m.ProizvodnyaPage })));
 
 
 const SkeletonBlock = ({ w = '100%', h = 16, r = 8, style = {} }) => (
@@ -339,6 +340,7 @@ export function Layout() {
     const adminNav = [
         { id: 'dashboard', icon: 'dashboard', label: 'Pregled' },
         { id: 'projekti', icon: 'project', label: 'Projekti' },
+        { id: 'proizvodnja', icon: 'misc', label: 'Proizvodnja' },
         { id: 'radnici', icon: 'workers', label: 'Radnici' },
         { id: 'radni-sati', icon: 'clock', label: 'Radni sati' },
         { id: 'racuni', icon: 'invoice', label: 'Računi R1' },
@@ -395,6 +397,7 @@ export function Layout() {
         { id: 'moja-evidencija', icon: 'history', label: 'Moja evidencija' },
         { id: 'separator-1', separator: true },
         { id: 'projekti', icon: 'project', label: 'Projekti' },
+        { id: 'proizvodnja', icon: 'misc', label: 'Proizvodnja' },
         { id: 'radnici', icon: 'workers', label: 'Radnici' },
         { id: 'radni-sati', icon: 'clock', label: 'Radni sati' },
         { id: 'racuni', icon: 'invoice', label: 'Računi R1' },
@@ -433,6 +436,7 @@ export function Layout() {
             switch (page) {
                 case 'dashboard': return <Dashboard onGoToNotifications={() => setPage('obavijesti')} onNavigate={navigate} />;
                 case 'projekti': return <ProjectsPage />;
+                case 'proizvodnja': return <ProizvodnyaPage />;
                 case 'radnici': return <WorkersPage />;
                 case 'radni-sati': return <TimesheetsPage />;
                 case 'racuni': return <InvoicesPage />;
@@ -461,6 +465,7 @@ export function Layout() {
                 case 'unos-sati': return <TimesheetEntry />;
                 case 'moja-evidencija': return <WorkerEvidencija />;
                 case 'projekti': return <ProjectsPage leaderProjectIds={leaderProjectIds} />;
+                case 'proizvodnja': return <ProizvodnyaPage leaderProjectIds={leaderProjectIds} />;
                 case 'radnici': return <WorkersPage leaderProjectIds={leaderProjectIds} leaderWorkerIds={leaderWorkerIds} />;
                 case 'radni-sati': return <TimesheetsPage leaderProjectIds={leaderProjectIds} />;
                 case 'racuni': return <InvoicesPage leaderProjectIds={leaderProjectIds} />;

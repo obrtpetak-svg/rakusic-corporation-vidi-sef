@@ -221,7 +221,7 @@ const COL = {
     users: 'users', workers: 'workers', projects: 'projects',
     timesheets: 'timesheets', invoices: 'invoices', vehicles: 'vehicles',
     smjestaj: 'smjestaj', obaveze: 'obaveze', otpremnice: 'otpremnice',
-    auditLog: 'auditLog',
+    production: 'production', auditLog: 'auditLog',
 };
 
 // ── AppProvider ──────────────────────────────────────────────────────────
@@ -240,6 +240,7 @@ export function AppProvider({ children }) {
     const [smjestaj, setSmjestaj] = useState([]);
     const [obaveze, setObaveze] = useState([]);
     const [otpremnice, setOtpremnice] = useState([]);
+    const [production, setProduction] = useState([]);
     const [auditLog, setAuditLog] = useState([]);
     const [companyProfile, setCompanyProfile] = useState(null);
 
@@ -249,7 +250,7 @@ export function AppProvider({ children }) {
             users: setUsers, projects: setProjects, workers: setWorkers,
             timesheets: setTimesheets, invoices: setInvoices, vehicles: setVehicles,
             smjestaj: setSmjestaj, obaveze: setObaveze, otpremnice: setOtpremnice,
-            auditLog: setAuditLog,
+            production: setProduction, auditLog: setAuditLog,
         });
     }, []);
     const [allTimesheetsLoaded, setAllTimesheetsLoaded] = useState(false);
@@ -410,7 +411,7 @@ export function AppProvider({ children }) {
             const [u, inv, veh, smj, otp, cp] = await Promise.all([
                 loadCol('users'),
                 loadCol('invoices'), loadCol('vehicles'),
-                loadCol('smjestaj'), loadCol('otpremnice'),
+                loadCol('smjestaj'), loadCol('otpremnice'), loadCol('production'),
                 loadDoc('config', 'companyProfile'),
             ]);
 
@@ -671,7 +672,7 @@ export function AppProvider({ children }) {
     }, [auditLogLoaded]);
 
     // Trash: load soft-deleted items across collections
-    const TRASH_COLLECTIONS = ['workers', 'projects', 'timesheets', 'invoices', 'vehicles', 'smjestaj', 'obaveze', 'otpremnice'];
+    const TRASH_COLLECTIONS = ['workers', 'projects', 'timesheets', 'invoices', 'vehicles', 'smjestaj', 'obaveze', 'otpremnice', 'production'];
     const loadDeletedItems = useCallback(async () => {
         const db = getDb(); if (!db) return [];
         const results = [];
@@ -771,6 +772,7 @@ export function AppProvider({ children }) {
     const refreshVehicles = useCallback(() => refreshCollection('vehicles', setVehicles), [refreshCollection]);
     const refreshSmjestaj = useCallback(() => refreshCollection('smjestaj', setSmjestaj), [refreshCollection]);
     const refreshOtpremnice = useCallback(() => refreshCollection('otpremnice', setOtpremnice), [refreshCollection]);
+    const refreshProduction = useCallback(() => refreshCollection('production', setProduction), [refreshCollection]);
 
     const value = useMemo(() => ({
         step, setStep, currentUser, setCurrentUser, firebaseReady, loadError,
@@ -778,6 +780,7 @@ export function AppProvider({ children }) {
         timesheets, setTimesheets, invoices, setInvoices,
         vehicles, setVehicles, smjestaj, setSmjestaj,
         obaveze, setObaveze, otpremnice, setOtpremnice,
+        production, setProduction,
         auditLog, setAuditLog, companyProfile, setCompanyProfile,
         dailyLogs, setDailyLogs,
         weatherRules, setWeatherRules,
@@ -792,10 +795,10 @@ export function AppProvider({ children }) {
         handleAdminCreate, handleUserLogin, handleLogout, handleResetFirebase,
         sessionConfig, forceLogoutAll, updateSessionDuration, updateSyncMode, lastSync,
         loadDeletedItems, cleanupOldDeleted,
-        refreshInvoices, refreshVehicles, refreshSmjestaj, refreshOtpremnice,
+        refreshInvoices, refreshVehicles, refreshSmjestaj, refreshOtpremnice, refreshProduction,
     }), [step, currentUser, firebaseReady, loadError,
         users, projects, workers, timesheets, invoices,
-        vehicles, smjestaj, obaveze, otpremnice,
+        vehicles, smjestaj, obaveze, otpremnice, production,
         auditLog, companyProfile, dailyLogs, weatherRules,
         safetyTemplates, safetyChecklists,
         workerMap, projectMap, getWorkerName, getProjectName,
