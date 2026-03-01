@@ -66,6 +66,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
     const [search, setSearch] = useState('');
     const [filterStage, setFilterStage] = useState('all');
     const [filterPriority, setFilterPriority] = useState('all');
+    const [filterDeadline, setFilterDeadline] = useState('all');
     const [showTemplateChooser, setShowTemplateChooser] = useState(false);
     const [signOffOrder, setSignOffOrder] = useState(null);
     const [signOffNote, setSignOffNote] = useState('');
@@ -94,8 +95,10 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
             (o.client || '').toLowerCase().includes(search.toLowerCase()) ||
             (o.orderNumber || '').toLowerCase().includes(search.toLowerCase())
         );
+        if (filterDeadline === 'kasni') list = list.filter(o => o.deadline && new Date(o.deadline) < new Date());
+        if (filterDeadline === 'uskoro') list = list.filter(o => { const d = o.deadline ? Math.ceil((new Date(o.deadline).getTime() - Date.now()) / 86400000) : null; return d !== null && d >= 0 && d <= 3; });
         return list;
-    }, [activeOrders, filterStage, filterPriority, search, leaderProjectIds]);
+    }, [activeOrders, filterStage, filterPriority, filterDeadline, search, leaderProjectIds]);
 
     // Stats
     const stats = useMemo(() => {
@@ -193,6 +196,10 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
         updatedStages.push({ stage: nextStage, enteredAt: new Date().toISOString() });
         await updateDoc('production', order.id, { stage: nextStage, stages: updatedStages });
         if (addAuditLog) await addAuditLog('PRODUCTION_STAGE_CHANGE', `${currentUser?.name} pomaknuo ${order.orderNumber} "${order.name}" u: ${STAGES[idx + 1]?.label}${signOffNote ? ' | ' + signOffNote : ''}`);
+        // Auto-comment on stage change
+        const autoComment = { id: genId(), text: `⏭️ Faza pomaknuta u: ${STAGES[idx + 1]?.label}${signOffNote ? ' — ' + signOffNote : ''}`, author: currentUser?.name || 'Sustav', createdAt: new Date().toISOString(), isSystem: true };
+        const existingComments = order.comments || [];
+        await updateDoc('production', order.id, { comments: [...existingComments, autoComment] });
         setSignOffOrder(null);
     };
 
@@ -255,6 +262,42 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
     const removeFile = async (fileId) => {
         const newFiles = (detailOrder?.files || []).filter(f => f.id !== fileId);
         await updateDoc('production', detailOrder.id, { files: newFiles });
+    };
+
+    // Comments
+    const [commentText, setCommentText] = useState('');
+    const addComment = async (orderId) => {
+        if (!commentText.trim()) return;
+        const order = allOrders.find(o => o.id === orderId);
+        if (!order) return;
+        const comment = { id: genId(), text: commentText.trim(), author: currentUser?.name || 'Nepoznat', createdAt: new Date().toISOString(), isSystem: false };
+        await updateDoc('production', orderId, { comments: [...(order.comments || []), comment] });
+        setCommentText('');
+    };
+    const removeComment = async (orderId, commentId) => {
+        const order = allOrders.find(o => o.id === orderId);
+        if (!order) return;
+        await updateDoc('production', orderId, { comments: (order.comments || []).filter(c => c.id !== commentId) });
+    };
+
+    // Stage photo upload
+    const handleStagePhoto = async (orderId, stageId) => {
+        const input = document.createElement('input');
+        input.type = 'file'; input.accept = 'image/*'; input.capture = 'environment';
+        input.onchange = async (e) => {
+            const file = (e.target as HTMLInputElement).files?.[0];
+            if (!file) return;
+            const compressed = await compressImage(file);
+            const order = allOrders.find(o => o.id === orderId);
+            if (!order) return;
+            const stages = [...(order.stages || [])];
+            const stage = stages.find(s => s.stage === stageId && !s.completedAt) || stages.findLast(s => s.stage === stageId);
+            if (stage) {
+                stage.photos = [...(stage.photos || []), { id: genId(), ...compressed, uploadedAt: new Date().toISOString(), uploadedBy: currentUser?.name }];
+                await updateDoc('production', orderId, { stages });
+            }
+        };
+        input.click();
     };
 
     // Export CSV
@@ -372,7 +415,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
 
                     {/* Detail tabs */}
                     <div style={{ display: 'flex', gap: 6, marginBottom: 16, overflowX: 'auto' }}>
-                        {[{ id: 'info', label: '📋 Info' }, { id: 'specifikacije', label: '📐 Specifikacije' }, { id: 'troskovnik', label: '💰 Troškovnik' }, { id: 'dokumenti', label: '📎 Dokumenti' }, { id: 'povijest', label: '🕐 Povijest' }].map(t => (
+                        {[{ id: 'info', label: '📋 Info' }, { id: 'aktivnost', label: `💬 Aktivnost${(detailOrder.comments || []).length > 0 ? ` (${(detailOrder.comments || []).length})` : ''}` }, { id: 'specifikacije', label: '📐 Specifikacije' }, { id: 'troskovnik', label: '💰 Troškovnik' }, { id: 'dokumenti', label: '📎 Dokumenti' }, { id: 'povijest', label: '🕐 Povijest' }].map(t => (
                             <button key={t.id} onClick={() => setDetailTab(t.id)} style={{ padding: '8px 16px', borderRadius: 8, border: `1.5px solid ${detailTab === t.id ? C.accent : C.border}`, background: detailTab === t.id ? C.accentLight : 'transparent', color: detailTab === t.id ? C.accent : C.textMuted, fontWeight: detailTab === t.id ? 700 : 500, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap' }}>
                                 {t.label}
                             </button>
@@ -413,6 +456,16 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                                     {record.signedBy && <span style={{ color: '#10B981', fontWeight: 600 }}>{' '}✍️ {record.signedBy}</span>}
                                                 </div>}
                                                 {record?.signNote && <div style={{ fontSize: 11, color: C.accent, fontStyle: 'italic', marginTop: 2 }}>📝 {record.signNote}</div>}
+                                                {/* Stage photos */}
+                                                {(record?.photos || []).length > 0 && (
+                                                    <div style={{ display: 'flex', gap: 4, marginTop: 6, flexWrap: 'wrap' }}>
+                                                        {record.photos.map(p => (
+                                                            <img key={p.id} src={p.data} alt="" onClick={() => { const w = window.open(); w?.document.write(`<img src="${p.data}" style="max-width:100%;height:auto">`); }} style={{ width: 48, height: 48, borderRadius: 6, objectFit: 'cover', cursor: 'pointer', border: `1px solid ${C.border}` }} />
+                                                        ))}
+                                                    </div>
+                                                )}
+                                                {/* Add photo button for current stage */}
+                                                {canManage && isCurrent && <button onClick={() => handleStagePhoto(detailOrder.id, s.id)} style={{ ...styles.btnSmall, marginTop: 6, fontSize: 10 }}>📸 Dodaj foto</button>}
                                             </div>
                                         </div>
                                     );
@@ -745,6 +798,11 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                             <option value="hitno">🔴 Hitno</option>
                             <option value="visok">🟡 Visok</option>
                             <option value="normalan">Normalan</option>
+                        </Select>
+                        <Select value={filterDeadline} onChange={e => setFilterDeadline(e.target.value)} style={{ width: 130 }}>
+                            <option value="all">Svi rokovi</option>
+                            <option value="kasni">🔴 Kasni</option>
+                            <option value="uskoro">⚠️ Uskoro (≤3d)</option>
                         </Select>
                     </div>
                 </div>
