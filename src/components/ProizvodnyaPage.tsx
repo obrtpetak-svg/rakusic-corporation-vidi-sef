@@ -177,7 +177,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
     };
     const openEdit = (o) => {
         setForm({ ...o, assignedWorkers: o.assignedWorkers || [], costItems: o.costItems || [], files: o.files || [], stages: o.stages || [], specifications: o.specifications || { materials: [], dimensions: [], technicalNotes: '' } });
-        setEditId(o.id); setShowForm(true);
+        setEditId(o.id); setDetailId(null); setShowForm(true);
     };
 
     const doSave = async () => {
@@ -439,6 +439,39 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                 <button onClick={() => doDelete(detailOrder.id)} style={{ ...styles.btnDanger, fontSize: 13 }}><Icon name="trash" size={14} /> Obriši</button>
                             </div>
                         )}
+                        {/* Export buttons */}
+                        <div style={{ display: 'flex', gap: 8, marginTop: canManage ? 8 : 16, flexWrap: 'wrap' }}>
+                            <button onClick={() => {
+                                const o = detailOrder;
+                                const specs = o.specifications || { materials: [] };
+                                const stg = STAGES.find(s => s.id === o.stage);
+                                let txt = `NARUDŽBA: ${o.orderNumber}\n${'='.repeat(40)}\n`;
+                                txt += `Naziv: ${o.name}\nKlijent: ${o.client || '—'}\nPrioritet: ${o.priority}\nFaza: ${stg?.label || o.stage}\n`;
+                                txt += `Količina: ${o.quantity} ${o.unit}\nRok: ${o.deadline || '—'}\n`;
+                                if (o.notes) txt += `Napomena: ${o.notes}\n`;
+                                txt += `\nMATERIJALI\n${'-'.repeat(30)}\n`;
+                                (specs.materials || []).forEach(m => {
+                                    const autoW = m.profile && m.length && PROFILE_WEIGHTS[m.profile] ? ` (≈${(PROFILE_WEIGHTS[m.profile] * (parseFloat(m.length) / 1000)).toFixed(1)}kg)` : '';
+                                    txt += `• ${m.name} | ${m.profile} | ${m.quantity} ${m.unit} | ${m.length || '—'}mm × ${m.thickness || '—'}mm | ${m.steelGrade}${autoW}\n`;
+                                });
+                                txt += `\nTROŠKOVNIK\n${'-'.repeat(30)}\n`;
+                                (o.costItems || []).forEach(c => txt += `• ${c.description} | ${c.total?.toFixed(2)}€\n`);
+                                txt += `UKUPNO: ${(o.totalCost || 0).toFixed(2)}€\n`;
+                                if ((o.subtasks || []).length > 0) { txt += `\nZADACI\n${'-'.repeat(30)}\n`; o.subtasks.forEach(t => txt += `[${t.status === 'gotovo' ? '✓' : ' '}] ${t.title}${t.assignedTo ? ' → ' + t.assignedTo : ''}\n`); }
+                                const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+                                const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${o.orderNumber}.txt`; a.click();
+                            }} style={{ ...styles.btnSecondary, fontSize: 12 }}>📄 PDF/TXT</button>
+                            <button onClick={() => {
+                                const o = detailOrder;
+                                const specs = o.specifications || { materials: [] };
+                                let csv = 'Tip,Naziv,Profil,Količina,Jedinica,Dimenzije(mm),Debljina(mm),Čelik,Cijena(€)\n';
+                                (specs.materials || []).forEach(m => csv += `Materijal,"${m.name}","${m.profile}",${m.quantity},${m.unit},${m.length || ''},${m.thickness || ''},${m.steelGrade},\n`);
+                                (o.costItems || []).forEach(c => csv += `Trošak,"${c.description}",,${c.quantity || 1},,,,,${c.total || 0}\n`);
+                                (o.subtasks || []).forEach(t => csv += `Zadatak,"${t.title}",${t.status},,,,,,,${t.assignedTo || ''}\n`);
+                                const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+                                const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${o.orderNumber}.csv`; a.click();
+                            }} style={{ ...styles.btnSecondary, fontSize: 12 }}>📊 XLS/CSV</button>
+                        </div>
                     </div>
 
                     {/* Detail tabs */}
