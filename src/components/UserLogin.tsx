@@ -6,7 +6,7 @@ import { C, styles, hashPin } from '../utils/helpers';
 const MAX_ATTEMPTS = 5;
 const BASE_LOCKOUT = 30; // seconds, doubles each lockout
 
-const MODULES = ['Projekti', 'Radnici', 'Evidencija sati', 'Vozila', 'GPS Nadzor', 'Računi', 'Izvještaji', 'Obavijesti'];
+const MODULES = ['Projekti', 'Radnici', 'Evidencija sati', 'Vozila', 'Otpremnice', 'Računi', 'Izvještaji', 'Obavijesti'];
 
 export function AuthScreen(): React.JSX.Element {
     const { handleUserLogin, users } = useApp();
@@ -74,7 +74,7 @@ export function AuthScreen(): React.JSX.Element {
                 <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '6px 10px', marginBottom: 24, minHeight: 28 }}>
                     {MODULES.map((m, i) => (
                         <div key={m} style={{
-                            fontSize: 11, fontWeight: 600, color: i < bootedCount ? 'var(--green)' : 'var(--text-muted)',
+                            fontSize: 11, fontWeight: 600, color: i < bootedCount ? 'var(--accent)' : 'var(--text-muted)',
                             opacity: i < bootedCount ? 1 : 0.3,
                             transform: i < bootedCount ? 'translateY(0)' : 'translateY(4px)',
                             transition: 'all 0.3s ease',
