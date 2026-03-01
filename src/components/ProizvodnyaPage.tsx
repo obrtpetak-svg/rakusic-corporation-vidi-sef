@@ -423,9 +423,9 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
 
                     {/* Specifikacije tab */}
                     {detailTab === 'specifikacije' && (() => {
-                        const specs = detailOrder.specifications || { materials: [], dimensions: [], technicalNotes: '' };
+                        const specs = detailOrder.specifications || { materials: [], technicalNotes: '' };
                         const addSpecMaterial = async () => {
-                            const newMat = { id: genId(), name: '', profile: '', quantity: 0, unit: 'kg', steelGrade: 'S235', notes: '' };
+                            const newMat = { id: genId(), name: '', profile: '', quantity: 0, unit: 'kg', steelGrade: 'S235', length: '', thickness: '', notes: '' };
                             const updated = { ...specs, materials: [...specs.materials, newMat] };
                             await updateDoc('production', detailOrder.id, { specifications: updated });
                         };
@@ -459,7 +459,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                         return (
                             <div style={{ ...styles.card, marginBottom: 20 }}>
                                 {/* Summary */}
-                                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(2, 1fr)', gap: 10, marginBottom: 20 }}>
                                     <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(59,130,246,0.08)', textAlign: 'center' }}>
                                         <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Materijali</div>
                                         <div style={{ fontSize: 22, fontWeight: 800, color: C.blue }}>{specs.materials.length}</div>
@@ -467,10 +467,6 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                     <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(16,185,129,0.08)', textAlign: 'center' }}>
                                         <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Ukupna težina</div>
                                         <div style={{ fontSize: 22, fontWeight: 800, color: C.green }}>{totalWeight >= 1000 ? `${(totalWeight / 1000).toFixed(2)}t` : `${totalWeight}kg`}</div>
-                                    </div>
-                                    <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(124,58,237,0.08)', textAlign: 'center' }}>
-                                        <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Dimenzije</div>
-                                        <div style={{ fontSize: 22, fontWeight: 800, color: '#7C3AED' }}>{specs.dimensions.length}</div>
                                     </div>
                                 </div>
 
@@ -482,47 +478,22 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                 {specs.materials.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, textAlign: 'center', padding: 20 }}>Nema materijala — dodajte stavke</div> : (
                                     <div style={{ overflowX: 'auto', marginBottom: 20 }}>
                                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                            <thead><tr><th style={styles.th}>Naziv</th><th style={styles.th}>Profil/Dim.</th><th style={styles.th}>Kol.</th><th style={styles.th}>Jed.</th><th style={styles.th}>Čelik</th>{canManage && <th style={styles.th}></th>}</tr></thead>
+                                            <thead><tr><th style={styles.th}>Naziv</th><th style={styles.th}>Profil</th><th style={styles.th}>Kol.</th><th style={styles.th}>Jed.</th><th style={styles.th}>Dimenzije (mm)</th><th style={styles.th}>Debljina (mm)</th><th style={styles.th}>Čelik</th>{canManage && <th style={styles.th}></th>}</tr></thead>
                                             <tbody>
                                                 {specs.materials.map(m => (
                                                     <tr key={m.id}>
                                                         <td style={styles.td}>{canManage ? <Input value={m.name} onChange={e => updateSpecMaterial(m.id, 'name', e.target.value)} placeholder="Stup, Nosač..." style={{ fontSize: 12, padding: '4px 8px' }} /> : <span style={{ fontWeight: 600 }}>{m.name}</span>}</td>
                                                         <td style={styles.td}>{canManage ? <Input value={m.profile} onChange={e => updateSpecMaterial(m.id, 'profile', e.target.value)} placeholder="HEB 300" style={{ fontSize: 12, padding: '4px 8px' }} /> : m.profile}</td>
-                                                        <td style={styles.td}>{canManage ? <Input type="number" value={m.quantity} onChange={e => updateSpecMaterial(m.id, 'quantity', parseFloat(e.target.value) || 0)} style={{ fontSize: 12, padding: '4px 8px', width: 70 }} /> : m.quantity}</td>
+                                                        <td style={styles.td}>{canManage ? <Input type="number" value={m.quantity} onChange={e => updateSpecMaterial(m.id, 'quantity', parseFloat(e.target.value) || 0)} style={{ fontSize: 12, padding: '4px 8px', width: 65 }} /> : m.quantity}</td>
                                                         <td style={styles.td}>{canManage ? <Select value={m.unit} onChange={e => updateSpecMaterial(m.id, 'unit', e.target.value)} style={{ fontSize: 11, padding: '4px' }}>{SPEC_UNITS.map(u => <option key={u} value={u}>{u}</option>)}</Select> : m.unit}</td>
+                                                        <td style={styles.td}>{canManage ? <Input value={m.length || ''} onChange={e => updateSpecMaterial(m.id, 'length', e.target.value)} placeholder="6000" style={{ fontSize: 12, padding: '4px 8px', width: 70 }} /> : (m.length || '—')}</td>
+                                                        <td style={styles.td}>{canManage ? <Input value={m.thickness || ''} onChange={e => updateSpecMaterial(m.id, 'thickness', e.target.value)} placeholder="10" style={{ fontSize: 12, padding: '4px 8px', width: 60 }} /> : (m.thickness || '—')}</td>
                                                         <td style={styles.td}>{canManage ? <Select value={m.steelGrade} onChange={e => updateSpecMaterial(m.id, 'steelGrade', e.target.value)} style={{ fontSize: 11, padding: '4px' }}>{STEEL_GRADES.map(g => <option key={g} value={g}>{g}</option>)}</Select> : <span style={{ fontSize: 11, fontWeight: 700, color: '#3B82F6', background: 'rgba(59,130,246,0.1)', padding: '2px 6px', borderRadius: 4 }}>{m.steelGrade}</span>}</td>
                                                         {canManage && <td style={styles.td}><button onClick={() => removeSpecMaterial(m.id)} style={{ ...styles.btnDanger, padding: '4px 8px' }}><Icon name="trash" size={10} /></button></td>}
                                                     </tr>
                                                 ))}
                                             </tbody>
                                         </table>
-                                    </div>
-                                )}
-
-                                {/* Dimensions */}
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>📏 Dimenzije / Mjere</div>
-                                    {canManage && <button onClick={addSpecDim} style={styles.btnSmall}><Icon name="plus" size={12} /> Dodaj</button>}
-                                </div>
-                                {specs.dimensions.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, textAlign: 'center', padding: 15 }}>Nema dimenzija</div> : (
-                                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(220px, 1fr))', gap: 10, marginBottom: 20 }}>
-                                        {specs.dimensions.map(d => (
-                                            <div key={d.id} style={{ padding: '10px 14px', borderRadius: 10, background: 'var(--bg)', border: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', gap: 8 }}>
-                                                {canManage ? (
-                                                    <>
-                                                        <Input value={d.label} onChange={e => updateSpecDim(d.id, 'label', e.target.value)} placeholder="Npr. Raspon" style={{ fontSize: 12, padding: '4px 8px', flex: 1 }} />
-                                                        <Input value={d.value} onChange={e => updateSpecDim(d.id, 'value', e.target.value)} placeholder="0" style={{ fontSize: 12, padding: '4px 8px', width: 60 }} />
-                                                        <Select value={d.unit} onChange={e => updateSpecDim(d.id, 'unit', e.target.value)} style={{ fontSize: 11, padding: '4px', width: 60 }}>{SPEC_UNITS.map(u => <option key={u} value={u}>{u}</option>)}</Select>
-                                                        <button onClick={() => removeSpecDim(d.id)} style={{ background: 'none', border: 'none', color: C.red, cursor: 'pointer', fontSize: 12 }}>✕</button>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <span style={{ fontSize: 12, color: C.textMuted, fontWeight: 600 }}>{d.label}:</span>
-                                                        <span style={{ fontSize: 14, fontWeight: 800, color: C.text }}>{d.value} {d.unit}</span>
-                                                    </>
-                                                )}
-                                            </div>
-                                        ))}
                                     </div>
                                 )}
 
