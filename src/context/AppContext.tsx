@@ -204,17 +204,15 @@ export function saveFirebaseConfig(config) {
     localStorage.setItem('vidime-firebase-config-v9', JSON.stringify(config));
 }
 
-// Built-in config from environment variables (production builds)
+// Built-in Firebase config (production)
 function getBuiltInConfig() {
-    const apiKey = import.meta.env.VITE_FIREBASE_API_KEY;
-    if (!apiKey) return null;
     return {
-        apiKey,
-        authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
-        projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || '',
-        storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || '',
-        messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
-        appId: import.meta.env.VITE_FIREBASE_APP_ID || '',
+        apiKey: 'AIzaSyDVcFE2dlnOyv8s12rKjp3IvJh1LUGZKOs',
+        authDomain: 'rakusic-corporation-vidi-sef.firebaseapp.com',
+        projectId: 'rakusic-corporation-vidi-sef',
+        storageBucket: 'rakusic-corporation-vidi-sef.firebasestorage.app',
+        messagingSenderId: '862008523269',
+        appId: '1:862008523269:web:32252db876f5faa000ba6c',
     };
 }
 
