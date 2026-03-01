@@ -572,26 +572,30 @@ export function AppProvider({ children }) {
         // Convert username to email: admin.josi → admin.josi@rakusic-corporation.live
         const email = `${username.toLowerCase().replace(/\s+/g, '.')}@rakusic-corporation.live`;
         const passwordWrapped = `vds_${password}_auth`;
+        console.log('[Auth] Attempting login for:', email);
 
         let firebaseUser = null;
+
+        // Strategy: Try CREATE first (first-time migration), then SIGN IN
         try {
-            // Try sign in first
-            const cred = await auth.signInWithEmailAndPassword(email, passwordWrapped);
-            console.log('[Auth] Firebase sign-in OK:', email);
+            const cred = await auth.createUserWithEmailAndPassword(email, passwordWrapped);
+            console.log('[Auth] Created new Firebase user:', email);
             firebaseUser = cred.user;
-        } catch (signInErr) {
-            // If user doesn't exist, try creating (first-time migration)
-            if (signInErr.code === 'auth/user-not-found') {
+        } catch (createErr) {
+            // Account already exists → sign in
+            if (createErr.code === 'auth/email-already-in-use') {
                 try {
-                    const cred = await auth.createUserWithEmailAndPassword(email, passwordWrapped);
-                    console.log('[Auth] Created new Firebase user:', email);
+                    const cred = await auth.signInWithEmailAndPassword(email, passwordWrapped);
+                    console.log('[Auth] Sign-in OK:', email);
                     firebaseUser = cred.user;
-                } catch (createErr) {
-                    console.error('[Auth] Create failed:', createErr.code);
-                    throw createErr;
+                } catch (signInErr) {
+                    console.error('[Auth] Sign-in failed:', signInErr.code);
+                    // Wrong password for existing account
+                    throw signInErr;
                 }
             } else {
-                throw signInErr;
+                console.error('[Auth] Create failed:', createErr.code, createErr.message);
+                throw createErr;
             }
         }
 
@@ -602,7 +606,6 @@ export function AppProvider({ children }) {
         await initFirebaseAndLoad(config);
 
         // Step 4: After data loaded, match Firebase user to Firestore user
-        // initFirebaseAndLoad sets users state, but we need to re-query since state may not be updated yet
         const db = getDb();
         if (db) {
             const usersSnap = await db.collection('users').get();
@@ -612,6 +615,10 @@ export function AppProvider({ children }) {
             if (matchedUser) {
                 await writeAuthMapping(firebaseUser.uid, matchedUser);
                 handleUserLogin(matchedUser);
+            } else {
+                // No matching Firestore user — still authenticated, show userLogin
+                console.warn('[Auth] No Firestore user matches username:', username);
+                setStep('userLogin');
             }
         }
 
