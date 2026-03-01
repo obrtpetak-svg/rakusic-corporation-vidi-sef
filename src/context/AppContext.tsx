@@ -411,7 +411,7 @@ export function AppProvider({ children }) {
             const [u, inv, veh, smj, otp, cp] = await Promise.all([
                 loadCol('users'),
                 loadCol('invoices'), loadCol('vehicles'),
-                loadCol('smjestaj'), loadCol('otpremnice'), loadCol('production'),
+                loadCol('smjestaj'), loadCol('otpremnice'),
                 loadDoc('config', 'companyProfile'),
             ]);
 
@@ -420,6 +420,10 @@ export function AppProvider({ children }) {
             setInvoices(inv); setVehicles(veh);
             setSmjestaj(smj); setOtpremnice(otp);
             setCompanyProfile(cp);
+
+            // Load production separately (may not have Firestore rules yet)
+            try { const prod = await loadCol('production'); setProduction(prod); }
+            catch (e) { console.warn('[AppContext] production collection not available:', e); }
 
             // One-time PIN migration: hash any plain-text PINs to hash('1234')
             const isHashed = (pin) => /^[a-f0-9]{64}$/.test(pin);
