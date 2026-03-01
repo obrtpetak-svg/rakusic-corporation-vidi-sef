@@ -181,5 +181,17 @@ service cloud.firestore {
       allow read: if isAuth();
       allow write: if isAuth();
     }
+
+    // ── Production Alerts — workers/leaders create, all read ──
+    match /prodAlerts/{docId} {
+      allow read: if isAuth();
+      allow write: if isAuth();
+    }
+
+    // ── Production Notifications — system creates, users read ──
+    match /prodNotifications/{docId} {
+      allow read: if isAuth();
+      allow write: if isAuth();
+    }
   }
 }

@@ -1,0 +1,48 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Only authenticated users can access storage
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // Invoice receipts — workers upload photos
+    match /invoices/{allPaths=**} {
+      allow read: if isAuth();
+      allow write: if isAuth()
+                   && request.resource.size < 10 * 1024 * 1024  // max 10MB
+                   && request.resource.contentType.matches('image/.*');
+    }
+
+    // Project photos and documents
+    match /projects/{allPaths=**} {
+      allow read: if isAuth();
+      allow write: if isAuth()
+                   && request.resource.size < 10 * 1024 * 1024;
+    }
+
+    // PDF reports
+    match /reports/{allPaths=**} {
+      allow read: if isAuth();
+      allow write: if isAuth()
+                   && request.resource.size < 25 * 1024 * 1024  // max 25MB for PDFs
+                   && request.resource.contentType.matches('application/pdf');
+    }
+
+    // Safety checklist photos
+    match /safety/{allPaths=**} {
+      allow read: if isAuth();
+      allow write: if isAuth()
+                   && request.resource.size < 10 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+    }
+
+    // General uploads (catch-all with stricter limits)
+    match /uploads/{allPaths=**} {
+      allow read: if isAuth();
+      allow write: if isAuth()
+                   && request.resource.size < 5 * 1024 * 1024;
+    }
+  }
+}

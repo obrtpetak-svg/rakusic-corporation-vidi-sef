@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { genId, hashPin } from '../utils/helpers';
 import { validateOrThrow } from '../utils/validate';
+import { firebaseSignIn, firebaseSignOut, writeAuthMapping } from './firebaseCore';
 
 const AppContext = createContext();
 export const useApp = () => useContext(AppContext);
@@ -15,7 +16,7 @@ export function useAuthState() {
         step: ctx.step, setStep: ctx.setStep,
         currentUser: ctx.currentUser, setCurrentUser: ctx.setCurrentUser,
         firebaseReady: ctx.firebaseReady, loadError: ctx.loadError,
-        handleAppLogin: ctx.handleAppLogin, handleFirebaseConfig: ctx.handleFirebaseConfig,
+        handleAppLogin: ctx.handleAppLogin, handleFirebaseLogin: ctx.handleFirebaseLogin, handleFirebaseConfig: ctx.handleFirebaseConfig,
         handleCompanySetup: ctx.handleCompanySetup, handleAdminCreate: ctx.handleAdminCreate,
         handleUserLogin: ctx.handleUserLogin, handleLogout: ctx.handleLogout,
         handleResetFirebase: ctx.handleResetFirebase,
@@ -317,6 +318,7 @@ export function AppProvider({ children }) {
             if (config) initFirebaseAndLoad(config);
             else setStep('firebaseConfig');
         } else {
+            // No stored login — go to Firebase Auth login screen
             setStep('appLogin');
         }
         return () => { unsubsRef.current.forEach(fn => fn()); if (sessionCheckRef.current) clearInterval(sessionCheckRef.current); };
@@ -548,6 +550,67 @@ export function AppProvider({ children }) {
         const config = loadFirebaseConfig();
         if (config) initFirebaseAndLoad(config);
         else setStep('firebaseConfig');
+    };
+
+    // ── Firebase Auth login (replaces hardcoded credentials) ──
+    const handleFirebaseLogin = async (username, password) => {
+        // Step 1: Init Firebase if not ready
+        let config = loadFirebaseConfig();
+        if (!config) config = getBuiltInConfig();
+        if (config && !firebaseReady) {
+            saveFirebaseConfig(config);
+            let tries = 0;
+            while (!window.firebase && tries < 50) { await new Promise(r => setTimeout(r, 100)); tries++; }
+            if (!window.firebase) throw new Error('Firebase library not loaded');
+            initFirebase(config);
+        }
+
+        // Step 2: Sign in with Firebase Auth (email/password)
+        const auth = getAuth();
+        if (!auth) throw new Error('Auth not available');
+
+        // Convert username to email: admin → admin@rakusic-corporation.live
+        const email = `${username.toLowerCase().replace(/\s+/g, '.')}@rakusic-corporation.live`;
+        const passwordWrapped = `vds_${password}_auth`;
+
+        try {
+            // Try sign in first
+            const cred = await auth.signInWithEmailAndPassword(email, passwordWrapped);
+            console.log('[Auth] Firebase sign-in OK:', email);
+
+            // Step 3: Store login flag and load data
+            localStorage.setItem('vidime-app-login', 'true');
+            await initFirebaseAndLoad(config);
+
+            // Step 4: Match Firebase user to Firestore user
+            const matchedUser = users.find(u => u.username === username.toLowerCase());
+            if (matchedUser) {
+                await writeAuthMapping(cred.user.uid, matchedUser);
+                handleUserLogin(matchedUser);
+            }
+
+            return cred.user;
+        } catch (signInErr) {
+            // If user doesn't exist, try creating (first-time migration)
+            if (signInErr.code === 'auth/user-not-found') {
+                try {
+                    const cred = await auth.createUserWithEmailAndPassword(email, passwordWrapped);
+                    console.log('[Auth] Created new Firebase user:', email);
+                    localStorage.setItem('vidime-app-login', 'true');
+                    await initFirebaseAndLoad(config);
+                    const matchedUser = users.find(u => u.username === username.toLowerCase());
+                    if (matchedUser) {
+                        await writeAuthMapping(cred.user.uid, matchedUser);
+                        handleUserLogin(matchedUser);
+                    }
+                    return cred.user;
+                } catch (createErr) {
+                    console.error('[Auth] Create failed:', createErr.code);
+                    throw createErr;
+                }
+            }
+            throw signInErr;
+        }
     };
 
     const handleFirebaseConfig = (config) => {
@@ -798,7 +861,7 @@ export function AppProvider({ children }) {
         addAuditLog, loadAuditLog, allTimesheetsLoaded, loadAllTimesheets,
         loadDailyLogs, loadWeatherRules, loadSafetyData,
         isLeader, leaderProjectIds, leaderWorkerIds,
-        handleAppLogin, handleFirebaseConfig, handleCompanySetup,
+        handleAppLogin, handleFirebaseLogin, handleFirebaseConfig, handleCompanySetup,
         handleAdminCreate, handleUserLogin, handleLogout, handleResetFirebase,
         sessionConfig, forceLogoutAll, updateSessionDuration, updateSyncMode, lastSync,
         loadDeletedItems, cleanupOldDeleted,

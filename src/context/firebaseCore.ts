@@ -68,7 +68,7 @@ export function saveFirebaseConfig(config: FirebaseConfig): void {
 // ═══════════════════════════════════════════════════════════════════════════
 // AUTH HELPERS — Firebase Auth sign-in/sign-out/mapping
 // ═══════════════════════════════════════════════════════════════════════════
-const AUTH_DOMAIN = 'vidisef.app';
+const AUTH_DOMAIN = 'rakusic-corporation.live';
 
 function usernameToEmail(username: string): string {
     return `${username.toLowerCase().replace(/\s+/g, '.')}@${AUTH_DOMAIN}`;
