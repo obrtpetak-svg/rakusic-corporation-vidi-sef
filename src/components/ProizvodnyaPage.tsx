@@ -68,7 +68,8 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
     const [filterPriority, setFilterPriority] = useState('all');
     const [showTemplateChooser, setShowTemplateChooser] = useState(false);
     const [signOffOrder, setSignOffOrder] = useState(null);
-    const [signOffForm, setSignOffForm] = useState({ note: '', confirmed: false });
+    const [signOffNote, setSignOffNote] = useState('');
+    const [signOffConfirmed, setSignOffConfirmed] = useState(false);
     const isMobile = useIsMobile();
     const isAdmin = currentUser?.role === 'admin';
     const isLeader = currentUser?.role === 'leader';
@@ -159,17 +160,21 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
 
     const doDelete = async (id) => {
         if (!(await confirm('Obrisati ovu narudžbu?'))) return;
+        const order = allOrders.find(o => o.id === id);
+        if (addAuditLog) await addAuditLog('PRODUCTION_DELETED', `🗑️ ${currentUser?.name} obrisao narudžbu: ${order?.orderNumber || ''} "${order?.name || ''}"`);
         await removeDoc('production', id);
+        if (detailId === id) setDetailId(null);
     };
 
-    // Stage advancement — opens sign-off modal instead of direct advance
     const requestAdvance = (order) => {
         setSignOffOrder(order);
-        setSignOffForm({ note: '', confirmed: false });
+        setSignOffNote('');
+        setSignOffConfirmed(false);
     };
     const confirmSignOff = async () => {
-        if (!signOffForm.confirmed) return alert('Morate potvrditi da je faza završena');
+        if (!signOffConfirmed) return alert('Morate potvrditi da je faza završena');
         const order = signOffOrder;
+        if (!order) return;
         const idx = STAGES.findIndex(s => s.id === order.stage);
         if (idx >= STAGES.length - 1) return;
         const nextStage = STAGES[idx + 1].id;
@@ -179,13 +184,12 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
             current.completedAt = new Date().toISOString();
             current.completedBy = currentUser?.name;
             current.signedBy = currentUser?.name;
-            current.signNote = signOffForm.note || '';
+            current.signNote = signOffNote || '';
             current.signedAt = new Date().toISOString();
         }
         updatedStages.push({ stage: nextStage, enteredAt: new Date().toISOString() });
         await updateDoc('production', order.id, { stage: nextStage, stages: updatedStages });
-        // Audit log — visible to all admins
-        if (addAuditLog) await addAuditLog('PRODUCTION_STAGE_CHANGE', `📋 ${currentUser?.name} → ${order.orderNumber} "${order.name}" pomaknuto u: ${STAGES[idx + 1]?.label}${signOffForm.note ? ` | ${signOffForm.note}` : ''}`);
+        if (addAuditLog) await addAuditLog('PRODUCTION_STAGE_CHANGE', `${currentUser?.name} pomaknuo ${order.orderNumber} "${order.name}" u: ${STAGES[idx + 1]?.label}${signOffNote ? ' | ' + signOffNote : ''}`);
         setSignOffOrder(null);
     };
 
@@ -267,7 +271,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
 
         return (
             <div>
-                <button onClick={() => { setDetailId(null); setDetailTab('info'); }} style={{ ...styles.btnSecondary, marginBottom: 20, display: 'inline-flex' }}><Icon name="back" size={16} /> Natrag</button>
+                <button onClick={() => { setDetailId(null); setDetailTab('info'); setSignOffOrder(null); }} style={{ ...styles.btnSecondary, marginBottom: 20, display: 'inline-flex' }}><Icon name="back" size={16} /> Natrag</button>
 
                 {/* Header card */}
                 <div style={{ ...styles.card, marginBottom: 20 }}>
@@ -323,16 +327,19 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
 
                     {/* Actions */}
                     {canManage && detailOrder.stage !== 'zavrseno' && (
-                        <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+                        <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
                             <button onClick={() => requestAdvance(detailOrder)} style={{ ...styles.btn, fontSize: 13 }}>
                                 ⏭️ {STAGES[stageIdx + 1] ? `Pomakni u: ${STAGES[stageIdx + 1].label}` : 'Završi'}
                             </button>
                             <button onClick={() => openEdit(detailOrder)} style={styles.btnSecondary}><Icon name="edit" size={14} /> Uredi</button>
+                            <button onClick={() => doDelete(detailOrder.id)} style={{ ...styles.btnDanger, fontSize: 13 }}><Icon name="trash" size={14} /> Obriši</button>
                         </div>
                     )}
                     {canManage && detailOrder.stage === 'zavrseno' && (
-                        <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+                        <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
                             <button onClick={() => archiveOrder(detailOrder)} style={{ ...styles.btnSecondary, fontSize: 13 }}>📦 Arhiviraj</button>
+                            <button onClick={() => openEdit(detailOrder)} style={styles.btnSecondary}><Icon name="edit" size={14} /> Uredi</button>
+                            <button onClick={() => doDelete(detailOrder.id)} style={{ ...styles.btnDanger, fontSize: 13 }}><Icon name="trash" size={14} /> Obriši</button>
                         </div>
                     )}
                 </div>
@@ -377,7 +384,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                             {record && <div style={{ fontSize: 11, color: C.textMuted }}>
                                                 {record.enteredAt && `Započeto: ${fmtDate(record.enteredAt)}`}
                                                 {record.completedAt && ` → Završeno: ${fmtDate(record.completedAt)}`}
-                                                {record.signedBy && <span style={{ color: '#10B981', fontWeight: 600 }}> ✍️ {record.signedBy}</span>}
+                                                {record.signedBy && <span style={{ color: '#10B981', fontWeight: 600 }}>{' '}✍️ {record.signedBy}</span>}
                                             </div>}
                                             {record?.signNote && <div style={{ fontSize: 11, color: C.accent, fontStyle: 'italic', marginTop: 2 }}>📝 {record.signNote}</div>}
                                         </div>
@@ -844,29 +851,33 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                 </Modal>
             )}
 
-            {/* Sign-off Modal */}
-            {signOffOrder && (
-                <Modal title={`\u2705 Potpis faze: ${STAGES.find(s => s.id === signOffOrder.stage)?.label}`} onClose={() => setSignOffOrder(null)}>
-                    <div style={{ padding: '16px', borderRadius: 10, background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.15)', marginBottom: 16 }}>
-                        <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 4 }}>Narud\u017eba</div>
-                        <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{signOffOrder.orderNumber} \u2014 {signOffOrder.name}</div>
-                        <div style={{ fontSize: 12, color: C.textMuted, marginTop: 4 }}>Sljede\u0107a faza: <strong style={{ color: STAGES[STAGES.findIndex(s => s.id === signOffOrder.stage) + 1]?.color }}>{STAGES[STAGES.findIndex(s => s.id === signOffOrder.stage) + 1]?.emoji} {STAGES[STAGES.findIndex(s => s.id === signOffOrder.stage) + 1]?.label}</strong></div>
-                    </div>
-                    <div style={{ marginBottom: 12 }}>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: C.textMuted, marginBottom: 4, textTransform: 'uppercase' }}>\ud83d\udc64 Potpisuje</div>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text, padding: '10px 14px', borderRadius: 8, background: C.bgElevated }}>{currentUser?.name || 'Nepoznat'}</div>
-                    </div>
-                    <Field label="Kontrolna bilje\u0161ka (opcionalno)"><Textarea value={signOffForm.note} onChange={e => setSignOffForm(f => ({ ...f, note: e.target.value }))} placeholder="Napomena o fazi, kvaliteta, status kontrole..." rows={3} /></Field>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '16px 0', cursor: 'pointer', padding: '12px 14px', borderRadius: 10, border: `1.5px solid ${signOffForm.confirmed ? '#10B981' : C.border}`, background: signOffForm.confirmed ? 'rgba(16,185,129,0.06)' : 'transparent', transition: 'all 0.2s' }}>
-                        <input type="checkbox" checked={signOffForm.confirmed} onChange={e => setSignOffForm(f => ({ ...f, confirmed: e.target.checked }))} style={{ width: 18, height: 18, accentColor: '#10B981' }} />
-                        <span style={{ fontSize: 13, fontWeight: 600, color: signOffForm.confirmed ? '#10B981' : C.text }}>Potvr\u0111ujem da je faza zavr\u0161ena i kontrolirana</span>
-                    </label>
-                    <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 16 }}>
-                        <button onClick={() => setSignOffOrder(null)} style={styles.btnSecondary}>Odustani</button>
-                        <button onClick={confirmSignOff} disabled={!signOffForm.confirmed} style={{ ...styles.btn, opacity: signOffForm.confirmed ? 1 : 0.4, fontSize: 14, padding: '10px 24px' }}>\u2705 Potpi\u0161i i pomakni</button>
-                    </div>
-                </Modal>
-            )}
+            {/* Potpis faze modal */}
+            {signOffOrder && (() => {
+                const nextIdx = STAGES.findIndex(s => s.id === signOffOrder.stage) + 1;
+                const nextStage = STAGES[nextIdx];
+                return (
+                    <Modal title={`Potpis faze: ${STAGES.find(s => s.id === signOffOrder.stage)?.label || ''}`} onClose={() => setSignOffOrder(null)}>
+                        <div style={{ padding: 16, borderRadius: 10, background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.15)', marginBottom: 16 }}>
+                            <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 4 }}>Narudžba</div>
+                            <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{signOffOrder.orderNumber} — {signOffOrder.name}</div>
+                            {nextStage && <div style={{ fontSize: 12, color: C.textMuted, marginTop: 4 }}>Sljedeća faza: <strong style={{ color: nextStage.color }}>{nextStage.emoji} {nextStage.label}</strong></div>}
+                        </div>
+                        <div style={{ marginBottom: 12 }}>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: C.textMuted, marginBottom: 4, textTransform: 'uppercase' }}>Potpisuje</div>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: C.text, padding: '10px 14px', borderRadius: 8, background: C.bgElevated }}>{currentUser?.name || 'Nepoznat'}</div>
+                        </div>
+                        <Field label="Kontrolna bilješka (opcionalno)"><Textarea value={signOffNote} onChange={e => setSignOffNote(e.target.value)} placeholder="Napomena o fazi, kvaliteta, status kontrole..." rows={3} /></Field>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '16px 0', cursor: 'pointer', padding: '12px 14px', borderRadius: 10, border: `1.5px solid ${signOffConfirmed ? '#10B981' : C.border}`, background: signOffConfirmed ? 'rgba(16,185,129,0.06)' : 'transparent', transition: 'all 0.2s' }}>
+                            <input type="checkbox" checked={signOffConfirmed} onChange={e => setSignOffConfirmed(e.target.checked)} style={{ width: 18, height: 18, accentColor: '#10B981' }} />
+                            <span style={{ fontSize: 13, fontWeight: 600, color: signOffConfirmed ? '#10B981' : C.text }}>Potvrđujem da je faza završena i kontrolirana</span>
+                        </label>
+                        <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 16 }}>
+                            <button onClick={() => setSignOffOrder(null)} style={styles.btnSecondary}>Odustani</button>
+                            <button onClick={confirmSignOff} disabled={!signOffConfirmed} style={{ ...styles.btn, opacity: signOffConfirmed ? 1 : 0.4, fontSize: 14, padding: '10px 24px' }}>✅ Potpiši i pomakni</button>
+                        </div>
+                    </Modal>
+                );
+            })()}
         </div>
     );
 }
