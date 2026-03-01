@@ -150,6 +150,7 @@ export function Layout() {
     const { currentUser, handleLogout, projects, workers, timesheets, invoices, otpremnice, obaveze, vehicles, smjestaj, dailyLogs, companyProfile,
         isLeader, leaderProjectIds, leaderWorkerIds } = useApp();
     const [page, setPage] = useState('dashboard');
+    const [navDetail, setNavDetail] = useState(null);
     const [mobileOpen, setMobileOpen] = useState(false);
     const [showSearch, setShowSearch] = useState(false);
     const [dark, setDark] = useDarkMode();
@@ -435,9 +436,9 @@ export function Layout() {
         if (isAdmin) {
             switch (page) {
                 case 'dashboard': return <Dashboard onGoToNotifications={() => setPage('obavijesti')} onNavigate={navigate} />;
-                case 'projekti': return <ProjectsPage />;
+                case 'projekti': return <ProjectsPage onNavigate={(pg, detail) => { setNavDetail(detail || null); navigate(pg); }} />;
                 case 'proizvodnja': return <ProizvodnyaPage />;
-                case 'radnici': return <WorkersPage />;
+                case 'radnici': return <WorkersPage defaultDetailId={page === 'radnici' ? navDetail : null} onDetailConsumed={() => setNavDetail(null)} />;
                 case 'radni-sati': return <TimesheetsPage />;
                 case 'racuni': return <InvoicesPage />;
                 case 'otpremnice': return <OtpremnicePage />;
@@ -464,9 +465,9 @@ export function Layout() {
                 case 'dashboard': return <Dashboard leaderProjectIds={leaderProjectIds} onGoToNotifications={() => setPage('obavijesti')} onNavigate={navigate} />;
                 case 'unos-sati': return <TimesheetEntry />;
                 case 'moja-evidencija': return <WorkerEvidencija />;
-                case 'projekti': return <ProjectsPage leaderProjectIds={leaderProjectIds} />;
+                case 'projekti': return <ProjectsPage leaderProjectIds={leaderProjectIds} onNavigate={(pg, detail) => { setNavDetail(detail || null); navigate(pg); }} />;
                 case 'proizvodnja': return <ProizvodnyaPage leaderProjectIds={leaderProjectIds} />;
-                case 'radnici': return <WorkersPage leaderProjectIds={leaderProjectIds} leaderWorkerIds={leaderWorkerIds} />;
+                case 'radnici': return <WorkersPage leaderProjectIds={leaderProjectIds} leaderWorkerIds={leaderWorkerIds} defaultDetailId={page === 'radnici' ? navDetail : null} onDetailConsumed={() => setNavDetail(null)} />;
                 case 'radni-sati': return <TimesheetsPage leaderProjectIds={leaderProjectIds} />;
                 case 'racuni': return <InvoicesPage leaderProjectIds={leaderProjectIds} />;
                 case 'otpremnice': return <OtpremnicePage leaderProjectIds={leaderProjectIds} />;

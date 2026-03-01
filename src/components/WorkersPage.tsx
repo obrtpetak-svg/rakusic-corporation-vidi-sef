@@ -6,7 +6,7 @@ import { C, styles, genId, fmtDate, diffMins, hashPin } from '../utils/helpers';
 import { EmptyState } from './ui/EmptyState';
 import { EditableField } from './ui/EditableField';
 
-export function WorkersPage({ leaderProjectIds, leaderWorkerIds }) {
+export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId, onDetailConsumed }) {
     const confirm = useConfirm();
     const { workers, users, projects, timesheets, vehicles, smjestaj, currentUser } = useApp();
     const [showForm, setShowForm] = useState(false);
@@ -15,6 +15,14 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds }) {
     const [search, setSearch] = useState('');
     const [filterActive, setFilterActive] = useState('active');
     const isMobile = useIsMobile();
+
+    // Deep-link: auto-open worker detail when navigated from another page
+    React.useEffect(() => {
+        if (defaultDetailId) {
+            setDetailId(defaultDetailId);
+            if (onDetailConsumed) onDetailConsumed();
+        }
+    }, [defaultDetailId]);
 
     const blankForm = () => ({ name: '', position: '', phone: '', email: '', oib: '', address: '', notes: '', active: true, username: '', pin: '', role: 'radnik', assignedProjects: [] });
     const [form, setForm] = useState(blankForm());

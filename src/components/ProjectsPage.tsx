@@ -5,7 +5,7 @@ import { useApp, add as addDoc, update as updateDoc, remove as removeDoc } from 
 import { Icon, Modal, Field, Input, Textarea, Select, StatusBadge, WorkerCheckboxList, useIsMobile } from './ui/SharedComponents';
 import { C, styles, genId, today, fmtDate, diffMins, compressImage } from '../utils/helpers';
 
-export function ProjectsPage({ workerFilterId, leaderProjectIds }) {
+export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
     const confirm = useConfirm();
     const { projects, workers, timesheets, invoices, obaveze, otpremnice, currentUser, addAuditLog } = useApp();
     const [showForm, setShowForm] = useState(false);
@@ -193,12 +193,12 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds }) {
                             <div style={{ fontSize: 11, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Unosi sati</div>
                             <div style={{ fontSize: 20, fontWeight: 800, color: C.green }}>{detailTimesheets.length}</div>
                         </div>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(124,58,237,0.08)' }}>
-                            <div style={{ fontSize: 11, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Računi</div>
+                        <div onClick={() => onNavigate && onNavigate('racuni')} style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(124,58,237,0.08)', cursor: onNavigate ? 'pointer' : 'default', transition: 'transform 0.15s' }} onMouseEnter={e => onNavigate && (e.currentTarget.style.transform = 'scale(1.03)')} onMouseLeave={e => e.currentTarget.style.transform = 'none'}>
+                            <div style={{ fontSize: 11, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Računi {onNavigate && '→'}</div>
                             <div style={{ fontSize: 20, fontWeight: 800, color: '#7C3AED' }}>{detailInvoices.length}</div>
                         </div>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(234,88,12,0.08)' }}>
-                            <div style={{ fontSize: 11, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Otpremnice</div>
+                        <div onClick={() => onNavigate && onNavigate('otpremnice')} style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(234,88,12,0.08)', cursor: onNavigate ? 'pointer' : 'default', transition: 'transform 0.15s' }} onMouseEnter={e => onNavigate && (e.currentTarget.style.transform = 'scale(1.03)')} onMouseLeave={e => e.currentTarget.style.transform = 'none'}>
+                            <div style={{ fontSize: 11, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Otpremnice {onNavigate && '→'}</div>
                             <div style={{ fontSize: 20, fontWeight: 800, color: '#EA580C' }}>{detailOtpremnice.length}</div>
                         </div>
                         <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(220,38,38,0.08)' }}>
@@ -268,12 +268,13 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds }) {
                                 const isLeader = detailProject.teamLeader === w.id;
                                 const isEngineer = detailProject.engineer === w.id;
                                 return (
-                                    <div key={w.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderRadius: 10, background: isLeader ? 'rgba(29,78,216,0.06)' : isEngineer ? 'rgba(4,120,87,0.06)' : 'var(--bg)', border: `1px solid ${isLeader ? 'rgba(29,78,216,0.2)' : isEngineer ? 'rgba(4,120,87,0.2)' : C.border}` }}>
+                                    <div key={w.id} onClick={() => onNavigate && onNavigate('radnici', w.id)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderRadius: 10, background: isLeader ? 'rgba(29,78,216,0.06)' : isEngineer ? 'rgba(4,120,87,0.06)' : 'var(--bg)', border: `1px solid ${isLeader ? 'rgba(29,78,216,0.2)' : isEngineer ? 'rgba(4,120,87,0.2)' : C.border}`, cursor: onNavigate ? 'pointer' : 'default', transition: 'transform 0.15s, box-shadow 0.15s' }} onMouseEnter={e => { if (onNavigate) { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'; } }} onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}>
                                         <div style={{ width: 36, height: 36, borderRadius: '50%', background: C.accentLight, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.accent, fontWeight: 800, fontSize: 14, flexShrink: 0 }}>{w.name?.charAt(0)}</div>
-                                        <div>
+                                        <div style={{ flex: 1 }}>
                                             <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{w.name} {isLeader && <span style={{ fontSize: 10, color: C.blue }}>👷 Voditelj</span>} {isEngineer && <span style={{ fontSize: 10, color: C.green }}> Inženjer</span>}</div>
                                             <div style={{ fontSize: 11, color: C.textMuted }}>{w.position || 'Radnik'} • {Math.round(wHours / 60)}h</div>
                                         </div>
+                                        {onNavigate && <div style={{ fontSize: 11, color: C.accent, fontWeight: 600 }}>Otvori →</div>}
                                     </div>
                                 );
                             })}
