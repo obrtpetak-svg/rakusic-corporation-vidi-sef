@@ -295,366 +295,404 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
         }));
 
         return (
-            <div>
-                <button onClick={() => { setDetailId(null); setDetailTab('info'); setSignOffOrder(null); }} style={{ ...styles.btnSecondary, marginBottom: 20, display: 'inline-flex' }}><Icon name="back" size={16} /> Natrag</button>
+            <>
+                <div>
+                    <button onClick={() => { setDetailId(null); setDetailTab('info'); setSignOffOrder(null); setShowForm(false); }} style={{ ...styles.btnSecondary, marginBottom: 20, display: 'inline-flex' }}><Icon name="back" size={16} /> Natrag</button>
 
-                {/* Header card */}
-                <div style={{ ...styles.card, marginBottom: 20 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
-                        <div>
-                            <div style={{ fontSize: 11, color: C.accent, fontWeight: 700, marginBottom: 4 }}>{detailOrder.orderNumber}</div>
-                            <div style={{ fontSize: 22, fontWeight: 800, color: C.text }}>{detailOrder.name}</div>
-                            <div style={{ fontSize: 13, color: C.textMuted, marginTop: 4 }}>🏢 {detailOrder.client || '—'} {detailOrder.quantity && `• ${detailOrder.quantity} ${detailOrder.unit}`}</div>
-                        </div>
-                        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                            {detailOrder.priority === 'hitno' && <span style={{ fontSize: 11, fontWeight: 700, color: '#EF4444', background: 'rgba(239,68,68,0.1)', padding: '4px 10px', borderRadius: 6 }}>🔴 HITNO</span>}
-                            {detailOrder.priority === 'visok' && <span style={{ fontSize: 11, fontWeight: 700, color: '#F59E0B', background: 'rgba(245,158,11,0.1)', padding: '4px 10px', borderRadius: 6 }}>🟡 Visok</span>}
-                            <span style={{ fontSize: 12, fontWeight: 700, color: STAGES[stageIdx]?.color, background: `${STAGES[stageIdx]?.color}18`, padding: '4px 12px', borderRadius: 8 }}>
-                                {STAGES[stageIdx]?.emoji} {STAGES[stageIdx]?.label}
-                            </span>
-                        </div>
-                    </div>
-
-                    {/* Progress bar */}
-                    <div style={{ marginBottom: 16 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: C.textMuted, marginBottom: 6 }}>
-                            <span>Napredak</span>
-                            <span style={{ fontWeight: 700, color: stageIdx === STAGES.length - 1 ? C.green : C.accent }}>{Math.round(progressPct)}%</span>
-                        </div>
-                        <div style={{ display: 'flex', gap: 3 }}>
-                            {STAGES.map((s, i) => (
-                                <div key={s.id} style={{ flex: 1, height: 6, borderRadius: 3, background: i <= stageIdx ? (STAGES[stageIdx]?.color || C.accent) : 'var(--border)', transition: 'background 0.3s ease' }} />
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Stat cards */}
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 10 }}>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: C.accentLight }}>
-                            <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Količina</div>
-                            <div style={{ fontSize: 20, fontWeight: 800, color: C.accent }}>{detailOrder.quantity} {detailOrder.unit}</div>
-                        </div>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(239,68,68,0.08)' }}>
-                            <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Ukupni trošak</div>
-                            <div style={{ fontSize: 20, fontWeight: 800, color: '#EF4444' }}>{(detailOrder.totalCost || 0).toFixed(2)}€</div>
-                        </div>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: daysLeft !== null && daysLeft < 0 ? 'rgba(239,68,68,0.08)' : daysLeft !== null && daysLeft <= 3 ? 'rgba(245,158,11,0.08)' : 'rgba(16,185,129,0.08)' }}>
-                            <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Rok isporuke</div>
-                            <div style={{ fontSize: 20, fontWeight: 800, color: daysLeft !== null && daysLeft < 0 ? '#EF4444' : daysLeft !== null && daysLeft <= 3 ? '#F59E0B' : C.green }}>
-                                {daysLeft !== null ? (daysLeft < 0 ? `${Math.abs(daysLeft)}d kasni` : daysLeft === 0 ? 'DANAS' : `${daysLeft}d`) : '—'}
-                            </div>
-                        </div>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(29,78,216,0.08)' }}>
-                            <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Stavke troška</div>
-                            <div style={{ fontSize: 20, fontWeight: 800, color: C.blue }}>{costItems.length}</div>
-                        </div>
-                    </div>
-
-                    {/* Actions */}
-                    {canManage && detailOrder.stage !== 'zavrseno' && (
-                        <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
-                            <button onClick={() => requestAdvance(detailOrder)} style={{ ...styles.btn, fontSize: 13 }}>
-                                ⏭️ {STAGES[stageIdx + 1] ? `Pomakni u: ${STAGES[stageIdx + 1].label}` : 'Završi'}
-                            </button>
-                            <button onClick={() => openEdit(detailOrder)} style={styles.btnSecondary}><Icon name="edit" size={14} /> Uredi</button>
-                            <button onClick={() => doDelete(detailOrder.id)} style={{ ...styles.btnDanger, fontSize: 13 }}><Icon name="trash" size={14} /> Obriši</button>
-                        </div>
-                    )}
-                    {canManage && detailOrder.stage === 'zavrseno' && (
-                        <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
-                            <button onClick={() => archiveOrder(detailOrder)} style={{ ...styles.btnSecondary, fontSize: 13 }}>📦 Arhiviraj</button>
-                            <button onClick={() => openEdit(detailOrder)} style={styles.btnSecondary}><Icon name="edit" size={14} /> Uredi</button>
-                            <button onClick={() => doDelete(detailOrder.id)} style={{ ...styles.btnDanger, fontSize: 13 }}><Icon name="trash" size={14} /> Obriši</button>
-                        </div>
-                    )}
-                </div>
-
-                {/* Detail tabs */}
-                <div style={{ display: 'flex', gap: 6, marginBottom: 16, overflowX: 'auto' }}>
-                    {[{ id: 'info', label: '📋 Info' }, { id: 'specifikacije', label: '📐 Specifikacije' }, { id: 'troskovnik', label: '💰 Troškovnik' }, { id: 'dokumenti', label: '📎 Dokumenti' }, { id: 'povijest', label: '🕐 Povijest' }].map(t => (
-                        <button key={t.id} onClick={() => setDetailTab(t.id)} style={{ padding: '8px 16px', borderRadius: 8, border: `1.5px solid ${detailTab === t.id ? C.accent : C.border}`, background: detailTab === t.id ? C.accentLight : 'transparent', color: detailTab === t.id ? C.accent : C.textMuted, fontWeight: detailTab === t.id ? 700 : 500, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                            {t.label}
-                        </button>
-                    ))}
-                </div>
-
-                {/* Info tab */}
-                {detailTab === 'info' && (
+                    {/* Header card */}
                     <div style={{ ...styles.card, marginBottom: 20 }}>
-                        {detailOrder.description && <div style={{ padding: '12px 16px', borderRadius: 8, background: C.bgElevated, fontSize: 13, color: C.textDim, lineHeight: 1.6, marginBottom: 12 }}>{detailOrder.description}</div>}
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, fontSize: 13 }}>
-                            <div><span style={{ color: C.textMuted }}>📅 Kreiran:</span> <strong>{fmtDate(detailOrder.createdAt)}</strong></div>
-                            <div><span style={{ color: C.textMuted }}>📅 Rok:</span> <strong>{fmtDate(detailOrder.deadline) || '—'}</strong></div>
-                            <div><span style={{ color: C.textMuted }}>👤 Kreirao:</span> <strong>{detailOrder.createdBy || '—'}</strong></div>
-                            <div><span style={{ color: C.textMuted }}>📋 Broj:</span> <strong>{detailOrder.orderNumber}</strong></div>
-                        </div>
-                        {detailOrder.notes && <div style={{ marginTop: 12, padding: '10px 14px', borderRadius: 8, background: 'rgba(245,158,11,0.08)', fontSize: 13, color: '#D97706' }}>📝 {detailOrder.notes}</div>}
-
-                        {/* Stage timeline */}
-                        <div style={{ marginTop: 20 }}>
-                            <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Tok narudžbe</div>
-                            {STAGES.map((s, i) => {
-                                const record = stageHistory.find(r => r.stage === s.id);
-                                const isCurrent = detailOrder.stage === s.id;
-                                const isDone = record?.completedAt;
-                                const isPast = STAGES.findIndex(x => x.id === detailOrder.stage) > i;
-                                return (
-                                    <div key={s.id} style={{ display: 'flex', gap: 12, position: 'relative', paddingBottom: i < STAGES.length - 1 ? 16 : 0 }}>
-                                        {i < STAGES.length - 1 && <div style={{ position: 'absolute', left: 13, top: 28, width: 2, height: 'calc(100% - 14px)', background: isPast || isDone ? s.color : 'var(--border)' }} />}
-                                        <div style={{ width: 28, height: 28, borderRadius: '50%', background: isDone || isPast ? s.color : isCurrent ? C.accent : 'var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#fff', fontWeight: 800, flexShrink: 0, zIndex: 1, border: isCurrent ? `3px solid ${C.accent}44` : 'none' }}>
-                                            {isDone || isPast ? '✓' : s.emoji}
-                                        </div>
-                                        <div style={{ flex: 1, paddingTop: 2 }}>
-                                            <div style={{ fontSize: 13, fontWeight: isCurrent ? 700 : 500, color: isCurrent ? C.text : isDone || isPast ? C.textDim : C.textMuted }}>{s.label}</div>
-                                            {record && <div style={{ fontSize: 11, color: C.textMuted }}>
-                                                {record.enteredAt && `Započeto: ${fmtDate(record.enteredAt)}`}
-                                                {record.completedAt && ` → Završeno: ${fmtDate(record.completedAt)}`}
-                                                {record.signedBy && <span style={{ color: '#10B981', fontWeight: 600 }}>{' '}✍️ {record.signedBy}</span>}
-                                            </div>}
-                                            {record?.signNote && <div style={{ fontSize: 11, color: C.accent, fontStyle: 'italic', marginTop: 2 }}>📝 {record.signNote}</div>}
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                )}
-
-                {/* Specifikacije tab */}
-                {detailTab === 'specifikacije' && (() => {
-                    const specs = detailOrder.specifications || { materials: [], dimensions: [], technicalNotes: '' };
-                    const addSpecMaterial = async () => {
-                        const newMat = { id: genId(), name: '', profile: '', quantity: 0, unit: 'kg', steelGrade: 'S235', notes: '' };
-                        const updated = { ...specs, materials: [...specs.materials, newMat] };
-                        await updateDoc('production', detailOrder.id, { specifications: updated });
-                    };
-                    const removeSpecMaterial = async (matId) => {
-                        const updated = { ...specs, materials: specs.materials.filter(m => m.id !== matId) };
-                        await updateDoc('production', detailOrder.id, { specifications: updated });
-                    };
-                    const updateSpecMaterial = async (matId, key, val) => {
-                        const updated = { ...specs, materials: specs.materials.map(m => m.id === matId ? { ...m, [key]: val } : m) };
-                        await updateDoc('production', detailOrder.id, { specifications: updated });
-                    };
-                    const addSpecDim = async () => {
-                        const newDim = { id: genId(), label: '', value: '', unit: 'm' };
-                        const updated = { ...specs, dimensions: [...specs.dimensions, newDim] };
-                        await updateDoc('production', detailOrder.id, { specifications: updated });
-                    };
-                    const removeSpecDim = async (dimId) => {
-                        const updated = { ...specs, dimensions: specs.dimensions.filter(d => d.id !== dimId) };
-                        await updateDoc('production', detailOrder.id, { specifications: updated });
-                    };
-                    const updateSpecDim = async (dimId, key, val) => {
-                        const updated = { ...specs, dimensions: specs.dimensions.map(d => d.id === dimId ? { ...d, [key]: val } : d) };
-                        await updateDoc('production', detailOrder.id, { specifications: updated });
-                    };
-                    const updateTechNotes = async (val) => {
-                        const updated = { ...specs, technicalNotes: val };
-                        await updateDoc('production', detailOrder.id, { specifications: updated });
-                    };
-                    const totalWeight = specs.materials.reduce((s, m) => s + ((['kg', 't'].includes(m.unit)) ? (m.unit === 't' ? m.quantity * 1000 : m.quantity) : 0), 0);
-
-                    return (
-                        <div style={{ ...styles.card, marginBottom: 20 }}>
-                            {/* Summary */}
-                            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
-                                <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(59,130,246,0.08)', textAlign: 'center' }}>
-                                    <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Materijali</div>
-                                    <div style={{ fontSize: 22, fontWeight: 800, color: C.blue }}>{specs.materials.length}</div>
-                                </div>
-                                <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(16,185,129,0.08)', textAlign: 'center' }}>
-                                    <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Ukupna težina</div>
-                                    <div style={{ fontSize: 22, fontWeight: 800, color: C.green }}>{totalWeight >= 1000 ? `${(totalWeight / 1000).toFixed(2)}t` : `${totalWeight}kg`}</div>
-                                </div>
-                                <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(124,58,237,0.08)', textAlign: 'center' }}>
-                                    <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Dimenzije</div>
-                                    <div style={{ fontSize: 22, fontWeight: 800, color: '#7C3AED' }}>{specs.dimensions.length}</div>
-                                </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
+                            <div>
+                                <div style={{ fontSize: 11, color: C.accent, fontWeight: 700, marginBottom: 4 }}>{detailOrder.orderNumber}</div>
+                                <div style={{ fontSize: 22, fontWeight: 800, color: C.text }}>{detailOrder.name}</div>
+                                <div style={{ fontSize: 13, color: C.textMuted, marginTop: 4 }}>🏢 {detailOrder.client || '—'} {detailOrder.quantity && `• ${detailOrder.quantity} ${detailOrder.unit}`}</div>
                             </div>
-
-                            {/* Materials */}
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                                <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>🧱 Materijali</div>
-                                {canManage && <button onClick={addSpecMaterial} style={styles.btnSmall}><Icon name="plus" size={12} /> Dodaj</button>}
+                            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                                {detailOrder.priority === 'hitno' && <span style={{ fontSize: 11, fontWeight: 700, color: '#EF4444', background: 'rgba(239,68,68,0.1)', padding: '4px 10px', borderRadius: 6 }}>🔴 HITNO</span>}
+                                {detailOrder.priority === 'visok' && <span style={{ fontSize: 11, fontWeight: 700, color: '#F59E0B', background: 'rgba(245,158,11,0.1)', padding: '4px 10px', borderRadius: 6 }}>🟡 Visok</span>}
+                                <span style={{ fontSize: 12, fontWeight: 700, color: STAGES[stageIdx]?.color, background: `${STAGES[stageIdx]?.color}18`, padding: '4px 12px', borderRadius: 8 }}>
+                                    {STAGES[stageIdx]?.emoji} {STAGES[stageIdx]?.label}
+                                </span>
                             </div>
-                            {specs.materials.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, textAlign: 'center', padding: 20 }}>Nema materijala — dodajte stavke</div> : (
-                                <div style={{ overflowX: 'auto', marginBottom: 20 }}>
-                                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                        <thead><tr><th style={styles.th}>Naziv</th><th style={styles.th}>Profil/Dim.</th><th style={styles.th}>Kol.</th><th style={styles.th}>Jed.</th><th style={styles.th}>Čelik</th>{canManage && <th style={styles.th}></th>}</tr></thead>
-                                        <tbody>
-                                            {specs.materials.map(m => (
-                                                <tr key={m.id}>
-                                                    <td style={styles.td}>{canManage ? <Input value={m.name} onChange={e => updateSpecMaterial(m.id, 'name', e.target.value)} placeholder="Stup, Nosač..." style={{ fontSize: 12, padding: '4px 8px' }} /> : <span style={{ fontWeight: 600 }}>{m.name}</span>}</td>
-                                                    <td style={styles.td}>{canManage ? <Input value={m.profile} onChange={e => updateSpecMaterial(m.id, 'profile', e.target.value)} placeholder="HEB 300" style={{ fontSize: 12, padding: '4px 8px' }} /> : m.profile}</td>
-                                                    <td style={styles.td}>{canManage ? <Input type="number" value={m.quantity} onChange={e => updateSpecMaterial(m.id, 'quantity', parseFloat(e.target.value) || 0)} style={{ fontSize: 12, padding: '4px 8px', width: 70 }} /> : m.quantity}</td>
-                                                    <td style={styles.td}>{canManage ? <Select value={m.unit} onChange={e => updateSpecMaterial(m.id, 'unit', e.target.value)} style={{ fontSize: 11, padding: '4px' }}>{SPEC_UNITS.map(u => <option key={u} value={u}>{u}</option>)}</Select> : m.unit}</td>
-                                                    <td style={styles.td}>{canManage ? <Select value={m.steelGrade} onChange={e => updateSpecMaterial(m.id, 'steelGrade', e.target.value)} style={{ fontSize: 11, padding: '4px' }}>{STEEL_GRADES.map(g => <option key={g} value={g}>{g}</option>)}</Select> : <span style={{ fontSize: 11, fontWeight: 700, color: '#3B82F6', background: 'rgba(59,130,246,0.1)', padding: '2px 6px', borderRadius: 4 }}>{m.steelGrade}</span>}</td>
-                                                    {canManage && <td style={styles.td}><button onClick={() => removeSpecMaterial(m.id)} style={{ ...styles.btnDanger, padding: '4px 8px' }}><Icon name="trash" size={10} /></button></td>}
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
+                        </div>
 
-                            {/* Dimensions */}
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                                <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>📏 Dimenzije / Mjere</div>
-                                {canManage && <button onClick={addSpecDim} style={styles.btnSmall}><Icon name="plus" size={12} /> Dodaj</button>}
+                        {/* Progress bar */}
+                        <div style={{ marginBottom: 16 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: C.textMuted, marginBottom: 6 }}>
+                                <span>Napredak</span>
+                                <span style={{ fontWeight: 700, color: stageIdx === STAGES.length - 1 ? C.green : C.accent }}>{Math.round(progressPct)}%</span>
                             </div>
-                            {specs.dimensions.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, textAlign: 'center', padding: 15 }}>Nema dimenzija</div> : (
-                                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(220px, 1fr))', gap: 10, marginBottom: 20 }}>
-                                    {specs.dimensions.map(d => (
-                                        <div key={d.id} style={{ padding: '10px 14px', borderRadius: 10, background: 'var(--bg)', border: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', gap: 8 }}>
-                                            {canManage ? (
-                                                <>
-                                                    <Input value={d.label} onChange={e => updateSpecDim(d.id, 'label', e.target.value)} placeholder="Npr. Raspon" style={{ fontSize: 12, padding: '4px 8px', flex: 1 }} />
-                                                    <Input value={d.value} onChange={e => updateSpecDim(d.id, 'value', e.target.value)} placeholder="0" style={{ fontSize: 12, padding: '4px 8px', width: 60 }} />
-                                                    <Select value={d.unit} onChange={e => updateSpecDim(d.id, 'unit', e.target.value)} style={{ fontSize: 11, padding: '4px', width: 60 }}>{SPEC_UNITS.map(u => <option key={u} value={u}>{u}</option>)}</Select>
-                                                    <button onClick={() => removeSpecDim(d.id)} style={{ background: 'none', border: 'none', color: C.red, cursor: 'pointer', fontSize: 12 }}>✕</button>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <span style={{ fontSize: 12, color: C.textMuted, fontWeight: 600 }}>{d.label}:</span>
-                                                    <span style={{ fontSize: 14, fontWeight: 800, color: C.text }}>{d.value} {d.unit}</span>
-                                                </>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            {/* Technical Notes */}
-                            <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 8 }}>📝 Tehničke napomene</div>
-                            {canManage ? (
-                                <Textarea value={specs.technicalNotes || ''} onChange={e => updateTechNotes(e.target.value)} placeholder="Tehničke specifikacije, napomene, zahtjevi kvalitete, norma..." rows={4} />
-                            ) : (
-                                <div style={{ padding: '12px 16px', borderRadius: 8, background: C.bgElevated, fontSize: 13, color: C.textDim, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{specs.technicalNotes || 'Nema napomena'}</div>
-                            )}
-                        </div>
-                    );
-                })()}
-
-                {/* Troškovnik tab */}
-                {detailTab === 'troskovnik' && (
-                    <div style={{ ...styles.card, marginBottom: 20 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                            <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>💰 Troškovnik ({costItems.length} stavki)</div>
-                            {canManage && <button onClick={() => setShowCostForm(true)} style={styles.btnSmall}><Icon name="plus" size={12} /> Nova stavka</button>}
-                        </div>
-                        {/* Category summary */}
-                        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 8, marginBottom: 16 }}>
-                            {costByCategory.map(c => (
-                                <div key={c.value} style={{ padding: '8px 12px', borderRadius: 8, background: 'var(--bg)', textAlign: 'center' }}>
-                                    <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700 }}>{c.label}</div>
-                                    <div style={{ fontSize: 16, fontWeight: 800, color: c.total > 0 ? C.accent : C.textMuted }}>{c.total.toFixed(2)}€</div>
-                                </div>
-                            ))}
-                        </div>
-                        {costItems.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, textAlign: 'center', padding: 20 }}>Nema stavki troškova</div> : (
-                            <div style={{ overflowX: 'auto' }}>
-                                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                    <thead><tr><th style={styles.th}>Stavka</th><th style={styles.th}>Kat.</th><th style={styles.th}>Kol.</th><th style={styles.th}>Cijena</th><th style={styles.th}>Ukupno</th>{canManage && <th style={styles.th}></th>}</tr></thead>
-                                    <tbody>
-                                        {costItems.map(c => (
-                                            <tr key={c.id}>
-                                                <td style={styles.td}><span style={{ fontWeight: 600 }}>{c.name}</span>{c.notes && <div style={{ fontSize: 10, color: C.textMuted }}>{c.notes}</div>}</td>
-                                                <td style={styles.td}>{COST_CATEGORIES.find(cat => cat.value === c.category)?.label || c.category}</td>
-                                                <td style={styles.td}>{c.quantity}</td>
-                                                <td style={styles.td}>{(c.unitPrice || 0).toFixed(2)}€</td>
-                                                <td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{(c.total || 0).toFixed(2)}€</td>
-                                                {canManage && <td style={styles.td}><button onClick={() => removeCostItem(c.id)} style={{ ...styles.btnDanger, padding: '4px 8px' }}><Icon name="trash" size={10} /></button></td>}
-                                            </tr>
-                                        ))}
-                                        <tr><td colSpan={4} style={{ ...styles.td, fontWeight: 700, textAlign: 'right' }}>UKUPNO:</td><td style={{ ...styles.td, fontWeight: 800, color: C.accent, fontSize: 16 }}>{(detailOrder.totalCost || 0).toFixed(2)}€</td>{canManage && <td style={styles.td}></td>}</tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-                        {/* Cost form modal */}
-                        {showCostForm && (
-                            <Modal title="Nova stavka troška" onClose={() => setShowCostForm(false)}>
-                                <Field label="Naziv stavke" required><Input value={costForm.name} onChange={e => setCostForm(f => ({ ...f, name: e.target.value }))} placeholder="Čelik S235, Transport..." autoFocus /></Field>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
-                                    <Field label="Kategorija"><Select value={costForm.category} onChange={e => setCostForm(f => ({ ...f, category: e.target.value }))}>{COST_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}</Select></Field>
-                                    <Field label="Količina"><Input type="number" value={costForm.quantity} onChange={e => setCostForm(f => ({ ...f, quantity: parseFloat(e.target.value) || 0 }))} /></Field>
-                                    <Field label="Jed. cijena (€)"><Input type="number" step="0.01" value={costForm.unitPrice} onChange={e => setCostForm(f => ({ ...f, unitPrice: parseFloat(e.target.value) || 0 }))} /></Field>
-                                </div>
-                                <div style={{ fontSize: 13, color: C.accent, fontWeight: 700, margin: '8px 0' }}>Ukupno: {(costForm.quantity * costForm.unitPrice).toFixed(2)}€</div>
-                                <Field label="Napomena"><Input value={costForm.notes} onChange={e => setCostForm(f => ({ ...f, notes: e.target.value }))} placeholder="Opcionalno..." /></Field>
-                                <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 16 }}>
-                                    <button onClick={() => setShowCostForm(false)} style={styles.btnSecondary}>Odustani</button>
-                                    <button onClick={addCostItem} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
-                                </div>
-                            </Modal>
-                        )}
-                    </div>
-                )}
-
-                {/* Dokumenti tab */}
-                {detailTab === 'dokumenti' && (
-                    <div style={{ ...styles.card, marginBottom: 20 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                            <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>📎 Dokumenti ({files.length})</div>
-                            {canManage && (
-                                <label style={{ ...styles.btnSmall, cursor: 'pointer', display: 'inline-flex' }}>
-                                    <Icon name="upload" size={12} /> Upload
-                                    <input type="file" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx" onChange={handleFileUpload} style={{ display: 'none' }} />
-                                </label>
-                            )}
-                        </div>
-                        {files.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, textAlign: 'center', padding: 30 }}>Nema dokumenata</div> : (
-                            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(180px, 1fr))', gap: 12 }}>
-                                {files.map(f => (
-                                    <div key={f.id} style={{ border: `1px solid ${C.border}`, borderRadius: 10, overflow: 'hidden', background: 'var(--bg)' }}>
-                                        {f.type?.startsWith('image/') ? (
-                                            <div style={{ height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: 'rgba(128,128,128,0.06)' }} onClick={() => { const w = window.open(); w.document.write(`<img src="${f.data}" style="max-width:100%;height:auto">`); }}>
-                                                <img src={f.data} alt={f.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'cover' }} />
-                                            </div>
-                                        ) : (
-                                            <div style={{ height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(128,128,128,0.06)' }}>
-                                                <div style={{ textAlign: 'center' }}><Icon name="file" size={28} /><div style={{ fontSize: 10, color: C.textMuted, marginTop: 4 }}>{f.type || 'File'}</div></div>
-                                            </div>
-                                        )}
-                                        <div style={{ padding: '8px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <div><div style={{ fontSize: 11, fontWeight: 600, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 120 }}>{f.name}</div><div style={{ fontSize: 9, color: C.textMuted }}>{f.uploadedBy}</div></div>
-                                            {canManage && <button onClick={() => removeFile(f.id)} style={{ background: 'none', border: 'none', color: C.red, cursor: 'pointer', fontSize: 12 }}>✕</button>}
-                                        </div>
-                                    </div>
+                            <div style={{ display: 'flex', gap: 3 }}>
+                                {STAGES.map((s, i) => (
+                                    <div key={s.id} style={{ flex: 1, height: 6, borderRadius: 3, background: i <= stageIdx ? (STAGES[stageIdx]?.color || C.accent) : 'var(--border)', transition: 'background 0.3s ease' }} />
                                 ))}
                             </div>
+                        </div>
+
+                        {/* Stat cards */}
+                        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 10 }}>
+                            <div style={{ padding: '12px 16px', borderRadius: 10, background: C.accentLight }}>
+                                <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Količina</div>
+                                <div style={{ fontSize: 20, fontWeight: 800, color: C.accent }}>{detailOrder.quantity} {detailOrder.unit}</div>
+                            </div>
+                            <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(239,68,68,0.08)' }}>
+                                <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Ukupni trošak</div>
+                                <div style={{ fontSize: 20, fontWeight: 800, color: '#EF4444' }}>{(detailOrder.totalCost || 0).toFixed(2)}€</div>
+                            </div>
+                            <div style={{ padding: '12px 16px', borderRadius: 10, background: daysLeft !== null && daysLeft < 0 ? 'rgba(239,68,68,0.08)' : daysLeft !== null && daysLeft <= 3 ? 'rgba(245,158,11,0.08)' : 'rgba(16,185,129,0.08)' }}>
+                                <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Rok isporuke</div>
+                                <div style={{ fontSize: 20, fontWeight: 800, color: daysLeft !== null && daysLeft < 0 ? '#EF4444' : daysLeft !== null && daysLeft <= 3 ? '#F59E0B' : C.green }}>
+                                    {daysLeft !== null ? (daysLeft < 0 ? `${Math.abs(daysLeft)}d kasni` : daysLeft === 0 ? 'DANAS' : `${daysLeft}d`) : '—'}
+                                </div>
+                            </div>
+                            <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(29,78,216,0.08)' }}>
+                                <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Stavke troška</div>
+                                <div style={{ fontSize: 20, fontWeight: 800, color: C.blue }}>{costItems.length}</div>
+                            </div>
+                        </div>
+
+                        {/* Actions */}
+                        {canManage && detailOrder.stage !== 'zavrseno' && (
+                            <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
+                                <button onClick={() => requestAdvance(detailOrder)} style={{ ...styles.btn, fontSize: 13 }}>
+                                    ⏭️ {STAGES[stageIdx + 1] ? `Pomakni u: ${STAGES[stageIdx + 1].label}` : 'Završi'}
+                                </button>
+                                <button onClick={() => openEdit(detailOrder)} style={styles.btnSecondary}><Icon name="edit" size={14} /> Uredi</button>
+                                <button onClick={() => doDelete(detailOrder.id)} style={{ ...styles.btnDanger, fontSize: 13 }}><Icon name="trash" size={14} /> Obriši</button>
+                            </div>
+                        )}
+                        {canManage && detailOrder.stage === 'zavrseno' && (
+                            <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
+                                <button onClick={() => archiveOrder(detailOrder)} style={{ ...styles.btnSecondary, fontSize: 13 }}>📦 Arhiviraj</button>
+                                <button onClick={() => openEdit(detailOrder)} style={styles.btnSecondary}><Icon name="edit" size={14} /> Uredi</button>
+                                <button onClick={() => doDelete(detailOrder.id)} style={{ ...styles.btnDanger, fontSize: 13 }}><Icon name="trash" size={14} /> Obriši</button>
+                            </div>
                         )}
                     </div>
-                )}
 
-                {/* Povijest tab */}
-                {detailTab === 'povijest' && (
-                    <div style={{ ...styles.card, marginBottom: 20 }}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>🕐 Povijest promjena</div>
-                        {stageHistory.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13 }}>Nema zapisa</div> : (
-                            <div>
-                                {[...stageHistory].reverse().map((h, i) => {
-                                    const stage = STAGES.find(s => s.id === h.stage);
+                    {/* Detail tabs */}
+                    <div style={{ display: 'flex', gap: 6, marginBottom: 16, overflowX: 'auto' }}>
+                        {[{ id: 'info', label: '📋 Info' }, { id: 'specifikacije', label: '📐 Specifikacije' }, { id: 'troskovnik', label: '💰 Troškovnik' }, { id: 'dokumenti', label: '📎 Dokumenti' }, { id: 'povijest', label: '🕐 Povijest' }].map(t => (
+                            <button key={t.id} onClick={() => setDetailTab(t.id)} style={{ padding: '8px 16px', borderRadius: 8, border: `1.5px solid ${detailTab === t.id ? C.accent : C.border}`, background: detailTab === t.id ? C.accentLight : 'transparent', color: detailTab === t.id ? C.accent : C.textMuted, fontWeight: detailTab === t.id ? 700 : 500, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                                {t.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Info tab */}
+                    {detailTab === 'info' && (
+                        <div style={{ ...styles.card, marginBottom: 20 }}>
+                            {detailOrder.description && <div style={{ padding: '12px 16px', borderRadius: 8, background: C.bgElevated, fontSize: 13, color: C.textDim, lineHeight: 1.6, marginBottom: 12 }}>{detailOrder.description}</div>}
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, fontSize: 13 }}>
+                                <div><span style={{ color: C.textMuted }}>📅 Kreiran:</span> <strong>{fmtDate(detailOrder.createdAt)}</strong></div>
+                                <div><span style={{ color: C.textMuted }}>📅 Rok:</span> <strong>{fmtDate(detailOrder.deadline) || '—'}</strong></div>
+                                <div><span style={{ color: C.textMuted }}>👤 Kreirao:</span> <strong>{detailOrder.createdBy || '—'}</strong></div>
+                                <div><span style={{ color: C.textMuted }}>📋 Broj:</span> <strong>{detailOrder.orderNumber}</strong></div>
+                            </div>
+                            {detailOrder.notes && <div style={{ marginTop: 12, padding: '10px 14px', borderRadius: 8, background: 'rgba(245,158,11,0.08)', fontSize: 13, color: '#D97706' }}>📝 {detailOrder.notes}</div>}
+
+                            {/* Stage timeline */}
+                            <div style={{ marginTop: 20 }}>
+                                <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Tok narudžbe</div>
+                                {STAGES.map((s, i) => {
+                                    const record = stageHistory.find(r => r.stage === s.id);
+                                    const isCurrent = detailOrder.stage === s.id;
+                                    const isDone = record?.completedAt;
+                                    const isPast = STAGES.findIndex(x => x.id === detailOrder.stage) > i;
                                     return (
-                                        <div key={i} style={{ padding: '10px 0', borderBottom: i < stageHistory.length - 1 ? `1px solid ${C.border}7A` : 'none', display: 'flex', gap: 12 }}>
-                                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: stage?.color || C.accent, marginTop: 6, flexShrink: 0 }} />
-                                            <div>
-                                                <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{stage?.emoji} {stage?.label}</div>
-                                                <div style={{ fontSize: 11, color: C.textMuted }}>
-                                                    Ulaz: {fmtDate(h.enteredAt)}
-                                                    {h.completedAt && ` → Izlaz: ${fmtDate(h.completedAt)}`}
-                                                    {h.completedBy && ` • ${h.completedBy}`}
-                                                </div>
+                                        <div key={s.id} style={{ display: 'flex', gap: 12, position: 'relative', paddingBottom: i < STAGES.length - 1 ? 16 : 0 }}>
+                                            {i < STAGES.length - 1 && <div style={{ position: 'absolute', left: 13, top: 28, width: 2, height: 'calc(100% - 14px)', background: isPast || isDone ? s.color : 'var(--border)' }} />}
+                                            <div style={{ width: 28, height: 28, borderRadius: '50%', background: isDone || isPast ? s.color : isCurrent ? C.accent : 'var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#fff', fontWeight: 800, flexShrink: 0, zIndex: 1, border: isCurrent ? `3px solid ${C.accent}44` : 'none' }}>
+                                                {isDone || isPast ? '✓' : s.emoji}
+                                            </div>
+                                            <div style={{ flex: 1, paddingTop: 2 }}>
+                                                <div style={{ fontSize: 13, fontWeight: isCurrent ? 700 : 500, color: isCurrent ? C.text : isDone || isPast ? C.textDim : C.textMuted }}>{s.label}</div>
+                                                {record && <div style={{ fontSize: 11, color: C.textMuted }}>
+                                                    {record.enteredAt && `Započeto: ${fmtDate(record.enteredAt)}`}
+                                                    {record.completedAt && ` → Završeno: ${fmtDate(record.completedAt)}`}
+                                                    {record.signedBy && <span style={{ color: '#10B981', fontWeight: 600 }}>{' '}✍️ {record.signedBy}</span>}
+                                                </div>}
+                                                {record?.signNote && <div style={{ fontSize: 11, color: C.accent, fontStyle: 'italic', marginTop: 2 }}>📝 {record.signNote}</div>}
                                             </div>
                                         </div>
                                     );
                                 })}
                             </div>
-                        )}
-                    </div>
-                )}
-            </div>
+                        </div>
+                    )}
+
+                    {/* Specifikacije tab */}
+                    {detailTab === 'specifikacije' && (() => {
+                        const specs = detailOrder.specifications || { materials: [], dimensions: [], technicalNotes: '' };
+                        const addSpecMaterial = async () => {
+                            const newMat = { id: genId(), name: '', profile: '', quantity: 0, unit: 'kg', steelGrade: 'S235', notes: '' };
+                            const updated = { ...specs, materials: [...specs.materials, newMat] };
+                            await updateDoc('production', detailOrder.id, { specifications: updated });
+                        };
+                        const removeSpecMaterial = async (matId) => {
+                            const updated = { ...specs, materials: specs.materials.filter(m => m.id !== matId) };
+                            await updateDoc('production', detailOrder.id, { specifications: updated });
+                        };
+                        const updateSpecMaterial = async (matId, key, val) => {
+                            const updated = { ...specs, materials: specs.materials.map(m => m.id === matId ? { ...m, [key]: val } : m) };
+                            await updateDoc('production', detailOrder.id, { specifications: updated });
+                        };
+                        const addSpecDim = async () => {
+                            const newDim = { id: genId(), label: '', value: '', unit: 'm' };
+                            const updated = { ...specs, dimensions: [...specs.dimensions, newDim] };
+                            await updateDoc('production', detailOrder.id, { specifications: updated });
+                        };
+                        const removeSpecDim = async (dimId) => {
+                            const updated = { ...specs, dimensions: specs.dimensions.filter(d => d.id !== dimId) };
+                            await updateDoc('production', detailOrder.id, { specifications: updated });
+                        };
+                        const updateSpecDim = async (dimId, key, val) => {
+                            const updated = { ...specs, dimensions: specs.dimensions.map(d => d.id === dimId ? { ...d, [key]: val } : d) };
+                            await updateDoc('production', detailOrder.id, { specifications: updated });
+                        };
+                        const updateTechNotes = async (val) => {
+                            const updated = { ...specs, technicalNotes: val };
+                            await updateDoc('production', detailOrder.id, { specifications: updated });
+                        };
+                        const totalWeight = specs.materials.reduce((s, m) => s + ((['kg', 't'].includes(m.unit)) ? (m.unit === 't' ? m.quantity * 1000 : m.quantity) : 0), 0);
+
+                        return (
+                            <div style={{ ...styles.card, marginBottom: 20 }}>
+                                {/* Summary */}
+                                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
+                                    <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(59,130,246,0.08)', textAlign: 'center' }}>
+                                        <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Materijali</div>
+                                        <div style={{ fontSize: 22, fontWeight: 800, color: C.blue }}>{specs.materials.length}</div>
+                                    </div>
+                                    <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(16,185,129,0.08)', textAlign: 'center' }}>
+                                        <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Ukupna težina</div>
+                                        <div style={{ fontSize: 22, fontWeight: 800, color: C.green }}>{totalWeight >= 1000 ? `${(totalWeight / 1000).toFixed(2)}t` : `${totalWeight}kg`}</div>
+                                    </div>
+                                    <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(124,58,237,0.08)', textAlign: 'center' }}>
+                                        <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Dimenzije</div>
+                                        <div style={{ fontSize: 22, fontWeight: 800, color: '#7C3AED' }}>{specs.dimensions.length}</div>
+                                    </div>
+                                </div>
+
+                                {/* Materials */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>🧱 Materijali</div>
+                                    {canManage && <button onClick={addSpecMaterial} style={styles.btnSmall}><Icon name="plus" size={12} /> Dodaj</button>}
+                                </div>
+                                {specs.materials.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, textAlign: 'center', padding: 20 }}>Nema materijala — dodajte stavke</div> : (
+                                    <div style={{ overflowX: 'auto', marginBottom: 20 }}>
+                                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                            <thead><tr><th style={styles.th}>Naziv</th><th style={styles.th}>Profil/Dim.</th><th style={styles.th}>Kol.</th><th style={styles.th}>Jed.</th><th style={styles.th}>Čelik</th>{canManage && <th style={styles.th}></th>}</tr></thead>
+                                            <tbody>
+                                                {specs.materials.map(m => (
+                                                    <tr key={m.id}>
+                                                        <td style={styles.td}>{canManage ? <Input value={m.name} onChange={e => updateSpecMaterial(m.id, 'name', e.target.value)} placeholder="Stup, Nosač..." style={{ fontSize: 12, padding: '4px 8px' }} /> : <span style={{ fontWeight: 600 }}>{m.name}</span>}</td>
+                                                        <td style={styles.td}>{canManage ? <Input value={m.profile} onChange={e => updateSpecMaterial(m.id, 'profile', e.target.value)} placeholder="HEB 300" style={{ fontSize: 12, padding: '4px 8px' }} /> : m.profile}</td>
+                                                        <td style={styles.td}>{canManage ? <Input type="number" value={m.quantity} onChange={e => updateSpecMaterial(m.id, 'quantity', parseFloat(e.target.value) || 0)} style={{ fontSize: 12, padding: '4px 8px', width: 70 }} /> : m.quantity}</td>
+                                                        <td style={styles.td}>{canManage ? <Select value={m.unit} onChange={e => updateSpecMaterial(m.id, 'unit', e.target.value)} style={{ fontSize: 11, padding: '4px' }}>{SPEC_UNITS.map(u => <option key={u} value={u}>{u}</option>)}</Select> : m.unit}</td>
+                                                        <td style={styles.td}>{canManage ? <Select value={m.steelGrade} onChange={e => updateSpecMaterial(m.id, 'steelGrade', e.target.value)} style={{ fontSize: 11, padding: '4px' }}>{STEEL_GRADES.map(g => <option key={g} value={g}>{g}</option>)}</Select> : <span style={{ fontSize: 11, fontWeight: 700, color: '#3B82F6', background: 'rgba(59,130,246,0.1)', padding: '2px 6px', borderRadius: 4 }}>{m.steelGrade}</span>}</td>
+                                                        {canManage && <td style={styles.td}><button onClick={() => removeSpecMaterial(m.id)} style={{ ...styles.btnDanger, padding: '4px 8px' }}><Icon name="trash" size={10} /></button></td>}
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+
+                                {/* Dimensions */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>📏 Dimenzije / Mjere</div>
+                                    {canManage && <button onClick={addSpecDim} style={styles.btnSmall}><Icon name="plus" size={12} /> Dodaj</button>}
+                                </div>
+                                {specs.dimensions.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, textAlign: 'center', padding: 15 }}>Nema dimenzija</div> : (
+                                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(220px, 1fr))', gap: 10, marginBottom: 20 }}>
+                                        {specs.dimensions.map(d => (
+                                            <div key={d.id} style={{ padding: '10px 14px', borderRadius: 10, background: 'var(--bg)', border: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', gap: 8 }}>
+                                                {canManage ? (
+                                                    <>
+                                                        <Input value={d.label} onChange={e => updateSpecDim(d.id, 'label', e.target.value)} placeholder="Npr. Raspon" style={{ fontSize: 12, padding: '4px 8px', flex: 1 }} />
+                                                        <Input value={d.value} onChange={e => updateSpecDim(d.id, 'value', e.target.value)} placeholder="0" style={{ fontSize: 12, padding: '4px 8px', width: 60 }} />
+                                                        <Select value={d.unit} onChange={e => updateSpecDim(d.id, 'unit', e.target.value)} style={{ fontSize: 11, padding: '4px', width: 60 }}>{SPEC_UNITS.map(u => <option key={u} value={u}>{u}</option>)}</Select>
+                                                        <button onClick={() => removeSpecDim(d.id)} style={{ background: 'none', border: 'none', color: C.red, cursor: 'pointer', fontSize: 12 }}>✕</button>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <span style={{ fontSize: 12, color: C.textMuted, fontWeight: 600 }}>{d.label}:</span>
+                                                        <span style={{ fontSize: 14, fontWeight: 800, color: C.text }}>{d.value} {d.unit}</span>
+                                                    </>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Technical Notes */}
+                                <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 8 }}>📝 Tehničke napomene</div>
+                                {canManage ? (
+                                    <Textarea value={specs.technicalNotes || ''} onChange={e => updateTechNotes(e.target.value)} placeholder="Tehničke specifikacije, napomene, zahtjevi kvalitete, norma..." rows={4} />
+                                ) : (
+                                    <div style={{ padding: '12px 16px', borderRadius: 8, background: C.bgElevated, fontSize: 13, color: C.textDim, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{specs.technicalNotes || 'Nema napomena'}</div>
+                                )}
+                            </div>
+                        );
+                    })()}
+
+                    {/* Troškovnik tab */}
+                    {detailTab === 'troskovnik' && (
+                        <div style={{ ...styles.card, marginBottom: 20 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                                <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>💰 Troškovnik ({costItems.length} stavki)</div>
+                                {canManage && <button onClick={() => setShowCostForm(true)} style={styles.btnSmall}><Icon name="plus" size={12} /> Nova stavka</button>}
+                            </div>
+                            {/* Category summary */}
+                            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 8, marginBottom: 16 }}>
+                                {costByCategory.map(c => (
+                                    <div key={c.value} style={{ padding: '8px 12px', borderRadius: 8, background: 'var(--bg)', textAlign: 'center' }}>
+                                        <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700 }}>{c.label}</div>
+                                        <div style={{ fontSize: 16, fontWeight: 800, color: c.total > 0 ? C.accent : C.textMuted }}>{c.total.toFixed(2)}€</div>
+                                    </div>
+                                ))}
+                            </div>
+                            {costItems.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, textAlign: 'center', padding: 20 }}>Nema stavki troškova</div> : (
+                                <div style={{ overflowX: 'auto' }}>
+                                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                        <thead><tr><th style={styles.th}>Stavka</th><th style={styles.th}>Kat.</th><th style={styles.th}>Kol.</th><th style={styles.th}>Cijena</th><th style={styles.th}>Ukupno</th>{canManage && <th style={styles.th}></th>}</tr></thead>
+                                        <tbody>
+                                            {costItems.map(c => (
+                                                <tr key={c.id}>
+                                                    <td style={styles.td}><span style={{ fontWeight: 600 }}>{c.name}</span>{c.notes && <div style={{ fontSize: 10, color: C.textMuted }}>{c.notes}</div>}</td>
+                                                    <td style={styles.td}>{COST_CATEGORIES.find(cat => cat.value === c.category)?.label || c.category}</td>
+                                                    <td style={styles.td}>{c.quantity}</td>
+                                                    <td style={styles.td}>{(c.unitPrice || 0).toFixed(2)}€</td>
+                                                    <td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{(c.total || 0).toFixed(2)}€</td>
+                                                    {canManage && <td style={styles.td}><button onClick={() => removeCostItem(c.id)} style={{ ...styles.btnDanger, padding: '4px 8px' }}><Icon name="trash" size={10} /></button></td>}
+                                                </tr>
+                                            ))}
+                                            <tr><td colSpan={4} style={{ ...styles.td, fontWeight: 700, textAlign: 'right' }}>UKUPNO:</td><td style={{ ...styles.td, fontWeight: 800, color: C.accent, fontSize: 16 }}>{(detailOrder.totalCost || 0).toFixed(2)}€</td>{canManage && <td style={styles.td}></td>}</tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                            {/* Cost form modal */}
+                            {showCostForm && (
+                                <Modal title="Nova stavka troška" onClose={() => setShowCostForm(false)}>
+                                    <Field label="Naziv stavke" required><Input value={costForm.name} onChange={e => setCostForm(f => ({ ...f, name: e.target.value }))} placeholder="Čelik S235, Transport..." autoFocus /></Field>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+                                        <Field label="Kategorija"><Select value={costForm.category} onChange={e => setCostForm(f => ({ ...f, category: e.target.value }))}>{COST_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}</Select></Field>
+                                        <Field label="Količina"><Input type="number" value={costForm.quantity} onChange={e => setCostForm(f => ({ ...f, quantity: parseFloat(e.target.value) || 0 }))} /></Field>
+                                        <Field label="Jed. cijena (€)"><Input type="number" step="0.01" value={costForm.unitPrice} onChange={e => setCostForm(f => ({ ...f, unitPrice: parseFloat(e.target.value) || 0 }))} /></Field>
+                                    </div>
+                                    <div style={{ fontSize: 13, color: C.accent, fontWeight: 700, margin: '8px 0' }}>Ukupno: {(costForm.quantity * costForm.unitPrice).toFixed(2)}€</div>
+                                    <Field label="Napomena"><Input value={costForm.notes} onChange={e => setCostForm(f => ({ ...f, notes: e.target.value }))} placeholder="Opcionalno..." /></Field>
+                                    <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 16 }}>
+                                        <button onClick={() => setShowCostForm(false)} style={styles.btnSecondary}>Odustani</button>
+                                        <button onClick={addCostItem} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
+                                    </div>
+                                </Modal>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Dokumenti tab */}
+                    {detailTab === 'dokumenti' && (
+                        <div style={{ ...styles.card, marginBottom: 20 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                                <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>📎 Dokumenti ({files.length})</div>
+                                {canManage && (
+                                    <label style={{ ...styles.btnSmall, cursor: 'pointer', display: 'inline-flex' }}>
+                                        <Icon name="upload" size={12} /> Upload
+                                        <input type="file" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx" onChange={handleFileUpload} style={{ display: 'none' }} />
+                                    </label>
+                                )}
+                            </div>
+                            {files.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, textAlign: 'center', padding: 30 }}>Nema dokumenata</div> : (
+                                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(180px, 1fr))', gap: 12 }}>
+                                    {files.map(f => (
+                                        <div key={f.id} style={{ border: `1px solid ${C.border}`, borderRadius: 10, overflow: 'hidden', background: 'var(--bg)' }}>
+                                            {f.type?.startsWith('image/') ? (
+                                                <div style={{ height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: 'rgba(128,128,128,0.06)' }} onClick={() => { const w = window.open(); w.document.write(`<img src="${f.data}" style="max-width:100%;height:auto">`); }}>
+                                                    <img src={f.data} alt={f.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'cover' }} />
+                                                </div>
+                                            ) : (
+                                                <div style={{ height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(128,128,128,0.06)' }}>
+                                                    <div style={{ textAlign: 'center' }}><Icon name="file" size={28} /><div style={{ fontSize: 10, color: C.textMuted, marginTop: 4 }}>{f.type || 'File'}</div></div>
+                                                </div>
+                                            )}
+                                            <div style={{ padding: '8px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <div><div style={{ fontSize: 11, fontWeight: 600, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 120 }}>{f.name}</div><div style={{ fontSize: 9, color: C.textMuted }}>{f.uploadedBy}</div></div>
+                                                {canManage && <button onClick={() => removeFile(f.id)} style={{ background: 'none', border: 'none', color: C.red, cursor: 'pointer', fontSize: 12 }}>✕</button>}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Povijest tab */}
+                    {detailTab === 'povijest' && (
+                        <div style={{ ...styles.card, marginBottom: 20 }}>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>🕐 Povijest promjena</div>
+                            {stageHistory.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13 }}>Nema zapisa</div> : (
+                                <div>
+                                    {[...stageHistory].reverse().map((h, i) => {
+                                        const stage = STAGES.find(s => s.id === h.stage);
+                                        return (
+                                            <div key={i} style={{ padding: '10px 0', borderBottom: i < stageHistory.length - 1 ? `1px solid ${C.border}7A` : 'none', display: 'flex', gap: 12 }}>
+                                                <div style={{ width: 8, height: 8, borderRadius: '50%', background: stage?.color || C.accent, marginTop: 6, flexShrink: 0 }} />
+                                                <div>
+                                                    <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{stage?.emoji} {stage?.label}</div>
+                                                    <div style={{ fontSize: 11, color: C.textMuted }}>
+                                                        Ulaz: {fmtDate(h.enteredAt)}
+                                                        {h.completedAt && ` → Izlaz: ${fmtDate(h.completedAt)}`}
+                                                        {h.completedBy && ` • ${h.completedBy}`}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                {/* Potpis faze modal — MUST be inside detail return block */}
+                {signOffOrder && (() => {
+                    const nextIdx = STAGES.findIndex(s => s.id === signOffOrder.stage) + 1;
+                    const nextStage = STAGES[nextIdx];
+                    return (
+                        <Modal title={`Potpis faze: ${STAGES.find(s => s.id === signOffOrder.stage)?.label || ''}`} onClose={() => setSignOffOrder(null)}>
+                            <div style={{ padding: 16, borderRadius: 10, background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.15)', marginBottom: 16 }}>
+                                <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 4 }}>Narudžba</div>
+                                <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{signOffOrder.orderNumber} — {signOffOrder.name}</div>
+                                {nextStage && <div style={{ fontSize: 12, color: C.textMuted, marginTop: 4 }}>Sljedeća faza: <strong style={{ color: nextStage.color }}>{nextStage.emoji} {nextStage.label}</strong></div>}
+                            </div>
+                            <div style={{ marginBottom: 12 }}>
+                                <div style={{ fontSize: 12, fontWeight: 700, color: C.textMuted, marginBottom: 4, textTransform: 'uppercase' }}>Potpisuje</div>
+                                <div style={{ fontSize: 14, fontWeight: 700, color: C.text, padding: '10px 14px', borderRadius: 8, background: C.bgElevated }}>{currentUser?.name || 'Nepoznat'}</div>
+                            </div>
+                            <Field label="Kontrolna bilješka (opcionalno)"><Textarea value={signOffNote} onChange={e => setSignOffNote(e.target.value)} placeholder="Napomena o fazi, kvaliteta, status kontrole..." rows={2} /></Field>
+                            <div style={{ marginBottom: 12 }}>
+                                <div style={{ fontSize: 12, fontWeight: 700, color: C.textMuted, marginBottom: 6, textTransform: 'uppercase' }}>✍️ Potpis</div>
+                                <div style={{ position: 'relative', borderRadius: 10, border: `1.5px solid ${C.border}`, overflow: 'hidden', background: '#fff' }}>
+                                    <canvas ref={initSigCanvas} width={380} height={120} style={{ width: '100%', height: 120, touchAction: 'none', cursor: 'crosshair' }} />
+                                    <button onClick={clearSigCanvas} style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(0,0,0,0.06)', border: 'none', borderRadius: 6, padding: '3px 8px', fontSize: 10, color: C.textMuted, cursor: 'pointer' }}>Očisti</button>
+                                </div>
+                                <div style={{ fontSize: 10, color: C.textMuted, marginTop: 4 }}>Potpišite se prstom ili mišem</div>
+                            </div>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 0', cursor: 'pointer', padding: '12px 14px', borderRadius: 10, border: `1.5px solid ${signOffConfirmed ? '#10B981' : C.border}`, background: signOffConfirmed ? 'rgba(16,185,129,0.06)' : 'transparent', transition: 'all 0.2s' }}>
+                                <input type="checkbox" checked={signOffConfirmed} onChange={e => setSignOffConfirmed(e.target.checked)} style={{ width: 18, height: 18, accentColor: '#10B981' }} />
+                                <span style={{ fontSize: 13, fontWeight: 600, color: signOffConfirmed ? '#10B981' : C.text }}>Potvrđujem da je faza završena i kontrolirana</span>
+                            </label>
+                            <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 12 }}>
+                                <button onClick={() => setSignOffOrder(null)} style={styles.btnSecondary}>Odustani</button>
+                                <button onClick={confirmSignOff} disabled={!signOffConfirmed} style={{ ...styles.btn, opacity: signOffConfirmed ? 1 : 0.4, fontSize: 14, padding: '10px 24px' }}>✅ Potpiši i pomakni</button>
+                            </div>
+                        </Modal>
+                    );
+                })()}
+            </>
         );
     }
 
@@ -876,41 +914,6 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                 </Modal>
             )}
 
-            {/* Potpis faze modal */}
-            {signOffOrder && (() => {
-                const nextIdx = STAGES.findIndex(s => s.id === signOffOrder.stage) + 1;
-                const nextStage = STAGES[nextIdx];
-                return (
-                    <Modal title={`Potpis faze: ${STAGES.find(s => s.id === signOffOrder.stage)?.label || ''}`} onClose={() => setSignOffOrder(null)}>
-                        <div style={{ padding: 16, borderRadius: 10, background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.15)', marginBottom: 16 }}>
-                            <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 4 }}>Narudžba</div>
-                            <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{signOffOrder.orderNumber} — {signOffOrder.name}</div>
-                            {nextStage && <div style={{ fontSize: 12, color: C.textMuted, marginTop: 4 }}>Sljedeća faza: <strong style={{ color: nextStage.color }}>{nextStage.emoji} {nextStage.label}</strong></div>}
-                        </div>
-                        <div style={{ marginBottom: 12 }}>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: C.textMuted, marginBottom: 4, textTransform: 'uppercase' }}>Potpisuje</div>
-                            <div style={{ fontSize: 14, fontWeight: 700, color: C.text, padding: '10px 14px', borderRadius: 8, background: C.bgElevated }}>{currentUser?.name || 'Nepoznat'}</div>
-                        </div>
-                        <Field label="Kontrolna bilješka (opcionalno)"><Textarea value={signOffNote} onChange={e => setSignOffNote(e.target.value)} placeholder="Napomena o fazi, kvaliteta, status kontrole..." rows={2} /></Field>
-                        <div style={{ marginBottom: 12 }}>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: C.textMuted, marginBottom: 6, textTransform: 'uppercase' }}>✍️ Potpis</div>
-                            <div style={{ position: 'relative', borderRadius: 10, border: `1.5px solid ${C.border}`, overflow: 'hidden', background: '#fff' }}>
-                                <canvas ref={initSigCanvas} width={380} height={120} style={{ width: '100%', height: 120, touchAction: 'none', cursor: 'crosshair' }} />
-                                <button onClick={clearSigCanvas} style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(0,0,0,0.06)', border: 'none', borderRadius: 6, padding: '3px 8px', fontSize: 10, color: C.textMuted, cursor: 'pointer' }}>Očisti</button>
-                            </div>
-                            <div style={{ fontSize: 10, color: C.textMuted, marginTop: 4 }}>Potpišite se prstom ili mišem</div>
-                        </div>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 0', cursor: 'pointer', padding: '12px 14px', borderRadius: 10, border: `1.5px solid ${signOffConfirmed ? '#10B981' : C.border}`, background: signOffConfirmed ? 'rgba(16,185,129,0.06)' : 'transparent', transition: 'all 0.2s' }}>
-                            <input type="checkbox" checked={signOffConfirmed} onChange={e => setSignOffConfirmed(e.target.checked)} style={{ width: 18, height: 18, accentColor: '#10B981' }} />
-                            <span style={{ fontSize: 13, fontWeight: 600, color: signOffConfirmed ? '#10B981' : C.text }}>Potvrđujem da je faza završena i kontrolirana</span>
-                        </label>
-                        <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 12 }}>
-                            <button onClick={() => setSignOffOrder(null)} style={styles.btnSecondary}>Odustani</button>
-                            <button onClick={confirmSignOff} disabled={!signOffConfirmed} style={{ ...styles.btn, opacity: signOffConfirmed ? 1 : 0.4, fontSize: 14, padding: '10px 24px' }}>✅ Potpiši i pomakni</button>
-                        </div>
-                    </Modal>
-                );
-            })()}
         </div>
     );
 }
