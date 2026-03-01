@@ -300,27 +300,35 @@ export function AppProvider({ children }) {
     const getProjectName = useCallback((id) => projectMap.get(id)?.name || '—', [projectMap]);
 
     useEffect(() => {
-        // Check for built-in config (production build with env vars)
-        const builtIn = getBuiltInConfig();
-        if (builtIn) {
-            saveFirebaseConfig(builtIn);
-            localStorage.setItem('vidime-app-login', 'true');
-            initFirebaseAndLoad(builtIn);
-            return () => unsubsRef.current.forEach(fn => fn());
-        }
+        const bootApp = async () => {
+            // Check for built-in config (production build with env vars)
+            const builtIn = getBuiltInConfig();
+            const config = builtIn || loadFirebaseConfig();
 
-        // Clean build: normal flow with manual config entry
-        const appLoggedIn = localStorage.getItem('vidime-app-login') || sessionStorage.getItem('vidime-app-login');
-        if (appLoggedIn === 'true') {
-            // Migrate from sessionStorage to localStorage
-            if (!localStorage.getItem('vidime-app-login')) localStorage.setItem('vidime-app-login', 'true');
-            const config = loadFirebaseConfig();
-            if (config) initFirebaseAndLoad(config);
-            else setStep('firebaseConfig');
-        } else {
-            // No stored login — go to Firebase Auth login screen
-            setStep('appLogin');
-        }
+            if (config) {
+                saveFirebaseConfig(config);
+                // Init Firebase SDK (but don't load data yet)
+                let tries = 0;
+                while (!window.firebase && tries < 50) { await new Promise(r => setTimeout(r, 100)); tries++; }
+                if (!window.firebase) { setLoadError('Firebase library not loaded'); setStep('appLogin'); return; }
+                if (!initFirebase(config)) { setLoadError('Firebase init failed'); setStep('appLogin'); return; }
+
+                // Check if Firebase Auth user already exists (session restore)
+                const auth = getAuth();
+                if (auth && auth.currentUser && !auth.currentUser.isAnonymous) {
+                    console.log('[Boot] Firebase Auth session found:', auth.currentUser.email);
+                    await initFirebaseAndLoad(config);
+                    return;
+                }
+
+                // No Firebase Auth session — show login screen
+                console.log('[Boot] No Firebase Auth session, showing login...');
+                setStep('appLogin');
+            } else {
+                setStep('appLogin');
+            }
+        };
+        bootApp();
         return () => { unsubsRef.current.forEach(fn => fn()); if (sessionCheckRef.current) clearInterval(sessionCheckRef.current); };
     }, []);
 
@@ -355,26 +363,18 @@ export function AppProvider({ children }) {
             console.log('[AppContext] Starting Firebase init...');
             let tries = 0;
             while (!window.firebase && tries < 50) { await new Promise(r => setTimeout(r, 100)); tries++; }
-            if (!window.firebase) { setLoadError('Firebase library not loaded'); setStep('firebaseConfig'); return; }
-            if (!initFirebase(config)) { setLoadError('Firebase init failed — check config'); setStep('firebaseConfig'); return; }
+            if (!window.firebase) { setLoadError('Firebase library not loaded'); setStep('appLogin'); return; }
+            if (!initFirebase(config)) { setLoadError('Firebase init failed — check config'); setStep('appLogin'); return; }
             console.log('[AppContext] Firebase initialized. Auth:', !!getAuth());
 
-            // Sign in anonymously so Firestore security rules allow reads
+            // Use existing Firebase Auth user (set by handleFirebaseLogin)
             const auth = getAuth();
-            if (auth) {
-                if (auth.currentUser) {
-                    console.log('[AppContext] Already signed in:', auth.currentUser.uid);
-                } else {
-                    try {
-                        console.log('[AppContext] Attempting anonymous sign-in...');
-                        const cred = await auth.signInAnonymously();
-                        console.log('[AppContext] Anonymous sign-in OK:', cred.user.uid);
-                    } catch (authErr) {
-                        console.error('[AppContext] Anonymous sign-in FAILED:', authErr.code, authErr.message);
-                    }
-                }
+            if (auth && auth.currentUser) {
+                console.log('[AppContext] Using authenticated user:', auth.currentUser.email || auth.currentUser.uid);
             } else {
-                console.warn('[AppContext] No auth instance available');
+                console.warn('[AppContext] No authenticated user — redirecting to login');
+                setStep('appLogin');
+                return;
             }
 
             setFirebaseReady(true);
@@ -569,48 +569,53 @@ export function AppProvider({ children }) {
         const auth = getAuth();
         if (!auth) throw new Error('Auth not available');
 
-        // Convert username to email: admin → admin@rakusic-corporation.live
+        // Convert username to email: admin.josi → admin.josi@rakusic-corporation.live
         const email = `${username.toLowerCase().replace(/\s+/g, '.')}@rakusic-corporation.live`;
         const passwordWrapped = `vds_${password}_auth`;
 
+        let firebaseUser = null;
         try {
             // Try sign in first
             const cred = await auth.signInWithEmailAndPassword(email, passwordWrapped);
             console.log('[Auth] Firebase sign-in OK:', email);
-
-            // Step 3: Store login flag and load data
-            localStorage.setItem('vidime-app-login', 'true');
-            await initFirebaseAndLoad(config);
-
-            // Step 4: Match Firebase user to Firestore user
-            const matchedUser = users.find(u => u.username === username.toLowerCase());
-            if (matchedUser) {
-                await writeAuthMapping(cred.user.uid, matchedUser);
-                handleUserLogin(matchedUser);
-            }
-
-            return cred.user;
+            firebaseUser = cred.user;
         } catch (signInErr) {
             // If user doesn't exist, try creating (first-time migration)
             if (signInErr.code === 'auth/user-not-found') {
                 try {
                     const cred = await auth.createUserWithEmailAndPassword(email, passwordWrapped);
                     console.log('[Auth] Created new Firebase user:', email);
-                    localStorage.setItem('vidime-app-login', 'true');
-                    await initFirebaseAndLoad(config);
-                    const matchedUser = users.find(u => u.username === username.toLowerCase());
-                    if (matchedUser) {
-                        await writeAuthMapping(cred.user.uid, matchedUser);
-                        handleUserLogin(matchedUser);
-                    }
-                    return cred.user;
+                    firebaseUser = cred.user;
                 } catch (createErr) {
                     console.error('[Auth] Create failed:', createErr.code);
                     throw createErr;
                 }
+            } else {
+                throw signInErr;
             }
-            throw signInErr;
         }
+
+        if (!firebaseUser) return null;
+
+        // Step 3: Now authenticated — load all data from Firestore
+        localStorage.setItem('vidime-app-login', 'true');
+        await initFirebaseAndLoad(config);
+
+        // Step 4: After data loaded, match Firebase user to Firestore user
+        // initFirebaseAndLoad sets users state, but we need to re-query since state may not be updated yet
+        const db = getDb();
+        if (db) {
+            const usersSnap = await db.collection('users').get();
+            const allUsers = [];
+            usersSnap.forEach(doc => { const d = { ...doc.data(), id: doc.id }; if (!d.deletedAt) allUsers.push(d); });
+            const matchedUser = allUsers.find(u => u.username === username.toLowerCase());
+            if (matchedUser) {
+                await writeAuthMapping(firebaseUser.uid, matchedUser);
+                handleUserLogin(matchedUser);
+            }
+        }
+
+        return firebaseUser;
     };
 
     const handleFirebaseConfig = (config) => {
