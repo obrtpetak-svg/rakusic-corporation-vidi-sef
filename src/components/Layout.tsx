@@ -148,7 +148,7 @@ const LazyFallback = ({ type = 'dashboard' }) => {
 
 export function Layout() {
     const { currentUser, handleLogout, projects, workers, timesheets, invoices, otpremnice, obaveze, vehicles, smjestaj, dailyLogs, companyProfile,
-        isLeader, leaderProjectIds, leaderWorkerIds } = useApp();
+        isLeader, leaderProjectIds, leaderWorkerIds, prodAlerts } = useApp();
     const [page, setPage] = useState('dashboard');
     const [navDetail, setNavDetail] = useState(null);
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -331,7 +331,8 @@ export function Layout() {
     const pendingInvoices = invoices.filter(i => (i.status === 'na čekanju' || i.status === 'odobreno-voditelj' || !i.status) && i.source === 'radnik').length;
     const pendingOtpremnice = otpremnice.filter(o => o.status === 'na čekanju' || o.status === 'odobreno-voditelj').length;
     const pendingDailyLogs = (dailyLogs || []).filter(l => l.status === 'na čekanju' || l.status === 'odobreno voditeljem').length;
-    const pendingCount = pendingTimesheets + pendingInvoices + pendingOtpremnice + pendingDailyLogs;
+    const pendingProdAlerts = (prodAlerts || []).filter(a => a.status === 'unread' && a.targetRole === 'admin').length;
+    const pendingCount = pendingTimesheets + pendingInvoices + pendingOtpremnice + pendingDailyLogs + pendingProdAlerts;
 
     // Worker-specific badges
     const workerObavezeBadge = obaveze.filter(o => (o.workerIds || []).includes(userId) && !(o.completions || []).some(c => c.workerId === userId)).length;

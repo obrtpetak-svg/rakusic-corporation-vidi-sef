@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useConfirm } from './ui/ConfirmModal';
-import { useApp, update as updateDoc } from '../context/AppContext';
+import { useApp, update as updateDoc, remove as removeDoc } from '../context/AppContext';
 import { Icon, StatusBadge, Pagination, usePagination, useIsMobile } from './ui/SharedComponents';
 import { C, styles, genId, fmtDate, fmtDateTime, diffMins } from '../utils/helpers';
 
@@ -76,7 +76,7 @@ const SectionHeader = React.memo(({ icon, iconColor, iconBg, title, count }) => 
 // ══════════════════════════════════════════════════════════════════════════
 export function NotificationsPage() {
     const confirm = useConfirm();
-    const { timesheets, invoices, otpremnice, workers, projects, currentUser, addAuditLog } = useApp();
+    const { timesheets, invoices, otpremnice, workers, projects, currentUser, addAuditLog, prodAlerts, users } = useApp();
     const [selectedIds, setSelectedIds] = useState(new Set());
 
     const pendingTs = timesheets.filter(t => t.status === 'na čekanju');
@@ -89,6 +89,12 @@ export function NotificationsPage() {
         ...pendingInv.map(i => ({ ...i, _type: 'inv' })),
         ...pendingOtp.map(o => ({ ...o, _type: 'otp' })),
     ], [pendingTs, pendingInv, pendingOtp]);
+
+    // Production alerts for current user
+    const myProdAlerts = useMemo(() => {
+        const isAdmin = currentUser?.role === 'admin';
+        return (prodAlerts || []).filter(a => a.status === 'unread' && (a.targetRole === 'admin' && isAdmin || a.targetUser === currentUser?.name)).sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+    }, [prodAlerts, currentUser]);
 
     const pg = usePagination(allItems.length, [allItems.length], 50);
     const pageItems = allItems.slice(pg.startIndex, pg.endIndex + 1);
@@ -131,7 +137,7 @@ export function NotificationsPage() {
         setSelectedIds(new Set());
     };
 
-    const total = allItems.length;
+    const total = allItems.length + myProdAlerts.length;
 
     const renderItem = (item) => {
         if (item._type === 'ts') {
@@ -154,7 +160,7 @@ export function NotificationsPage() {
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
                 <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.5px' }}>
-                     Obavijesti
+                    Obavijesti
                 </div>
                 {total > 0 && (
                     <span style={{ background: 'var(--red)', color: '#fff', borderRadius: 20, fontSize: 13, fontWeight: 800, padding: '3px 10px', fontVariantNumeric: 'tabular-nums', animation: 'badgePop 0.3s cubic-bezier(0.34,1.56,0.64,1)' }}>
@@ -194,6 +200,34 @@ export function NotificationsPage() {
                     <div style={{ fontSize: 40, marginBottom: 12 }}>✅</div>
                     <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)' }}>Sve čisto!</div>
                     <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>Nema ničega na čekanju</div>
+                </div>
+            )}
+
+            {/* Production alerts */}
+            {myProdAlerts.length > 0 && (
+                <div style={{ ...styles.card, marginBottom: 20 }}>
+                    <SectionHeader icon="settings" iconColor="#7C3AED" iconBg="rgba(124,58,237,0.1)" title="Proizvodnja" count={myProdAlerts.length} />
+                    {myProdAlerts.map(a => (
+                        <div key={a.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--divider)', gap: 12, flexWrap: 'wrap' }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, flex: 1 }}>
+                                <div style={{ width: 36, height: 36, borderRadius: 10, background: a.type === 'new_order' ? 'rgba(16,185,129,0.1)' : 'rgba(59,130,246,0.1)', color: a.type === 'new_order' ? 'var(--green)' : 'var(--blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>
+                                    {a.type === 'new_order' ? '📦' : '⏭️'}
+                                </div>
+                                <div>
+                                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)' }}>
+                                        {a.type === 'new_order' ? `Nova narudžba: ${a.orderNumber}` : `${a.orderNumber} → ${a.toStage}`}
+                                    </div>
+                                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
+                                        {a.type === 'new_order' ? `${a.createdBy} kreirao "${a.orderName}"` : `${a.changedBy} pomaknuo "${a.orderName}" iz ${a.fromStage}`}
+                                        {' · '}{fmtDateTime(a.createdAt)}
+                                    </div>
+                                </div>
+                            </div>
+                            <button onClick={() => updateDoc('prodAlerts', a.id, { status: 'read' })} style={{ background: 'var(--bg-elevated)', color: 'var(--text-muted)', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: 'inherit' }}>
+                                ✓ Pročitano
+                            </button>
+                        </div>
+                    ))}
                 </div>
             )}
 

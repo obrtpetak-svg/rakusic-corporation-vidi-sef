@@ -186,7 +186,10 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
         if (editId) {
             await updateDoc('production', editId, { ...data, updatedAt: new Date().toISOString() });
         } else {
-            await addDoc('production', { id: genId(), ...data, createdAt: new Date().toISOString(), createdBy: currentUser?.name });
+            const newId = genId();
+            await addDoc('production', { id: newId, ...data, createdAt: new Date().toISOString(), createdBy: currentUser?.name });
+            // Notify admin about new order
+            await addDoc('prodAlerts', { id: genId(), type: 'new_order', orderNumber: data.orderNumber, orderName: data.name, createdBy: currentUser?.name, createdAt: new Date().toISOString(), status: 'unread', targetRole: 'admin' });
         }
         setShowForm(false);
     };
@@ -228,6 +231,12 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
         const autoComment = { id: genId(), text: `⏭️ Faza pomaknuta u: ${STAGES[idx + 1]?.label}${signOffNote ? ' — ' + signOffNote : ''}`, author: currentUser?.name || 'Sustav', createdAt: new Date().toISOString(), isSystem: true };
         const existingComments = order.comments || [];
         await updateDoc('production', order.id, { comments: [...existingComments, autoComment] });
+        // Notify admin + creator about stage change
+        const alertBase = { type: 'stage_change', orderNumber: order.orderNumber, orderName: order.name, fromStage: STAGES[idx]?.label, toStage: STAGES[idx + 1]?.label, changedBy: currentUser?.name, createdAt: new Date().toISOString(), status: 'unread' };
+        await addDoc('prodAlerts', { id: genId(), ...alertBase, targetRole: 'admin' });
+        if (order.createdBy && order.createdBy !== currentUser?.name) {
+            await addDoc('prodAlerts', { id: genId(), ...alertBase, targetUser: order.createdBy });
+        }
         setSignOffOrder(null);
     };
 

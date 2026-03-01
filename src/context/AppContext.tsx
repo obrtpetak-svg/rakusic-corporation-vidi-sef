@@ -241,6 +241,7 @@ export function AppProvider({ children }) {
     const [obaveze, setObaveze] = useState([]);
     const [otpremnice, setOtpremnice] = useState([]);
     const [production, setProduction] = useState([]);
+    const [prodAlerts, setProdAlerts] = useState([]);
     const [auditLog, setAuditLog] = useState([]);
     const [companyProfile, setCompanyProfile] = useState(null);
 
@@ -250,7 +251,7 @@ export function AppProvider({ children }) {
             users: setUsers, projects: setProjects, workers: setWorkers,
             timesheets: setTimesheets, invoices: setInvoices, vehicles: setVehicles,
             smjestaj: setSmjestaj, obaveze: setObaveze, otpremnice: setOtpremnice,
-            production: setProduction, auditLog: setAuditLog,
+            production: setProduction, prodAlerts: setProdAlerts, auditLog: setAuditLog,
         });
     }, []);
     const [allTimesheetsLoaded, setAllTimesheetsLoaded] = useState(false);
@@ -424,6 +425,8 @@ export function AppProvider({ children }) {
             // Load production separately (may not have Firestore rules yet)
             try { const prod = await loadCol('production'); setProduction(prod); }
             catch (e) { console.warn('[AppContext] production collection not available:', e); }
+            try { const pa = await loadCol('prodAlerts'); setProdAlerts(pa); }
+            catch (e) { console.warn('[AppContext] prodAlerts collection not available:', e); }
 
             // One-time PIN migration: hash any plain-text PINs to hash('1234')
             const isHashed = (pin) => /^[a-f0-9]{64}$/.test(pin);
@@ -784,7 +787,7 @@ export function AppProvider({ children }) {
         timesheets, setTimesheets, invoices, setInvoices,
         vehicles, setVehicles, smjestaj, setSmjestaj,
         obaveze, setObaveze, otpremnice, setOtpremnice,
-        production, setProduction,
+        production, setProduction, prodAlerts, setProdAlerts,
         auditLog, setAuditLog, companyProfile, setCompanyProfile,
         dailyLogs, setDailyLogs,
         weatherRules, setWeatherRules,
