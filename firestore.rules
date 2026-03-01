@@ -132,6 +132,12 @@ service cloud.firestore {
       allow write: if isAuth();
     }
 
+    // ── Production — admin/leader manage production orders ──
+    match /production/{productionId} {
+      allow read: if isAuth();
+      allow write: if isAuth();
+    }
+
     // ── Obaveze — workers mark complete, admin creates ──
     match /obaveze/{obavezaId} {
       allow read: if isAuth();
