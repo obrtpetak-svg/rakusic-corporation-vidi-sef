@@ -40,6 +40,17 @@ const COST_CATEGORIES = [
 const STEEL_GRADES = ['S235', 'S275', 'S355', 'S460', 'Inox 304', 'Inox 316', 'Al 6060', 'Ostalo'];
 const SPEC_UNITS = ['kg', 't', 'm', 'm²', 'm³', 'kom', 'set', 'l'];
 
+// Profile weights in kg/m for auto-calculation
+const PROFILE_WEIGHTS = {
+    'HEA 100': 21.2, 'HEA 200': 42.3, 'HEA 300': 88.3, 'HEA 400': 125,
+    'HEB 100': 20.4, 'HEB 200': 61.3, 'HEB 300': 117, 'HEB 400': 155,
+    'IPE 100': 8.1, 'IPE 200': 22.4, 'IPE 300': 42.2, 'IPE 400': 66.3,
+    'UPN 100': 10.6, 'UPN 200': 25.3, 'UPN 300': 46.2,
+    'L 50x5': 3.77, 'L 60x6': 5.42, 'L 80x8': 9.63, 'L 100x10': 15.0,
+    'Cijev Ø42': 3.56, 'Cijev 40x40': 4.39, 'Cijev Ø16': 0.99,
+    'PL 10mm': 78.5, 'PL 15mm': 117.8, 'PL 20mm': 157.0,
+};
+
 const TEMPLATES = [
     {
         id: 'hala', name: '🏗️ Čelična hala', desc: 'Industrijska/skladišna hala', defaults: { quantity: 1, unit: 'kom', priority: 'normalan' },
@@ -432,7 +443,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
 
                     {/* Detail tabs */}
                     <div style={{ display: 'flex', gap: 6, marginBottom: 16, overflowX: 'auto' }}>
-                        {[{ id: 'info', label: '📋 Info' }, { id: 'aktivnost', label: `💬 Aktivnost${(detailOrder.comments || []).length > 0 ? ` (${(detailOrder.comments || []).length})` : ''}` }, { id: 'specifikacije', label: '📐 Specifikacije' }, { id: 'troskovnik', label: '💰 Troškovnik' }, { id: 'dokumenti', label: '📎 Dokumenti' }, { id: 'povijest', label: '🕐 Povijest' }].map(t => (
+                        {[{ id: 'info', label: '📋 Info' }, { id: 'aktivnost', label: `💬 Aktivnost${(detailOrder.comments || []).length > 0 ? ` (${(detailOrder.comments || []).length})` : ''}` }, { id: 'zadaci', label: `☑️ Zadaci${(detailOrder.subtasks || []).length > 0 ? ` (${(detailOrder.subtasks || []).filter(t => t.status === 'gotovo').length}/${(detailOrder.subtasks || []).length})` : ''}` }, { id: 'specifikacije', label: '📐 Specifikacije' }, { id: 'troskovnik', label: '💰 Troškovnik' }, { id: 'dokumenti', label: '📎 Dokumenti' }, { id: 'povijest', label: '🕐 Povijest' }].map(t => (
                             <button key={t.id} onClick={() => setDetailTab(t.id)} style={{ padding: '8px 16px', borderRadius: 8, border: `1.5px solid ${detailTab === t.id ? C.accent : C.border}`, background: detailTab === t.id ? C.accentLight : 'transparent', color: detailTab === t.id ? C.accent : C.textMuted, fontWeight: detailTab === t.id ? 700 : 500, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap' }}>
                                 {t.label}
                             </button>
@@ -526,6 +537,68 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                         </div>
                     )}
 
+                    {/* Zadaci (Sub-tasks) tab */}
+                    {detailTab === 'zadaci' && (() => {
+                        const subtasks = detailOrder.subtasks || [];
+                        const addSubtask = async () => {
+                            const title = prompt('Naziv zadatka:');
+                            if (!title?.trim()) return;
+                            const newTask = { id: genId(), title: title.trim(), status: 'otvoreno', assignedTo: '', dueDate: '', createdAt: new Date().toISOString(), createdBy: currentUser?.name };
+                            await updateDoc('production', detailOrder.id, { subtasks: [...subtasks, newTask] });
+                        };
+                        const toggleSubtask = async (taskId) => {
+                            const updated = subtasks.map(t => t.id === taskId ? { ...t, status: t.status === 'gotovo' ? 'otvoreno' : 'gotovo', completedAt: t.status !== 'gotovo' ? new Date().toISOString() : null } : t);
+                            await updateDoc('production', detailOrder.id, { subtasks: updated });
+                        };
+                        const removeSubtask = async (taskId) => {
+                            await updateDoc('production', detailOrder.id, { subtasks: subtasks.filter(t => t.id !== taskId) });
+                        };
+                        const updateSubtask = async (taskId, key, val) => {
+                            const updated = subtasks.map(t => t.id === taskId ? { ...t, [key]: val } : t);
+                            await updateDoc('production', detailOrder.id, { subtasks: updated });
+                        };
+                        const done = subtasks.filter(t => t.status === 'gotovo').length;
+                        return (
+                            <div style={{ ...styles.card, marginBottom: 20 }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>☑️ Radni zadaci ({done}/{subtasks.length})</div>
+                                    {canManage && <button onClick={addSubtask} style={styles.btnSmall}><Icon name="plus" size={12} /> Novi zadatak</button>}
+                                </div>
+                                {subtasks.length > 0 && <div style={{ width: '100%', height: 4, borderRadius: 2, background: 'var(--border)', marginBottom: 16 }}><div style={{ width: `${subtasks.length > 0 ? (done / subtasks.length) * 100 : 0}%`, height: 4, borderRadius: 2, background: '#10B981', transition: 'width 0.3s' }} /></div>}
+                                {subtasks.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, textAlign: 'center', padding: 20 }}>Nema zadataka — dodajte radne naloge</div> : (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                        {subtasks.map(t => (
+                                            <div key={t.id} style={{ padding: '10px 14px', borderRadius: 10, background: t.status === 'gotovo' ? 'rgba(16,185,129,0.04)' : 'var(--bg)', border: `1px solid ${t.status === 'gotovo' ? 'rgba(16,185,129,0.2)' : C.border}`, display: 'flex', alignItems: 'center', gap: 10 }}>
+                                                <input type="checkbox" checked={t.status === 'gotovo'} onChange={() => toggleSubtask(t.id)} style={{ width: 18, height: 18, accentColor: '#10B981', flexShrink: 0 }} />
+                                                <div style={{ flex: 1 }}>
+                                                    <div style={{ fontSize: 13, fontWeight: 600, color: t.status === 'gotovo' ? '#10B981' : C.text, textDecoration: t.status === 'gotovo' ? 'line-through' : 'none' }}>{t.title}</div>
+                                                    <div style={{ display: 'flex', gap: 8, marginTop: 4, fontSize: 10, color: C.textMuted, flexWrap: 'wrap', alignItems: 'center' }}>
+                                                        {canManage ? (
+                                                            <>
+                                                                <Select value={t.assignedTo || ''} onChange={e => updateSubtask(t.id, 'assignedTo', e.target.value)} style={{ fontSize: 10, padding: '2px 4px', width: 100 }}>
+                                                                    <option value="">— Radnik</option>
+                                                                    {activeWorkers.map(w => <option key={w.id} value={w.name}>{w.name}</option>)}
+                                                                </Select>
+                                                                <Input type="date" value={t.dueDate || ''} onChange={e => updateSubtask(t.id, 'dueDate', e.target.value)} style={{ fontSize: 10, padding: '2px 4px', width: 110 }} />
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                {t.assignedTo && <span>👤 {t.assignedTo}</span>}
+                                                                {t.dueDate && <span>📅 {fmtDate(t.dueDate)}</span>}
+                                                            </>
+                                                        )}
+                                                        <span>🕒 {fmtDate(t.createdAt)}</span>
+                                                    </div>
+                                                </div>
+                                                {canManage && <button onClick={() => removeSubtask(t.id)} style={{ background: 'none', border: 'none', color: C.red, cursor: 'pointer', fontSize: 12 }}>✕</button>}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })()}
+
                     {/* Specifikacije tab */}
                     {detailTab === 'specifikacije' && (() => {
                         const specs = detailOrder.specifications || { materials: [], technicalNotes: '' };
@@ -591,7 +664,10 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                                         <td style={styles.td}>{canManage ? <Input value={m.profile} onChange={e => updateSpecMaterial(m.id, 'profile', e.target.value)} placeholder="HEB 300" style={{ fontSize: 12, padding: '4px 8px' }} /> : m.profile}</td>
                                                         <td style={styles.td}>{canManage ? <Input type="number" value={m.quantity} onChange={e => updateSpecMaterial(m.id, 'quantity', parseFloat(e.target.value) || 0)} style={{ fontSize: 12, padding: '4px 8px', width: 65 }} /> : m.quantity}</td>
                                                         <td style={styles.td}>{canManage ? <Select value={m.unit} onChange={e => updateSpecMaterial(m.id, 'unit', e.target.value)} style={{ fontSize: 11, padding: '4px' }}>{SPEC_UNITS.map(u => <option key={u} value={u}>{u}</option>)}</Select> : m.unit}</td>
-                                                        <td style={styles.td}>{canManage ? <Input value={m.length || ''} onChange={e => updateSpecMaterial(m.id, 'length', e.target.value)} placeholder="6000" style={{ fontSize: 12, padding: '4px 8px', width: 70 }} /> : (m.length || '—')}</td>
+                                                        <td style={styles.td}>
+                                                            {canManage ? <Input value={m.length || ''} onChange={e => updateSpecMaterial(m.id, 'length', e.target.value)} placeholder="6000" style={{ fontSize: 12, padding: '4px 8px', width: 70 }} /> : (m.length || '—')}
+                                                            {m.profile && m.length && PROFILE_WEIGHTS[m.profile] && <div style={{ fontSize: 9, color: '#7C3AED', fontWeight: 600, marginTop: 1 }}>≈ {(PROFILE_WEIGHTS[m.profile] * (parseFloat(m.length) / 1000)).toFixed(1)} kg</div>}
+                                                        </td>
                                                         <td style={styles.td}>{canManage ? <Input value={m.thickness || ''} onChange={e => updateSpecMaterial(m.id, 'thickness', e.target.value)} placeholder="10" style={{ fontSize: 12, padding: '4px 8px', width: 60 }} /> : (m.thickness || '—')}</td>
                                                         <td style={styles.td}>{canManage ? <Select value={m.steelGrade} onChange={e => updateSpecMaterial(m.id, 'steelGrade', e.target.value)} style={{ fontSize: 11, padding: '4px' }}>{STEEL_GRADES.map(g => <option key={g} value={g}>{g}</option>)}</Select> : <span style={{ fontSize: 11, fontWeight: 700, color: '#3B82F6', background: 'rgba(59,130,246,0.1)', padding: '2px 6px', borderRadius: 4 }}>{m.steelGrade}</span>}</td>
                                                         {canManage && <td style={styles.td}><button onClick={() => removeSpecMaterial(m.id)} style={{ ...styles.btnDanger, padding: '4px 8px' }}><Icon name="trash" size={10} /></button></td>}
@@ -844,8 +920,8 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
             </div>
 
             {/* Tabs */}
-            <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
-                {[{ id: 'pipeline', label: '🔄 Pipeline' }, { id: 'lista', label: '📋 Lista' }, { id: 'archive', label: '📦 Arhiva' }].map(t => (
+            <div style={{ display: 'flex', gap: 6, marginBottom: 16, overflowX: 'auto' }}>
+                {[{ id: 'pipeline', label: '🔄 Pipeline' }, { id: 'lista', label: '📋 Lista' }, { id: 'gantt', label: '📊 Gantt' }, { id: 'calendar', label: '📅 Kalendar' }, { id: 'archive', label: '📦 Arhiva' }].map(t => (
                     <button key={t.id} onClick={() => setActiveTab(t.id)} style={{ padding: '8px 18px', borderRadius: 8, border: `1.5px solid ${activeTab === t.id ? C.accent : C.border}`, background: activeTab === t.id ? C.accentLight : 'transparent', color: activeTab === t.id ? C.accent : C.textMuted, fontWeight: activeTab === t.id ? 700 : 500, fontSize: 13, cursor: 'pointer' }}>
                         {t.label} {t.id === 'archive' && archivedOrders.length > 0 && <span style={{ fontSize: 10, marginLeft: 4 }}>({archivedOrders.length})</span>}
                     </button>
@@ -941,6 +1017,90 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                     )}
                 </div>
             )}
+
+            {/* Gantt Chart View */}
+            {activeTab === 'gantt' && (() => {
+                const ordersWithDates = filtered.filter(o => o.createdAt && o.deadline);
+                if (ordersWithDates.length === 0) return <div style={{ ...styles.card, textAlign: 'center', padding: 50, color: C.textMuted }}><div style={{ fontSize: 32, marginBottom: 8 }}>📊</div>Nema narudžbi s rokovima za Gantt prikaz</div>;
+                const allDates = ordersWithDates.flatMap(o => [new Date(o.createdAt).getTime(), new Date(o.deadline).getTime()]);
+                const minDate = Math.min(...allDates);
+                const maxDate = Math.max(...allDates);
+                const range = maxDate - minDate || 1;
+                return (
+                    <div style={{ ...styles.card, overflowX: 'auto' }}>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16 }}>📊 Gantt Chart — Vremenski raspored</div>
+                        <div style={{ minWidth: 600 }}>
+                            {ordersWithDates.map(o => {
+                                const start = new Date(o.createdAt).getTime();
+                                const end = new Date(o.deadline).getTime();
+                                const left = ((start - minDate) / range) * 100;
+                                const width = Math.max(((end - start) / range) * 100, 2);
+                                const stg = STAGES.find(s => s.id === o.stage);
+                                const isLate = end < Date.now();
+                                return (
+                                    <div key={o.id} onClick={() => setDetailId(o.id)} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, cursor: 'pointer', padding: '4px 0' }}>
+                                        <div style={{ width: 140, fontSize: 11, fontWeight: 600, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flexShrink: 0 }}>{o.orderNumber}</div>
+                                        <div style={{ flex: 1, position: 'relative', height: 22, background: 'var(--bg)', borderRadius: 4 }}>
+                                            <div style={{ position: 'absolute', left: `${left}%`, width: `${width}%`, height: '100%', borderRadius: 4, background: isLate ? '#EF4444' : stg?.color || C.accent, opacity: 0.85, display: 'flex', alignItems: 'center', paddingLeft: 6, overflow: 'hidden' }}>
+                                                <span style={{ fontSize: 9, color: '#fff', fontWeight: 700, whiteSpace: 'nowrap' }}>{o.name}</span>
+                                            </div>
+                                        </div>
+                                        <div style={{ width: 60, fontSize: 10, color: C.textMuted, flexShrink: 0 }}>{fmtDate(o.deadline)}</div>
+                                    </div>
+                                );
+                            })}
+                            {/* Timeline axis */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, paddingLeft: 150, fontSize: 9, color: C.textMuted }}>
+                                <span>{new Date(minDate).toLocaleDateString('hr')}</span>
+                                <span>{new Date((minDate + maxDate) / 2).toLocaleDateString('hr')}</span>
+                                <span>{new Date(maxDate).toLocaleDateString('hr')}</span>
+                            </div>
+                        </div>
+                    </div>
+                );
+            })()}
+
+            {/* Calendar View */}
+            {activeTab === 'calendar' && (() => {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = now.getMonth();
+                const firstDay = new Date(year, month, 1).getDay() || 7;
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const deadlineMap = {};
+                filtered.forEach(o => {
+                    if (!o.deadline) return;
+                    const d = new Date(o.deadline);
+                    if (d.getFullYear() === year && d.getMonth() === month) {
+                        const day = d.getDate();
+                        if (!deadlineMap[day]) deadlineMap[day] = [];
+                        deadlineMap[day].push(o);
+                    }
+                });
+                const cells = [];
+                for (let i = 1; i < firstDay; i++) cells.push(null);
+                for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+                return (
+                    <div style={{ ...styles.card }}>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16 }}>📅 Kalendar — {now.toLocaleDateString('hr', { month: 'long', year: 'numeric' })}</div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2 }}>
+                            {['Pon', 'Uto', 'Sri', 'Čet', 'Pet', 'Sub', 'Ned'].map(d => <div key={d} style={{ fontSize: 10, fontWeight: 700, color: C.textMuted, textAlign: 'center', padding: '4px 0' }}>{d}</div>)}
+                            {cells.map((day, i) => (
+                                <div key={i} style={{ minHeight: 60, padding: 4, borderRadius: 6, border: `1px solid ${day === now.getDate() ? C.accent : C.border}22`, background: day ? (deadlineMap[day] ? 'rgba(59,130,246,0.04)' : 'var(--bg)') : 'transparent' }}>
+                                    {day && <>
+                                        <div style={{ fontSize: 11, fontWeight: day === now.getDate() ? 800 : 500, color: day === now.getDate() ? C.accent : C.textMuted, marginBottom: 2 }}>{day}</div>
+                                        {(deadlineMap[day] || []).slice(0, 3).map(o => {
+                                            const stg = STAGES.find(s => s.id === o.stage);
+                                            return <div key={o.id} onClick={() => setDetailId(o.id)} style={{ fontSize: 8, padding: '1px 4px', borderRadius: 3, background: stg?.color || C.accent, color: '#fff', marginBottom: 1, cursor: 'pointer', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 600 }}>{o.name}</div>;
+                                        })}
+                                        {(deadlineMap[day] || []).length > 3 && <div style={{ fontSize: 8, color: C.textMuted }}>+{deadlineMap[day].length - 3}</div>}
+                                    </>}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            })()}
 
             {/* Archive view */}
             {activeTab === 'archive' && (
