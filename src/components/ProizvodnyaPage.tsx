@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useCallback } from 'react';
 import { useConfirm } from './ui/ConfirmModal';
 import { useApp, add as addDoc, update as updateDoc, remove as removeDoc } from '../context/AppContext';
 import { Icon, Modal, Field, Input, Textarea, Select, StatusBadge, WorkerCheckboxList, useIsMobile } from './ui/SharedComponents';
@@ -70,6 +70,8 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
     const [signOffOrder, setSignOffOrder] = useState(null);
     const [signOffNote, setSignOffNote] = useState('');
     const [signOffConfirmed, setSignOffConfirmed] = useState(false);
+    const sigCanvasRef = useRef(null);
+    const sigDrawing = useRef(false);
     const isMobile = useIsMobile();
     const isAdmin = currentUser?.role === 'admin';
     const isLeader = currentUser?.role === 'leader';
@@ -186,12 +188,35 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
             current.signedBy = currentUser?.name;
             current.signNote = signOffNote || '';
             current.signedAt = new Date().toISOString();
+            current.signature = getSigData() || null;
         }
         updatedStages.push({ stage: nextStage, enteredAt: new Date().toISOString() });
         await updateDoc('production', order.id, { stage: nextStage, stages: updatedStages });
         if (addAuditLog) await addAuditLog('PRODUCTION_STAGE_CHANGE', `${currentUser?.name} pomaknuo ${order.orderNumber} "${order.name}" u: ${STAGES[idx + 1]?.label}${signOffNote ? ' | ' + signOffNote : ''}`);
         setSignOffOrder(null);
     };
+
+    // Canvas signature helpers
+    const initSigCanvas = useCallback((canvas) => {
+        if (!canvas) return;
+        sigCanvasRef.current = canvas;
+        const ctx = canvas.getContext('2d');
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#1a1a1a';
+        const getPos = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const t = e.touches ? e.touches[0] : e;
+            return { x: t.clientX - rect.left, y: t.clientY - rect.top };
+        };
+        const start = (e) => { e.preventDefault(); sigDrawing.current = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); };
+        const move = (e) => { if (!sigDrawing.current) return; e.preventDefault(); const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); };
+        const end = () => { sigDrawing.current = false; };
+        canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', move); canvas.addEventListener('mouseup', end); canvas.addEventListener('mouseleave', end);
+        canvas.addEventListener('touchstart', start, { passive: false }); canvas.addEventListener('touchmove', move, { passive: false }); canvas.addEventListener('touchend', end);
+    }, []);
+    const clearSigCanvas = () => { const c = sigCanvasRef.current; if (c) { const ctx = c.getContext('2d'); ctx.clearRect(0, 0, c.width, c.height); } };
+    const getSigData = () => { const c = sigCanvasRef.current; return c ? c.toDataURL('image/png') : null; };
 
     const archiveOrder = async (order) => {
         await updateDoc('production', order.id, { status: 'arhiviran' });
@@ -439,7 +464,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                     <div style={{ fontSize: 22, fontWeight: 800, color: C.blue }}>{specs.materials.length}</div>
                                 </div>
                                 <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(16,185,129,0.08)', textAlign: 'center' }}>
-                                    <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Ukupna te\u017eina</div>
+                                    <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Ukupna težina</div>
                                     <div style={{ fontSize: 22, fontWeight: 800, color: C.green }}>{totalWeight >= 1000 ? `${(totalWeight / 1000).toFixed(2)}t` : `${totalWeight}kg`}</div>
                                 </div>
                                 <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(124,58,237,0.08)', textAlign: 'center' }}>
@@ -450,17 +475,17 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
 
                             {/* Materials */}
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                                <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>\ud83e\uddf1 Materijali</div>
+                                <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>🧱 Materijali</div>
                                 {canManage && <button onClick={addSpecMaterial} style={styles.btnSmall}><Icon name="plus" size={12} /> Dodaj</button>}
                             </div>
                             {specs.materials.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, textAlign: 'center', padding: 20 }}>Nema materijala — dodajte stavke</div> : (
                                 <div style={{ overflowX: 'auto', marginBottom: 20 }}>
                                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                        <thead><tr><th style={styles.th}>Naziv</th><th style={styles.th}>Profil/Dim.</th><th style={styles.th}>Kol.</th><th style={styles.th}>Jed.</th><th style={styles.th}>\u010celik</th>{canManage && <th style={styles.th}></th>}</tr></thead>
+                                        <thead><tr><th style={styles.th}>Naziv</th><th style={styles.th}>Profil/Dim.</th><th style={styles.th}>Kol.</th><th style={styles.th}>Jed.</th><th style={styles.th}>Čelik</th>{canManage && <th style={styles.th}></th>}</tr></thead>
                                         <tbody>
                                             {specs.materials.map(m => (
                                                 <tr key={m.id}>
-                                                    <td style={styles.td}>{canManage ? <Input value={m.name} onChange={e => updateSpecMaterial(m.id, 'name', e.target.value)} placeholder="Stup, Nosa\u010d..." style={{ fontSize: 12, padding: '4px 8px' }} /> : <span style={{ fontWeight: 600 }}>{m.name}</span>}</td>
+                                                    <td style={styles.td}>{canManage ? <Input value={m.name} onChange={e => updateSpecMaterial(m.id, 'name', e.target.value)} placeholder="Stup, Nosač..." style={{ fontSize: 12, padding: '4px 8px' }} /> : <span style={{ fontWeight: 600 }}>{m.name}</span>}</td>
                                                     <td style={styles.td}>{canManage ? <Input value={m.profile} onChange={e => updateSpecMaterial(m.id, 'profile', e.target.value)} placeholder="HEB 300" style={{ fontSize: 12, padding: '4px 8px' }} /> : m.profile}</td>
                                                     <td style={styles.td}>{canManage ? <Input type="number" value={m.quantity} onChange={e => updateSpecMaterial(m.id, 'quantity', parseFloat(e.target.value) || 0)} style={{ fontSize: 12, padding: '4px 8px', width: 70 }} /> : m.quantity}</td>
                                                     <td style={styles.td}>{canManage ? <Select value={m.unit} onChange={e => updateSpecMaterial(m.id, 'unit', e.target.value)} style={{ fontSize: 11, padding: '4px' }}>{SPEC_UNITS.map(u => <option key={u} value={u}>{u}</option>)}</Select> : m.unit}</td>
@@ -475,7 +500,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
 
                             {/* Dimensions */}
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                                <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>\ud83d\udccf Dimenzije / Mjere</div>
+                                <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>📏 Dimenzije / Mjere</div>
                                 {canManage && <button onClick={addSpecDim} style={styles.btnSmall}><Icon name="plus" size={12} /> Dodaj</button>}
                             </div>
                             {specs.dimensions.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, textAlign: 'center', padding: 15 }}>Nema dimenzija</div> : (
@@ -487,7 +512,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                                     <Input value={d.label} onChange={e => updateSpecDim(d.id, 'label', e.target.value)} placeholder="Npr. Raspon" style={{ fontSize: 12, padding: '4px 8px', flex: 1 }} />
                                                     <Input value={d.value} onChange={e => updateSpecDim(d.id, 'value', e.target.value)} placeholder="0" style={{ fontSize: 12, padding: '4px 8px', width: 60 }} />
                                                     <Select value={d.unit} onChange={e => updateSpecDim(d.id, 'unit', e.target.value)} style={{ fontSize: 11, padding: '4px', width: 60 }}>{SPEC_UNITS.map(u => <option key={u} value={u}>{u}</option>)}</Select>
-                                                    <button onClick={() => removeSpecDim(d.id)} style={{ background: 'none', border: 'none', color: C.red, cursor: 'pointer', fontSize: 12 }}>\u2715</button>
+                                                    <button onClick={() => removeSpecDim(d.id)} style={{ background: 'none', border: 'none', color: C.red, cursor: 'pointer', fontSize: 12 }}>✕</button>
                                                 </>
                                             ) : (
                                                 <>
@@ -501,9 +526,9 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                             )}
 
                             {/* Technical Notes */}
-                            <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 8 }}>\ud83d\udcdd Tehni\u010dke napomene</div>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 8 }}>📝 Tehničke napomene</div>
                             {canManage ? (
-                                <Textarea value={specs.technicalNotes || ''} onChange={e => updateTechNotes(e.target.value)} placeholder="Tehni\u010dke specifikacije, napomene, zahtjevi kvalitete, norma..." rows={4} />
+                                <Textarea value={specs.technicalNotes || ''} onChange={e => updateTechNotes(e.target.value)} placeholder="Tehničke specifikacije, napomene, zahtjevi kvalitete, norma..." rows={4} />
                             ) : (
                                 <div style={{ padding: '12px 16px', borderRadius: 8, background: C.bgElevated, fontSize: 13, color: C.textDim, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{specs.technicalNotes || 'Nema napomena'}</div>
                             )}
@@ -511,7 +536,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                     );
                 })()}
 
-                {/* Tro\u0161kovnik tab */}
+                {/* Troškovnik tab */}
                 {detailTab === 'troskovnik' && (
                     <div style={{ ...styles.card, marginBottom: 20 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
@@ -831,8 +856,8 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
 
             {/* Template Chooser Modal */}
             {showTemplateChooser && (
-                <Modal title="Odaberi predlo\u017eak proizvoda" onClose={() => setShowTemplateChooser(false)} wide>
-                    <div style={{ fontSize: 13, color: C.textMuted, marginBottom: 16 }}>Odaberi tip \u010deli\u010dnog proizvoda za brzi po\u010detak, ili kreiraj prazan projekt.</div>
+                <Modal title="Odaberi predložak proizvoda" onClose={() => setShowTemplateChooser(false)} wide>
+                    <div style={{ fontSize: 13, color: C.textMuted, marginBottom: 16 }}>Odaberi tip čeličnog proizvoda za brzi početak, ili kreiraj prazan projekt.</div>
                     <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 12 }}>
                         {TEMPLATES.map(tpl => (
                             <div key={tpl.id} onClick={() => openFromTemplate(tpl)}
@@ -843,7 +868,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                 <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 4 }}>{tpl.name.replace(/^[^\s]+\s/, '')}</div>
                                 <div style={{ fontSize: 11, color: C.textMuted }}>{tpl.desc}</div>
                                 {tpl.specDefaults?.materials?.length > 0 && (
-                                    <div style={{ marginTop: 8, fontSize: 10, color: C.accent, fontWeight: 600 }}>{tpl.specDefaults.materials.length} materijala \u2022 {tpl.specDefaults.dimensions?.length || 0} dimenzija</div>
+                                    <div style={{ marginTop: 8, fontSize: 10, color: C.accent, fontWeight: 600 }}>{tpl.specDefaults.materials.length} materijala • {tpl.specDefaults.dimensions?.length || 0} dimenzija</div>
                                 )}
                             </div>
                         ))}
@@ -866,12 +891,20 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                             <div style={{ fontSize: 12, fontWeight: 700, color: C.textMuted, marginBottom: 4, textTransform: 'uppercase' }}>Potpisuje</div>
                             <div style={{ fontSize: 14, fontWeight: 700, color: C.text, padding: '10px 14px', borderRadius: 8, background: C.bgElevated }}>{currentUser?.name || 'Nepoznat'}</div>
                         </div>
-                        <Field label="Kontrolna bilješka (opcionalno)"><Textarea value={signOffNote} onChange={e => setSignOffNote(e.target.value)} placeholder="Napomena o fazi, kvaliteta, status kontrole..." rows={3} /></Field>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '16px 0', cursor: 'pointer', padding: '12px 14px', borderRadius: 10, border: `1.5px solid ${signOffConfirmed ? '#10B981' : C.border}`, background: signOffConfirmed ? 'rgba(16,185,129,0.06)' : 'transparent', transition: 'all 0.2s' }}>
+                        <Field label="Kontrolna bilješka (opcionalno)"><Textarea value={signOffNote} onChange={e => setSignOffNote(e.target.value)} placeholder="Napomena o fazi, kvaliteta, status kontrole..." rows={2} /></Field>
+                        <div style={{ marginBottom: 12 }}>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: C.textMuted, marginBottom: 6, textTransform: 'uppercase' }}>✍️ Potpis</div>
+                            <div style={{ position: 'relative', borderRadius: 10, border: `1.5px solid ${C.border}`, overflow: 'hidden', background: '#fff' }}>
+                                <canvas ref={initSigCanvas} width={380} height={120} style={{ width: '100%', height: 120, touchAction: 'none', cursor: 'crosshair' }} />
+                                <button onClick={clearSigCanvas} style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(0,0,0,0.06)', border: 'none', borderRadius: 6, padding: '3px 8px', fontSize: 10, color: C.textMuted, cursor: 'pointer' }}>Očisti</button>
+                            </div>
+                            <div style={{ fontSize: 10, color: C.textMuted, marginTop: 4 }}>Potpišite se prstom ili mišem</div>
+                        </div>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 0', cursor: 'pointer', padding: '12px 14px', borderRadius: 10, border: `1.5px solid ${signOffConfirmed ? '#10B981' : C.border}`, background: signOffConfirmed ? 'rgba(16,185,129,0.06)' : 'transparent', transition: 'all 0.2s' }}>
                             <input type="checkbox" checked={signOffConfirmed} onChange={e => setSignOffConfirmed(e.target.checked)} style={{ width: 18, height: 18, accentColor: '#10B981' }} />
                             <span style={{ fontSize: 13, fontWeight: 600, color: signOffConfirmed ? '#10B981' : C.text }}>Potvrđujem da je faza završena i kontrolirana</span>
                         </label>
-                        <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 16 }}>
+                        <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 12 }}>
                             <button onClick={() => setSignOffOrder(null)} style={styles.btnSecondary}>Odustani</button>
                             <button onClick={confirmSignOff} disabled={!signOffConfirmed} style={{ ...styles.btn, opacity: signOffConfirmed ? 1 : 0.4, fontSize: 14, padding: '10px 24px' }}>✅ Potpiši i pomakni</button>
                         </div>
