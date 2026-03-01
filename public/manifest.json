@@ -1,0 +1,45 @@
+{
+    "name": "Vi-Di-Sef — Upravljanje Gradilištem",
+    "short_name": "Vi-Di-Sef",
+    "description": "Profesionalni sustav za upravljanje gradilištem — evidencija radnika, sati, projekata, računa i otpremnica",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "background_color": "#EEF2F7",
+    "theme_color": "#D95D08",
+    "lang": "hr",
+    "dir": "ltr",
+    "orientation": "any",
+    "categories": [
+        "business",
+        "productivity"
+    ],
+    "icons": [
+        {
+            "src": "/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "screenshots": [],
+    "prefer_related_applications": false
+}

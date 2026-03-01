@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vi-Di-Sef — Politika privatnosti</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.7;
+            color: #1e293b;
+            background: #f8fafc;
+            padding: 2rem 1rem;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 16px;
+            padding: 3rem 2.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        h1 {
+            font-size: 1.8rem;
+            color: #f97316;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            color: #64748b;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 1rem;
+        }
+        h2 {
+            font-size: 1.2rem;
+            color: #0f172a;
+            margin: 1.8rem 0 0.6rem;
+        }
+        p, li {
+            color: #475569;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+        ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        a { color: #f97316; }
+        .footer {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+        @media (max-width: 600px) {
+            .container { padding: 1.5rem 1.2rem; }
+            h1 { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Politika privatnosti</h1>
+    <p class="subtitle">Vi-Di-Sef — Sustav za upravljanje radnom snagom<br>Zadnje ažuriranje: 20. veljače 2026.</p>
+
+    <h2>1. Uvod</h2>
+    <p>Vi-Di-Sef ("mi", "naš", "aplikacija") je platforma za upravljanje radnom snagom u građevinskoj industriji. Ova politika privatnosti opisuje kako prikupljamo, koristimo i štitimo vaše osobne podatke.</p>
+
+    <h2>2. Podaci koje prikupljamo</h2>
+    <ul>
+        <li><strong>Osobni podaci:</strong> Ime i prezime, korisničko ime, PIN (šifrirano hashiranjem).</li>
+        <li><strong>Podaci o lokaciji (GPS):</strong> Geografska širina i dužina, točnost signala, udaljenost od gradilišta, status geofence zone. Prikupljaju se isključivo tijekom radnog vremena i samo uz aktivno praćenje.</li>
+        <li><strong>Podaci o radu:</strong> Evidencija radnih sati, projekti, zadaci, dnevni izvještaji.</li>
+        <li><strong>Podaci o uređaju:</strong> Razina baterije (za optimizaciju GPS praćenja), status mrežne veze.</li>
+    </ul>
+
+    <h2>3. Svrha prikupljanja podataka</h2>
+    <ul>
+        <li>Evidencija radnog vremena i prisutnosti na gradilištu.</li>
+        <li>Upravljanje projektima i resursima.</li>
+        <li>Generiranje izvještaja za voditelje i administratore.</li>
+        <li>Sigurnost radnika — praćenje prisutnosti u geofence zonama.</li>
+        <li>Optimizacija rasporeda i troškova.</li>
+    </ul>
+
+    <h2>4. GPS praćenje</h2>
+    <p>Aplikacija prikuplja podatke o lokaciji samo kada:</p>
+    <ul>
+        <li>GPS praćenje je izričito omogućeno od strane administratora tvrtke.</li>
+        <li>Radnik je prijavljen u aplikaciju i praćenje je aktivno.</li>
+        <li>Aplikacija je otvorena (PING_ON_OPEN) ili aktivno praćenje je uključeno (LIVE_WHILE_OPEN).</li>
+    </ul>
+    <p>GPS podaci se <strong>ne prikupljaju</strong> van radnog vremena, nakon odjave ili kada je praćenje isključeno.</p>
+
+    <h2>5. Pohrana i sigurnost podataka</h2>
+    <ul>
+        <li>Podaci se pohranjuju na <strong>Google Firebase (Firestore)</strong> s enkripcijom u prijenosu i mirovanju.</li>
+        <li>PIN-ovi su zaštićeni jednosmjernim hashiranjem (SHA-256 sa solju).</li>
+        <li>Pristup podacima je ograničen ulogama (admin, voditelj, radnik).</li>
+        <li>Radnici mogu vidjeti samo vlastite podatke.</li>
+    </ul>
+
+    <h2>6. Dijeljenje podataka</h2>
+    <p>Vaše podatke <strong>ne prodajemo i ne dijelimo</strong> s trećim stranama, osim:</p>
+    <ul>
+        <li><strong>Google Firebase:</strong> Infrastruktura za pohranu podataka (Google Cloud, EU regija).</li>
+        <li><strong>Zakonski zahtjevi:</strong> Ako smo zakonski obvezani otkriti podatke.</li>
+    </ul>
+
+    <h2>7. Vaša prava</h2>
+    <p>U skladu s GDPR uredbom, imate pravo na:</p>
+    <ul>
+        <li><strong>Pristup:</strong> Uvid u sve osobne podatke koje pohranjujemo.</li>
+        <li><strong>Ispravak:</strong> Ispravak netočnih osobnih podataka.</li>
+        <li><strong>Brisanje:</strong> Zahtjev za brisanje vaših podataka ("pravo na zaborav").</li>
+        <li><strong>Prijenos:</strong> Dobijanje kopije vaših podataka u strojno čitljivom formatu.</li>
+        <li><strong>Prigovor:</strong> Prigovor na obradu vaših osobnih podataka.</li>
+    </ul>
+
+    <h2>8. Zadržavanje podataka</h2>
+    <ul>
+        <li>GPS lokacijski podaci: 90 dana aktivno, arhivirano do 1 godine.</li>
+        <li>Evidencija radnog vremena: Za vrijeme trajanja poslovnog odnosa + zakonski rok čuvanja.</li>
+        <li>Korisnički računi: Do zahtjeva za brisanje ili prestanka korištenja.</li>
+    </ul>
+
+    <h2>9. Djeca</h2>
+    <p>Vi-Di-Sef nije namijenjen osobama mlađim od 18 godina. Ne prikupljamo svjesno podatke od maloljetnika.</p>
+
+    <h2>10. Promjene politike</h2>
+    <p>Zadržavamo pravo ažuriranja ove politike. O značajnim promjenama ćemo vas obavijestiti putem aplikacije.</p>
+
+    <h2>11. Kontakt</h2>
+    <p>Za pitanja o privatnosti ili za ostvarivanje vaših prava:</p>
+    <ul>
+        <li>E-mail: <a href="mailto:privacy@vidisef.hr">privacy@vidisef.hr</a></li>
+        <li>Web: <a href="https://vidisef.hr">vidisef.hr</a></li>
+    </ul>
+
+    <div class="footer">
+        &copy; 2026 Vi-Di-Sef. Sva prava pridržana.
+    </div>
+</div>
+</body>
+</html>

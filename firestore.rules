@@ -1,0 +1,179 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ══════════════════════════════════════════════════════════════
+    // ROLE-BASED SECURITY RULES for Vi-Di-Sef
+    // Uses authMapping collection: Firebase UID → { role, userId }
+    // Roles: admin | leader | radnik (default)
+    // ══════════════════════════════════════════════════════════════
+
+    // ── Helper functions ─────────────────────────────────────────
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    function getRole() {
+      return get(/databases/$(database)/documents/authMapping/$(request.auth.uid)).data.role;
+    }
+
+    function isAdmin() {
+      return isAuth() && getRole() == 'admin';
+    }
+
+    // Fallback: if authMapping doesn't exist, allow auth-only access
+    // This prevents lockout during migration
+    function hasMapping() {
+      return isAuth() && exists(/databases/$(database)/documents/authMapping/$(request.auth.uid));
+    }
+
+    function adminOrNoMapping() {
+      return isAuth() && (!hasMapping() || getRole() == 'admin');
+    }
+
+    // ── AUTH MAPPING — authenticated read/write (app writes on login) ──
+    match /authMapping/{uid} {
+      allow read: if isAuth();
+      allow write: if isAuth();
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // ADMIN-ONLY WRITE collections
+    // Everyone reads, only admin (or unmapped users) can write
+    // ═══════════════════════════════════════════════════════════════
+
+    // ── Users & Workers — admin manages, all read ──
+    match /users/{userId} {
+      allow read: if isAuth();
+      allow write: if adminOrNoMapping();
+    }
+
+    match /workers/{workerId} {
+      allow read: if isAuth();
+      allow write: if adminOrNoMapping();
+    }
+
+    // ── Projects — admin manages, all read ──
+    match /projects/{projectId} {
+      allow read: if isAuth();
+      allow write: if adminOrNoMapping();
+    }
+
+    // ── Config — admin manages, all read ──
+    match /config/{docId} {
+      allow read: if isAuth();
+      allow write: if adminOrNoMapping();
+    }
+
+    // ── Vehicles — admin manages, all read ──
+    match /vehicles/{vehicleId} {
+      allow read: if isAuth();
+      allow write: if adminOrNoMapping();
+    }
+
+    // ── Smjestaj — admin manages, all read ──
+    match /smjestaj/{smjestajId} {
+      allow read: if isAuth();
+      allow write: if adminOrNoMapping();
+    }
+
+    // ── Weather Rules — admin manages, all read ──
+    match /weatherRules/{docId} {
+      allow read: if isAuth();
+      allow write: if adminOrNoMapping();
+    }
+
+    // ── Safety Templates — admin manages, all read ──
+    match /safetyTemplates/{docId} {
+      allow read: if isAuth();
+      allow write: if adminOrNoMapping();
+    }
+
+    // ── GPS Settings — admin manages, all read ──
+    match /gpsSettings/{docId} {
+      allow read: if isAuth();
+      allow write: if adminOrNoMapping();
+    }
+    match /gpsProjectSettings/{docId} {
+      allow read: if isAuth();
+      allow write: if adminOrNoMapping();
+    }
+    match /gpsWorkerSettings/{docId} {
+      allow read: if isAuth();
+      allow write: if adminOrNoMapping();
+    }
+
+    // ── Audit Log — admin reads, all write (app logs actions) ──
+    match /auditLog/{logId} {
+      allow read: if adminOrNoMapping();
+      allow write: if isAuth();
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // ALL-WRITE collections
+    // Workers need to create/update their own data
+    // ═══════════════════════════════════════════════════════════════
+
+    // ── Timesheets — workers create entries, admin approves ──
+    match /timesheets/{timesheetId} {
+      allow read: if isAuth();
+      allow write: if isAuth();
+    }
+
+    // ── Invoices — workers submit, admin approves ──
+    match /invoices/{invoiceId} {
+      allow read: if isAuth();
+      allow write: if isAuth();
+    }
+
+    // ── Otpremnice — workers create, admin approves ──
+    match /otpremnice/{otpremnicaId} {
+      allow read: if isAuth();
+      allow write: if isAuth();
+    }
+
+    // ── Obaveze — workers mark complete, admin creates ──
+    match /obaveze/{obavezaId} {
+      allow read: if isAuth();
+      allow write: if isAuth();
+    }
+
+    // ── Safety Checklists — workers fill out ──
+    match /safetyChecklists/{docId} {
+      allow read: if isAuth();
+      allow write: if isAuth();
+    }
+
+    // ── Daily Logs — workers/leaders create ──
+    match /dailyLogs/{docId} {
+      allow read: if isAuth();
+      allow write: if isAuth();
+    }
+
+    // ── Fuel Logs — workers log fuel ──
+    match /fuelLogs/{docId} {
+      allow read: if isAuth();
+      allow write: if isAuth();
+    }
+
+    // ── Leave Requests — workers submit, admin approves ──
+    match /leaveRequests/{docId} {
+      allow read: if isAuth();
+      allow write: if isAuth();
+    }
+
+    // ── GPS Live Data — workers send positions ──
+    match /gpsLiveLocations/{docId} {
+      allow read: if isAuth();
+      allow write: if isAuth();
+    }
+    match /gpsEvents/{docId} {
+      allow read: if isAuth();
+      allow write: if isAuth();
+    }
+    match /gps-live/{docId} {
+      allow read: if isAuth();
+      allow write: if isAuth();
+    }
+  }
+}
