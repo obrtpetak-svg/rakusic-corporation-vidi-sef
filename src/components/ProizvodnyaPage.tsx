@@ -460,7 +460,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                 if ((o.subtasks || []).length > 0) { txt += `\nZADACI\n${'-'.repeat(30)}\n`; o.subtasks.forEach(t => txt += `[${t.status === 'gotovo' ? '✓' : ' '}] ${t.title}${t.assignedTo ? ' → ' + t.assignedTo : ''}\n`); }
                                 const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
                                 const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${o.orderNumber}.txt`; a.click();
-                            }} style={{ ...styles.btnSecondary, fontSize: 12 }}>📄 PDF/TXT</button>
+                            }} style={{ ...styles.btnSecondary, fontSize: 12 }}>📄 PDF</button>
                             <button onClick={() => {
                                 const o = detailOrder;
                                 const specs = o.specifications || { materials: [] };
@@ -470,7 +470,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                 (o.subtasks || []).forEach(t => csv += `Zadatak,"${t.title}",${t.status},,,,,,,${t.assignedTo || ''}\n`);
                                 const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
                                 const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${o.orderNumber}.csv`; a.click();
-                            }} style={{ ...styles.btnSecondary, fontSize: 12 }}>📊 XLS/CSV</button>
+                            }} style={{ ...styles.btnSecondary, fontSize: 12 }}>📊 CSV</button>
                         </div>
                     </div>
 
