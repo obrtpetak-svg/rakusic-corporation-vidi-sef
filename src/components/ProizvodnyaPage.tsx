@@ -20,6 +20,36 @@ const COST_CATEGORIES = [
     { value: 'ostalo', label: '📦 Ostalo' },
 ];
 
+const STEEL_GRADES = ['S235', 'S275', 'S355', 'S460', 'Inox 304', 'Inox 316', 'Al 6060', 'Ostalo'];
+const SPEC_UNITS = ['kg', 't', 'm', 'm²', 'm³', 'kom', 'set', 'l'];
+
+const TEMPLATES = [
+    {
+        id: 'hala', name: '🏗️ Čelična hala', desc: 'Industrijska/skladišna hala', defaults: { quantity: 1, unit: 'kom', priority: 'normalan' },
+        specDefaults: { dimensions: [{ label: 'Raspon', unit: 'm' }, { label: 'Visina', unit: 'm' }, { label: 'Dužina', unit: 'm' }], materials: [{ name: 'Stupovi HEA/HEB', profile: 'HEA 300', unit: 'kg', steelGrade: 'S355' }, { name: 'Krovni nosači IPE', profile: 'IPE 400', unit: 'kg', steelGrade: 'S355' }, { name: 'Sekundarni nosači', profile: 'IPE 200', unit: 'kg', steelGrade: 'S235' }, { name: 'Spregovi/Ukrute', profile: 'L 80x8', unit: 'kg', steelGrade: 'S235' }] }
+    },
+    {
+        id: 'stupovi', name: '🏛️ Stupovi', desc: 'HEA/HEB/Okrugli stupovi', defaults: { unit: 'kom', priority: 'normalan' },
+        specDefaults: { dimensions: [{ label: 'Visina', unit: 'm' }, { label: 'Bazna ploča', unit: 'mm' }], materials: [{ name: 'Stup', profile: 'HEB 300', unit: 'kg', steelGrade: 'S355' }, { name: 'Bazna ploča', profile: 'PL 20mm', unit: 'kg', steelGrade: 'S355' }, { name: 'Ankeri', profile: 'M24', unit: 'kom', steelGrade: 'S235' }] }
+    },
+    {
+        id: 'nosaci', name: '🔩 Nosači', desc: 'IPE/HEA/UPN nosači', defaults: { unit: 'kom', priority: 'normalan' },
+        specDefaults: { dimensions: [{ label: 'Raspon', unit: 'm' }, { label: 'Opterećenje', unit: 'kN/m' }], materials: [{ name: 'Nosač', profile: 'IPE 300', unit: 'kg', steelGrade: 'S355' }, { name: 'Spojna ploča', profile: 'PL 15mm', unit: 'kg', steelGrade: 'S235' }, { name: 'Vijci', profile: 'M20 10.9', unit: 'kom', steelGrade: 'S235' }] }
+    },
+    {
+        id: 'stepeniste', name: '🪜 Stepenište', desc: 'Čelično stepenište/rampa', defaults: { quantity: 1, unit: 'kom', priority: 'normalan' },
+        specDefaults: { dimensions: [{ label: 'Visina', unit: 'm' }, { label: 'Širina', unit: 'mm' }, { label: 'Broj stepenica', unit: 'kom' }], materials: [{ name: 'Gaziša', profile: 'Rešetkasto', unit: 'kom', steelGrade: 'S235' }, { name: 'Podnica', profile: 'UPN 200', unit: 'kg', steelGrade: 'S235' }, { name: 'Ograda', profile: 'Cijev Ø42', unit: 'm', steelGrade: 'S235' }] }
+    },
+    {
+        id: 'ograda', name: '🛡️ Ograde / Railing', desc: 'Zaštitne ograde, rukohvati', defaults: { unit: 'm', priority: 'normalan' },
+        specDefaults: { dimensions: [{ label: 'Dužina', unit: 'm' }, { label: 'Visina', unit: 'mm' }], materials: [{ name: 'Stupići', profile: 'Cijev 40x40', unit: 'kom', steelGrade: 'S235' }, { name: 'Rukohvat', profile: 'Cijev Ø42', unit: 'm', steelGrade: 'Inox 304' }, { name: 'Ispuna', profile: 'Cijev Ø16', unit: 'm', steelGrade: 'S235' }] }
+    },
+    {
+        id: 'custom', name: '⚡ Proizvoljno', desc: 'Konstrukcija po mjeri', defaults: { quantity: 1, unit: 'kom', priority: 'normalan' },
+        specDefaults: { dimensions: [], materials: [] }
+    },
+];
+
 const genOrderNumber = () => {
     const year = new Date().getFullYear();
     const num = String(Math.floor(Math.random() * 9000) + 1000);
@@ -28,7 +58,7 @@ const genOrderNumber = () => {
 
 export function ProizvodnyaPage({ leaderProjectIds }) {
     const confirm = useConfirm();
-    const { production, workers, projects, currentUser } = useApp();
+    const { production, workers, projects, currentUser, addAuditLog } = useApp();
     const [activeTab, setActiveTab] = useState('pipeline');
     const [showForm, setShowForm] = useState(false);
     const [editId, setEditId] = useState(null);
@@ -36,6 +66,9 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
     const [search, setSearch] = useState('');
     const [filterStage, setFilterStage] = useState('all');
     const [filterPriority, setFilterPriority] = useState('all');
+    const [showTemplateChooser, setShowTemplateChooser] = useState(false);
+    const [signOffOrder, setSignOffOrder] = useState(null);
+    const [signOffForm, setSignOffForm] = useState({ note: '', confirmed: false });
     const isMobile = useIsMobile();
     const isAdmin = currentUser?.role === 'admin';
     const isLeader = currentUser?.role === 'leader';
@@ -96,9 +129,20 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
     const [form, setForm] = useState(blankForm());
     const upd = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
-    const openAdd = () => { setForm(blankForm()); setEditId(null); setShowForm(true); };
+    const openAdd = () => { setShowTemplateChooser(true); };
+    const openFromTemplate = (tpl) => {
+        const f = blankForm();
+        if (tpl) {
+            f.name = tpl.id !== 'custom' ? tpl.name.replace(/^[^\s]+\s/, '') : '';
+            if (tpl.defaults) Object.assign(f, tpl.defaults);
+            if (tpl.specDefaults) {
+                f.specifications = { materials: (tpl.specDefaults.materials || []).map(m => ({ id: genId(), ...m, quantity: 0 })), dimensions: (tpl.specDefaults.dimensions || []).map(d => ({ id: genId(), ...d, value: '' })), technicalNotes: '' };
+            }
+        }
+        setForm(f); setEditId(null); setShowTemplateChooser(false); setShowForm(true);
+    };
     const openEdit = (o) => {
-        setForm({ ...o, assignedWorkers: o.assignedWorkers || [], costItems: o.costItems || [], files: o.files || [], stages: o.stages || [] });
+        setForm({ ...o, assignedWorkers: o.assignedWorkers || [], costItems: o.costItems || [], files: o.files || [], stages: o.stages || [], specifications: o.specifications || { materials: [], dimensions: [], technicalNotes: '' } });
         setEditId(o.id); setShowForm(true);
     };
 
@@ -118,17 +162,31 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
         await removeDoc('production', id);
     };
 
-    const advanceStage = async (order) => {
+    // Stage advancement — opens sign-off modal instead of direct advance
+    const requestAdvance = (order) => {
+        setSignOffOrder(order);
+        setSignOffForm({ note: '', confirmed: false });
+    };
+    const confirmSignOff = async () => {
+        if (!signOffForm.confirmed) return alert('Morate potvrditi da je faza završena');
+        const order = signOffOrder;
         const idx = STAGES.findIndex(s => s.id === order.stage);
         if (idx >= STAGES.length - 1) return;
         const nextStage = STAGES[idx + 1].id;
         const updatedStages = [...(order.stages || [])];
-        // Mark current stage as completed
         const current = updatedStages.find(s => s.stage === order.stage && !s.completedAt);
-        if (current) { current.completedAt = new Date().toISOString(); current.completedBy = currentUser?.name; }
-        // Add entry for next stage
+        if (current) {
+            current.completedAt = new Date().toISOString();
+            current.completedBy = currentUser?.name;
+            current.signedBy = currentUser?.name;
+            current.signNote = signOffForm.note || '';
+            current.signedAt = new Date().toISOString();
+        }
         updatedStages.push({ stage: nextStage, enteredAt: new Date().toISOString() });
         await updateDoc('production', order.id, { stage: nextStage, stages: updatedStages });
+        // Audit log — visible to all admins
+        if (addAuditLog) await addAuditLog('PRODUCTION_STAGE_CHANGE', `📋 ${currentUser?.name} → ${order.orderNumber} "${order.name}" pomaknuto u: ${STAGES[idx + 1]?.label}${signOffForm.note ? ` | ${signOffForm.note}` : ''}`);
+        setSignOffOrder(null);
     };
 
     const archiveOrder = async (order) => {
@@ -266,7 +324,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                     {/* Actions */}
                     {canManage && detailOrder.stage !== 'zavrseno' && (
                         <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-                            <button onClick={() => advanceStage(detailOrder)} style={{ ...styles.btn, fontSize: 13 }}>
+                            <button onClick={() => requestAdvance(detailOrder)} style={{ ...styles.btn, fontSize: 13 }}>
                                 ⏭️ {STAGES[stageIdx + 1] ? `Pomakni u: ${STAGES[stageIdx + 1].label}` : 'Završi'}
                             </button>
                             <button onClick={() => openEdit(detailOrder)} style={styles.btnSecondary}><Icon name="edit" size={14} /> Uredi</button>
@@ -281,7 +339,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
 
                 {/* Detail tabs */}
                 <div style={{ display: 'flex', gap: 6, marginBottom: 16, overflowX: 'auto' }}>
-                    {[{ id: 'info', label: '📋 Info' }, { id: 'troskovnik', label: '💰 Troškovnik' }, { id: 'dokumenti', label: '📎 Dokumenti' }, { id: 'povijest', label: '🕐 Povijest' }].map(t => (
+                    {[{ id: 'info', label: '📋 Info' }, { id: 'specifikacije', label: '📐 Specifikacije' }, { id: 'troskovnik', label: '💰 Troškovnik' }, { id: 'dokumenti', label: '📎 Dokumenti' }, { id: 'povijest', label: '🕐 Povijest' }].map(t => (
                         <button key={t.id} onClick={() => setDetailTab(t.id)} style={{ padding: '8px 16px', borderRadius: 8, border: `1.5px solid ${detailTab === t.id ? C.accent : C.border}`, background: detailTab === t.id ? C.accentLight : 'transparent', color: detailTab === t.id ? C.accent : C.textMuted, fontWeight: detailTab === t.id ? 700 : 500, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap' }}>
                             {t.label}
                         </button>
@@ -319,8 +377,9 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                             {record && <div style={{ fontSize: 11, color: C.textMuted }}>
                                                 {record.enteredAt && `Započeto: ${fmtDate(record.enteredAt)}`}
                                                 {record.completedAt && ` → Završeno: ${fmtDate(record.completedAt)}`}
-                                                {record.completedBy && ` (${record.completedBy})`}
+                                                {record.signedBy && <span style={{ color: '#10B981', fontWeight: 600 }}> ✍️ {record.signedBy}</span>}
                                             </div>}
+                                            {record?.signNote && <div style={{ fontSize: 11, color: C.accent, fontStyle: 'italic', marginTop: 2 }}>📝 {record.signNote}</div>}
                                         </div>
                                     </div>
                                 );
@@ -329,7 +388,123 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                     </div>
                 )}
 
-                {/* Troškovnik tab */}
+                {/* Specifikacije tab */}
+                {detailTab === 'specifikacije' && (() => {
+                    const specs = detailOrder.specifications || { materials: [], dimensions: [], technicalNotes: '' };
+                    const addSpecMaterial = async () => {
+                        const newMat = { id: genId(), name: '', profile: '', quantity: 0, unit: 'kg', steelGrade: 'S235', notes: '' };
+                        const updated = { ...specs, materials: [...specs.materials, newMat] };
+                        await updateDoc('production', detailOrder.id, { specifications: updated });
+                    };
+                    const removeSpecMaterial = async (matId) => {
+                        const updated = { ...specs, materials: specs.materials.filter(m => m.id !== matId) };
+                        await updateDoc('production', detailOrder.id, { specifications: updated });
+                    };
+                    const updateSpecMaterial = async (matId, key, val) => {
+                        const updated = { ...specs, materials: specs.materials.map(m => m.id === matId ? { ...m, [key]: val } : m) };
+                        await updateDoc('production', detailOrder.id, { specifications: updated });
+                    };
+                    const addSpecDim = async () => {
+                        const newDim = { id: genId(), label: '', value: '', unit: 'm' };
+                        const updated = { ...specs, dimensions: [...specs.dimensions, newDim] };
+                        await updateDoc('production', detailOrder.id, { specifications: updated });
+                    };
+                    const removeSpecDim = async (dimId) => {
+                        const updated = { ...specs, dimensions: specs.dimensions.filter(d => d.id !== dimId) };
+                        await updateDoc('production', detailOrder.id, { specifications: updated });
+                    };
+                    const updateSpecDim = async (dimId, key, val) => {
+                        const updated = { ...specs, dimensions: specs.dimensions.map(d => d.id === dimId ? { ...d, [key]: val } : d) };
+                        await updateDoc('production', detailOrder.id, { specifications: updated });
+                    };
+                    const updateTechNotes = async (val) => {
+                        const updated = { ...specs, technicalNotes: val };
+                        await updateDoc('production', detailOrder.id, { specifications: updated });
+                    };
+                    const totalWeight = specs.materials.reduce((s, m) => s + ((['kg', 't'].includes(m.unit)) ? (m.unit === 't' ? m.quantity * 1000 : m.quantity) : 0), 0);
+
+                    return (
+                        <div style={{ ...styles.card, marginBottom: 20 }}>
+                            {/* Summary */}
+                            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
+                                <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(59,130,246,0.08)', textAlign: 'center' }}>
+                                    <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Materijali</div>
+                                    <div style={{ fontSize: 22, fontWeight: 800, color: C.blue }}>{specs.materials.length}</div>
+                                </div>
+                                <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(16,185,129,0.08)', textAlign: 'center' }}>
+                                    <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Ukupna te\u017eina</div>
+                                    <div style={{ fontSize: 22, fontWeight: 800, color: C.green }}>{totalWeight >= 1000 ? `${(totalWeight / 1000).toFixed(2)}t` : `${totalWeight}kg`}</div>
+                                </div>
+                                <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(124,58,237,0.08)', textAlign: 'center' }}>
+                                    <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Dimenzije</div>
+                                    <div style={{ fontSize: 22, fontWeight: 800, color: '#7C3AED' }}>{specs.dimensions.length}</div>
+                                </div>
+                            </div>
+
+                            {/* Materials */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                                <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>\ud83e\uddf1 Materijali</div>
+                                {canManage && <button onClick={addSpecMaterial} style={styles.btnSmall}><Icon name="plus" size={12} /> Dodaj</button>}
+                            </div>
+                            {specs.materials.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, textAlign: 'center', padding: 20 }}>Nema materijala — dodajte stavke</div> : (
+                                <div style={{ overflowX: 'auto', marginBottom: 20 }}>
+                                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                        <thead><tr><th style={styles.th}>Naziv</th><th style={styles.th}>Profil/Dim.</th><th style={styles.th}>Kol.</th><th style={styles.th}>Jed.</th><th style={styles.th}>\u010celik</th>{canManage && <th style={styles.th}></th>}</tr></thead>
+                                        <tbody>
+                                            {specs.materials.map(m => (
+                                                <tr key={m.id}>
+                                                    <td style={styles.td}>{canManage ? <Input value={m.name} onChange={e => updateSpecMaterial(m.id, 'name', e.target.value)} placeholder="Stup, Nosa\u010d..." style={{ fontSize: 12, padding: '4px 8px' }} /> : <span style={{ fontWeight: 600 }}>{m.name}</span>}</td>
+                                                    <td style={styles.td}>{canManage ? <Input value={m.profile} onChange={e => updateSpecMaterial(m.id, 'profile', e.target.value)} placeholder="HEB 300" style={{ fontSize: 12, padding: '4px 8px' }} /> : m.profile}</td>
+                                                    <td style={styles.td}>{canManage ? <Input type="number" value={m.quantity} onChange={e => updateSpecMaterial(m.id, 'quantity', parseFloat(e.target.value) || 0)} style={{ fontSize: 12, padding: '4px 8px', width: 70 }} /> : m.quantity}</td>
+                                                    <td style={styles.td}>{canManage ? <Select value={m.unit} onChange={e => updateSpecMaterial(m.id, 'unit', e.target.value)} style={{ fontSize: 11, padding: '4px' }}>{SPEC_UNITS.map(u => <option key={u} value={u}>{u}</option>)}</Select> : m.unit}</td>
+                                                    <td style={styles.td}>{canManage ? <Select value={m.steelGrade} onChange={e => updateSpecMaterial(m.id, 'steelGrade', e.target.value)} style={{ fontSize: 11, padding: '4px' }}>{STEEL_GRADES.map(g => <option key={g} value={g}>{g}</option>)}</Select> : <span style={{ fontSize: 11, fontWeight: 700, color: '#3B82F6', background: 'rgba(59,130,246,0.1)', padding: '2px 6px', borderRadius: 4 }}>{m.steelGrade}</span>}</td>
+                                                    {canManage && <td style={styles.td}><button onClick={() => removeSpecMaterial(m.id)} style={{ ...styles.btnDanger, padding: '4px 8px' }}><Icon name="trash" size={10} /></button></td>}
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+
+                            {/* Dimensions */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                                <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>\ud83d\udccf Dimenzije / Mjere</div>
+                                {canManage && <button onClick={addSpecDim} style={styles.btnSmall}><Icon name="plus" size={12} /> Dodaj</button>}
+                            </div>
+                            {specs.dimensions.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, textAlign: 'center', padding: 15 }}>Nema dimenzija</div> : (
+                                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(220px, 1fr))', gap: 10, marginBottom: 20 }}>
+                                    {specs.dimensions.map(d => (
+                                        <div key={d.id} style={{ padding: '10px 14px', borderRadius: 10, background: 'var(--bg)', border: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', gap: 8 }}>
+                                            {canManage ? (
+                                                <>
+                                                    <Input value={d.label} onChange={e => updateSpecDim(d.id, 'label', e.target.value)} placeholder="Npr. Raspon" style={{ fontSize: 12, padding: '4px 8px', flex: 1 }} />
+                                                    <Input value={d.value} onChange={e => updateSpecDim(d.id, 'value', e.target.value)} placeholder="0" style={{ fontSize: 12, padding: '4px 8px', width: 60 }} />
+                                                    <Select value={d.unit} onChange={e => updateSpecDim(d.id, 'unit', e.target.value)} style={{ fontSize: 11, padding: '4px', width: 60 }}>{SPEC_UNITS.map(u => <option key={u} value={u}>{u}</option>)}</Select>
+                                                    <button onClick={() => removeSpecDim(d.id)} style={{ background: 'none', border: 'none', color: C.red, cursor: 'pointer', fontSize: 12 }}>\u2715</button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <span style={{ fontSize: 12, color: C.textMuted, fontWeight: 600 }}>{d.label}:</span>
+                                                    <span style={{ fontSize: 14, fontWeight: 800, color: C.text }}>{d.value} {d.unit}</span>
+                                                </>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Technical Notes */}
+                            <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 8 }}>\ud83d\udcdd Tehni\u010dke napomene</div>
+                            {canManage ? (
+                                <Textarea value={specs.technicalNotes || ''} onChange={e => updateTechNotes(e.target.value)} placeholder="Tehni\u010dke specifikacije, napomene, zahtjevi kvalitete, norma..." rows={4} />
+                            ) : (
+                                <div style={{ padding: '12px 16px', borderRadius: 8, background: C.bgElevated, fontSize: 13, color: C.textDim, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{specs.technicalNotes || 'Nema napomena'}</div>
+                            )}
+                        </div>
+                    );
+                })()}
+
+                {/* Tro\u0161kovnik tab */}
                 {detailTab === 'troskovnik' && (
                     <div style={{ ...styles.card, marginBottom: 20 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
@@ -643,6 +818,52 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                     <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 20 }}>
                         <button onClick={() => setShowForm(false)} style={styles.btnSecondary}>Odustani</button>
                         <button onClick={doSave} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
+                    </div>
+                </Modal>
+            )}
+
+            {/* Template Chooser Modal */}
+            {showTemplateChooser && (
+                <Modal title="Odaberi predlo\u017eak proizvoda" onClose={() => setShowTemplateChooser(false)} wide>
+                    <div style={{ fontSize: 13, color: C.textMuted, marginBottom: 16 }}>Odaberi tip \u010deli\u010dnog proizvoda za brzi po\u010detak, ili kreiraj prazan projekt.</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 12 }}>
+                        {TEMPLATES.map(tpl => (
+                            <div key={tpl.id} onClick={() => openFromTemplate(tpl)}
+                                style={{ padding: '20px 16px', borderRadius: 12, border: `1.5px solid ${C.border}`, cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s', background: 'var(--bg)' }}
+                                onMouseEnter={e => { e.currentTarget.style.borderColor = C.accent; e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.12)'; }}
+                                onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}>
+                                <div style={{ fontSize: 32, marginBottom: 8 }}>{tpl.name.split(' ')[0]}</div>
+                                <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 4 }}>{tpl.name.replace(/^[^\s]+\s/, '')}</div>
+                                <div style={{ fontSize: 11, color: C.textMuted }}>{tpl.desc}</div>
+                                {tpl.specDefaults?.materials?.length > 0 && (
+                                    <div style={{ marginTop: 8, fontSize: 10, color: C.accent, fontWeight: 600 }}>{tpl.specDefaults.materials.length} materijala \u2022 {tpl.specDefaults.dimensions?.length || 0} dimenzija</div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </Modal>
+            )}
+
+            {/* Sign-off Modal */}
+            {signOffOrder && (
+                <Modal title={`\u2705 Potpis faze: ${STAGES.find(s => s.id === signOffOrder.stage)?.label}`} onClose={() => setSignOffOrder(null)}>
+                    <div style={{ padding: '16px', borderRadius: 10, background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.15)', marginBottom: 16 }}>
+                        <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 4 }}>Narud\u017eba</div>
+                        <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{signOffOrder.orderNumber} \u2014 {signOffOrder.name}</div>
+                        <div style={{ fontSize: 12, color: C.textMuted, marginTop: 4 }}>Sljede\u0107a faza: <strong style={{ color: STAGES[STAGES.findIndex(s => s.id === signOffOrder.stage) + 1]?.color }}>{STAGES[STAGES.findIndex(s => s.id === signOffOrder.stage) + 1]?.emoji} {STAGES[STAGES.findIndex(s => s.id === signOffOrder.stage) + 1]?.label}</strong></div>
+                    </div>
+                    <div style={{ marginBottom: 12 }}>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: C.textMuted, marginBottom: 4, textTransform: 'uppercase' }}>\ud83d\udc64 Potpisuje</div>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text, padding: '10px 14px', borderRadius: 8, background: C.bgElevated }}>{currentUser?.name || 'Nepoznat'}</div>
+                    </div>
+                    <Field label="Kontrolna bilje\u0161ka (opcionalno)"><Textarea value={signOffForm.note} onChange={e => setSignOffForm(f => ({ ...f, note: e.target.value }))} placeholder="Napomena o fazi, kvaliteta, status kontrole..." rows={3} /></Field>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '16px 0', cursor: 'pointer', padding: '12px 14px', borderRadius: 10, border: `1.5px solid ${signOffForm.confirmed ? '#10B981' : C.border}`, background: signOffForm.confirmed ? 'rgba(16,185,129,0.06)' : 'transparent', transition: 'all 0.2s' }}>
+                        <input type="checkbox" checked={signOffForm.confirmed} onChange={e => setSignOffForm(f => ({ ...f, confirmed: e.target.checked }))} style={{ width: 18, height: 18, accentColor: '#10B981' }} />
+                        <span style={{ fontSize: 13, fontWeight: 600, color: signOffForm.confirmed ? '#10B981' : C.text }}>Potvr\u0111ujem da je faza zavr\u0161ena i kontrolirana</span>
+                    </label>
+                    <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 16 }}>
+                        <button onClick={() => setSignOffOrder(null)} style={styles.btnSecondary}>Odustani</button>
+                        <button onClick={confirmSignOff} disabled={!signOffForm.confirmed} style={{ ...styles.btn, opacity: signOffForm.confirmed ? 1 : 0.4, fontSize: 14, padding: '10px 24px' }}>\u2705 Potpi\u0161i i pomakni</button>
                     </div>
                 </Modal>
             )}
