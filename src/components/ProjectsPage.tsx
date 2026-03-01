@@ -5,7 +5,7 @@ import { useApp, add as addDoc, update as updateDoc, remove as removeDoc } from 
 import { Icon, Modal, Field, Input, Textarea, Select, StatusBadge, WorkerCheckboxList, useIsMobile } from './ui/SharedComponents';
 import { C, styles, genId, today, fmtDate, diffMins, compressImage } from '../utils/helpers';
 
-export function ProjectsPage({ workerFilterId }) {
+export function ProjectsPage({ workerFilterId, leaderProjectIds }) {
     const confirm = useConfirm();
     const { projects, workers, timesheets, invoices, obaveze, otpremnice, currentUser, addAuditLog } = useApp();
     const [showForm, setShowForm] = useState(false);
@@ -39,6 +39,7 @@ export function ProjectsPage({ workerFilterId }) {
     const filtered = useMemo(() => {
         let list = projects;
         if (isWorker) list = list.filter(p => (p.workers || []).includes(workerFilterId));
+        if (leaderProjectIds && leaderProjectIds.length > 0) list = list.filter(p => leaderProjectIds.includes(p.id));
         if (filterStatus !== 'all') list = list.filter(p => p.status === filterStatus);
         if (filterWorker !== 'all') list = list.filter(p => (p.workers || []).includes(filterWorker) || p.teamLeader === filterWorker || p.engineer === filterWorker);
         if (filterLocation !== 'all') list = list.filter(p => p.location === filterLocation);
@@ -53,7 +54,7 @@ export function ProjectsPage({ workerFilterId }) {
             return 0;
         });
         return list;
-    }, [projects, filterStatus, filterWorker, filterLocation, search, workerFilterId, sortBy, timesheets, invoices]);
+    }, [projects, filterStatus, filterWorker, filterLocation, search, workerFilterId, leaderProjectIds, sortBy, timesheets, invoices]);
 
     // Stats overview
     const projectStats = useMemo(() => {
@@ -267,7 +268,7 @@ export function ProjectsPage({ workerFilterId }) {
                                 const isLeader = detailProject.teamLeader === w.id;
                                 const isEngineer = detailProject.engineer === w.id;
                                 return (
-                                    <div key={w.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderRadius: 10, background: isLeader ? 'rgba(29,78,216,0.06)' : isEngineer ? 'rgba(4,120,87,0.06)' : '#F8FAFC', border: `1px solid ${isLeader ? 'rgba(29,78,216,0.2)' : isEngineer ? 'rgba(4,120,87,0.2)' : C.border}` }}>
+                                    <div key={w.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderRadius: 10, background: isLeader ? 'rgba(29,78,216,0.06)' : isEngineer ? 'rgba(4,120,87,0.06)' : 'var(--bg)', border: `1px solid ${isLeader ? 'rgba(29,78,216,0.2)' : isEngineer ? 'rgba(4,120,87,0.2)' : C.border}` }}>
                                         <div style={{ width: 36, height: 36, borderRadius: '50%', background: C.accentLight, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.accent, fontWeight: 800, fontSize: 14, flexShrink: 0 }}>{w.name?.charAt(0)}</div>
                                         <div>
                                             <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{w.name} {isLeader && <span style={{ fontSize: 10, color: C.blue }}>👷 Voditelj</span>} {isEngineer && <span style={{ fontSize: 10, color: C.green }}> Inženjer</span>}</div>

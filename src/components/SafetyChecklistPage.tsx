@@ -184,7 +184,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
         const proj = projects.find(p => p.id === checklist.projectId);
         const html = `<html><head><title>Kontrolna lista - ${checklist.templateName}</title>
             <style>body{font-family:Arial,sans-serif;padding:20px;max-width:700px;margin:0 auto}h1{color:#1E293B;font-size:20px;border-bottom:3px solid #F97316;padding-bottom:8px}
-            .meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:16px 0;font-size:13px}.meta-item{padding:8px 12px;background:#F8FAFC;border-radius:8px}
+            .meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:16px 0;font-size:13px}.meta-item{padding:8px 12px;background:var(--bg);border-radius:8px}
             .item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #E2E8F0}.item-status{font-size:18px;width:28px;text-align:center}
             .item-text{flex:1;font-size:13px}.score{text-align:center;margin:20px 0;font-size:48px;font-weight:800}
             .sig{border:1px solid #ddd;border-radius:8px;margin-top:16px}@media print{.no-print{display:none}}</style></head>

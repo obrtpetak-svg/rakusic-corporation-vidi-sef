@@ -188,7 +188,7 @@ export function VozilaPage({ workerFilterId }) {
                         {diaryEntries.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, padding: 12 }}>Nema obavijesti</div> : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                                 {diaryEntries.map(d => (
-                                    <div key={d.id} style={{ padding: '14px 18px', borderRadius: 10, background: d.priority === 'hitna' ? 'rgba(185,28,28,0.06)' : d.priority === 'važna' ? 'rgba(180,89,9,0.06)' : '#F8FAFC', border: `1px solid ${d.priority === 'hitna' ? 'rgba(185,28,28,0.2)' : d.priority === 'važna' ? 'rgba(180,89,9,0.2)' : C.border}` }}>
+                                    <div key={d.id} style={{ padding: '14px 18px', borderRadius: 10, background: d.priority === 'hitna' ? 'rgba(185,28,28,0.06)' : d.priority === 'važna' ? 'rgba(180,89,9,0.06)' : 'var(--bg)', border: `1px solid ${d.priority === 'hitna' ? 'rgba(185,28,28,0.2)' : d.priority === 'važna' ? 'rgba(180,89,9,0.2)' : C.border}` }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
                                             <div>
                                                 <span style={styles.badge(d.priority === 'hitna' ? '185,28,28' : d.priority === 'važna' ? '180,89,9' : '100,116,139')}>{d.priority}</span>

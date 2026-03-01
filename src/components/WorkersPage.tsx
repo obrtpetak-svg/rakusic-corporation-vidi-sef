@@ -6,7 +6,7 @@ import { C, styles, genId, fmtDate, diffMins, hashPin } from '../utils/helpers';
 import { EmptyState } from './ui/EmptyState';
 import { EditableField } from './ui/EditableField';
 
-export function WorkersPage() {
+export function WorkersPage({ leaderProjectIds, leaderWorkerIds }) {
     const confirm = useConfirm();
     const { workers, users, projects, timesheets, vehicles, smjestaj, currentUser } = useApp();
     const [showForm, setShowForm] = useState(false);
@@ -22,11 +22,12 @@ export function WorkersPage() {
 
     const filtered = useMemo(() => {
         let list = workers.filter(w => w.role !== 'admin');
+        if (leaderWorkerIds && leaderWorkerIds.length > 0) list = list.filter(w => leaderWorkerIds.includes(w.id));
         if (filterActive === 'active') list = list.filter(w => w.active !== false);
         else if (filterActive === 'inactive') list = list.filter(w => w.active === false);
         if (search) list = list.filter(w => (w.name || '').toLowerCase().includes(search.toLowerCase()) || (w.position || '').toLowerCase().includes(search.toLowerCase()));
         return list;
-    }, [workers, filterActive, search]);
+    }, [workers, filterActive, search, leaderWorkerIds]);
 
     const pg = usePagination(filtered.length, [filtered.length, search, filterActive], 50);
     const paginatedWorkers = filtered.slice(pg.startIndex, pg.endIndex + 1);
