@@ -1,10 +1,12 @@
-import React, { useState, useRef, type KeyboardEvent, type ChangeEvent } from 'react';
+import React, { useState, useRef, useEffect, type KeyboardEvent, type ChangeEvent } from 'react';
 import { useApp } from '../context/AppContext';
 import { Icon, Field, Input } from './ui/SharedComponents';
 import { C, styles, hashPin } from '../utils/helpers';
 
 const MAX_ATTEMPTS = 5;
 const BASE_LOCKOUT = 30; // seconds, doubles each lockout
+
+const MODULES = ['Projekti', 'Radnici', 'Evidencija sati', 'Vozila', 'GPS Nadzor', 'Računi', 'Izvještaji', 'Obavijesti'];
 
 export function AuthScreen(): React.JSX.Element {
     const { handleUserLogin, users } = useApp();
@@ -13,8 +15,16 @@ export function AuthScreen(): React.JSX.Element {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [lockoutEnd, setLockoutEnd] = useState(0);
+    const [bootedCount, setBootedCount] = useState(0);
     const attemptsRef = useRef(0);
     const lockoutCountRef = useRef(0);
+
+    // Staggered module boot animation
+    useEffect(() => {
+        if (bootedCount >= MODULES.length) return;
+        const t = setTimeout(() => setBootedCount(c => c + 1), 200 + bootedCount * 120);
+        return () => clearTimeout(t);
+    }, [bootedCount]);
 
     const submit = async (): Promise<void> => {
         // Rate limiting check
@@ -53,12 +63,28 @@ export function AuthScreen(): React.JSX.Element {
     return (
         <div style={{ ...styles.page, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div style={{ width: '100%', maxWidth: 420 }}>
-                <div style={{ textAlign: 'center', marginBottom: 40 }}>
+                <div style={{ textAlign: 'center', marginBottom: 24 }}>
                     <img src="/icon-192.png" alt="Rakušić Corporation" style={{ width: 72, height: 72, borderRadius: 20, marginBottom: 16 }} />
                     <div style={{ fontSize: 26, fontWeight: 900, color: C.text, letterSpacing: '0.02em' }}>RAKUŠIĆ corporation</div>
                     <div style={{ fontSize: 13, color: C.textMuted, marginTop: 4 }}>Operativni centar upravljanja</div>
                     <a href="https://vi-di-sef.com" target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: C.accent, fontWeight: 600, textDecoration: 'none', marginTop: 8, display: 'inline-block' }}>powered by Vi-Di-Sef</a>
                 </div>
+
+                {/* Module boot sequence */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '6px 10px', marginBottom: 24, minHeight: 28 }}>
+                    {MODULES.map((m, i) => (
+                        <div key={m} style={{
+                            fontSize: 11, fontWeight: 600, color: i < bootedCount ? 'var(--green)' : 'var(--text-muted)',
+                            opacity: i < bootedCount ? 1 : 0.3,
+                            transform: i < bootedCount ? 'translateY(0)' : 'translateY(4px)',
+                            transition: 'all 0.3s ease',
+                            fontFamily: 'var(--font-mono)',
+                        }}>
+                            {i < bootedCount ? '✓' : '○'} {m}
+                        </div>
+                    ))}
+                </div>
+
                 <div style={styles.card}>
                     <div style={{ fontSize: 16, fontWeight: 700, color: C.text, marginBottom: 20 }}>Prijava u sustav</div>
                     <Field label="Korisničko ime" required><Input placeholder="Unesite korisničko ime" value={username} onChange={(e: ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)} onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && submit()} /></Field>

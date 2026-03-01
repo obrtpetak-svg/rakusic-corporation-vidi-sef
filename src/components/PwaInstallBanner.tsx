@@ -69,9 +69,9 @@ export function PwaInstallBanner() {
             }}>
                 <img src="/icon-192.png" alt="" style={{ width: 44, height: 44, borderRadius: 10, flexShrink: 0 }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 2 }}>Instaliraj Vi-Di-Sef</div>
+                    <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 2 }}>Instaliraj RAKUŠIĆ corporation</div>
                     <div style={{ fontSize: 12, color: C.textMuted }}>
-                        {isIos ? 'Dodajte na početni ekran za brži pristup' : 'Aplikacija za brži pristup i offline rad'}
+                        {isIos ? 'Operativni centar upravljanja — dodajte na početni ekran' : 'Operativni centar upravljanja — brži pristup i offline rad'}
                     </div>
                 </div>
                 <button onClick={handleInstall} style={{
