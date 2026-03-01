@@ -461,7 +461,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                 ${o.notes ? `<div class="meta">📝 ${o.notes}</div>` : ''}
                                 <h2>🧱 Materijali</h2>
                                 ${matRows ? `<table><thead><tr><th>Naziv</th><th>Profil</th><th>Kol.</th><th>Dimenzije</th><th>Debljina</th><th>Čelik</th></tr></thead><tbody>${matRows}</tbody></table>` : '<div>Nema materijala</div>'}
-                                <h2>💰 Troškovnik</h2>
+                                <h2>🧾 Troškovnik</h2>
                                 ${costRows ? `<table><thead><tr><th>Opis</th><th style="text-align:right">Iznos</th></tr></thead><tbody>${costRows}</tbody></table>` : '<div>Nema troškova</div>'}
                                 <div class="total">UKUPNO: ${(o.totalCost || 0).toFixed(2)}€</div>
                                 ${taskRows ? `<h2>☑️ Zadaci</h2><table><thead><tr><th>✔</th><th>Zadatak</th><th>Radnik</th></tr></thead><tbody>${taskRows}</tbody></table>` : ''}
@@ -484,7 +484,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
 
                     {/* Detail tabs */}
                     <div style={{ display: 'flex', gap: 6, marginBottom: 16, overflowX: 'auto' }}>
-                        {[{ id: 'info', label: '📋 Info' }, { id: 'aktivnost', label: `💬 Aktivnost${(detailOrder.comments || []).length > 0 ? ` (${(detailOrder.comments || []).length})` : ''}` }, { id: 'zadaci', label: `☑️ Zadaci${(detailOrder.subtasks || []).length > 0 ? ` (${(detailOrder.subtasks || []).filter(t => t.status === 'gotovo').length}/${(detailOrder.subtasks || []).length})` : ''}` }, { id: 'specifikacije', label: '📐 Specifikacije' }, { id: 'troskovnik', label: '💰 Troškovnik' }, { id: 'dokumenti', label: '📎 Dokumenti' }, { id: 'povijest', label: '🕐 Povijest' }].map(t => (
+                        {[{ id: 'info', label: '📋 Info' }, { id: 'aktivnost', label: `💬 Aktivnost${(detailOrder.comments || []).length > 0 ? ` (${(detailOrder.comments || []).length})` : ''}` }, { id: 'zadaci', label: `☑️ Zadaci${(detailOrder.subtasks || []).length > 0 ? ` (${(detailOrder.subtasks || []).filter(t => t.status === 'gotovo').length}/${(detailOrder.subtasks || []).length})` : ''}` }, { id: 'specifikacije', label: '📐 Specifikacije' }, { id: 'troskovnik', label: '🧾 Troškovnik' }, { id: 'dokumenti', label: '📎 Dokumenti' }, { id: 'povijest', label: '🕐 Povijest' }].map(t => (
                             <button key={t.id} onClick={() => setDetailTab(t.id)} style={{ padding: '8px 16px', borderRadius: 8, border: `1.5px solid ${detailTab === t.id ? C.accent : C.border}`, background: detailTab === t.id ? C.accentLight : 'transparent', color: detailTab === t.id ? C.accent : C.textMuted, fontWeight: detailTab === t.id ? 700 : 500, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap' }}>
                                 {t.label}
                             </button>
@@ -734,7 +734,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                     {detailTab === 'troskovnik' && (
                         <div style={{ ...styles.card, marginBottom: 20 }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                                <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>💰 Troškovnik ({costItems.length} stavki)</div>
+                                <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>🧾 Troškovnik ({costItems.length} stavki)</div>
                                 {canManage && <button onClick={() => setShowCostForm(true)} style={styles.btnSmall}><Icon name="plus" size={12} /> Nova stavka</button>}
                             </div>
                             {/* Category summary */}
