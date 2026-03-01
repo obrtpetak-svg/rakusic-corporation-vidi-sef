@@ -719,6 +719,31 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                     </div>
                                 )}
 
+                                {/* Weight Summary */}
+                                {(() => {
+                                    const weightItems = (specs.materials || []).filter(m => m.profile && m.length && PROFILE_WEIGHTS[m.profile]).map(m => ({
+                                        name: m.name, profile: m.profile, length: parseFloat(m.length),
+                                        weight: PROFILE_WEIGHTS[m.profile] * (parseFloat(m.length) / 1000) * (m.quantity || 1),
+                                        qty: m.quantity || 1
+                                    }));
+                                    const totalKg = weightItems.reduce((s, w) => s + w.weight, 0);
+                                    if (weightItems.length === 0) return null;
+                                    return (
+                                        <div style={{ padding: '14px 16px', borderRadius: 10, background: 'rgba(124,58,237,0.06)', border: '1px solid rgba(124,58,237,0.15)', marginBottom: 16 }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                                                <div style={{ fontSize: 13, fontWeight: 700, color: '#7C3AED' }}>⚖️ Ukupna težina</div>
+                                                <div style={{ fontSize: 18, fontWeight: 800, color: '#7C3AED' }}>{totalKg >= 1000 ? `${(totalKg / 1000).toFixed(2)} t` : `${totalKg.toFixed(1)} kg`}</div>
+                                            </div>
+                                            {weightItems.map((w, i) => (
+                                                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: C.textDim, padding: '2px 0' }}>
+                                                    <span>{w.name} ({w.profile} × {w.length}mm{w.qty > 1 ? ` × ${w.qty}` : ''})</span>
+                                                    <span style={{ fontWeight: 600, color: '#7C3AED' }}>{w.weight.toFixed(1)} kg</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    );
+                                })()}
+
                                 {/* Technical Notes */}
                                 <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 8 }}>📝 Tehničke napomene</div>
                                 {canManage ? (
@@ -746,6 +771,31 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                     </div>
                                 ))}
                             </div>
+                            {/* Auto material weights from specs */}
+                            {(() => {
+                                const specs = detailOrder.specifications || { materials: [] };
+                                const autoItems = (specs.materials || []).filter(m => m.profile && m.length && PROFILE_WEIGHTS[m.profile]).map(m => ({
+                                    name: m.name, profile: m.profile,
+                                    weight: PROFILE_WEIGHTS[m.profile] * (parseFloat(m.length) / 1000) * (m.quantity || 1),
+                                    qty: m.quantity || 1, unit: m.unit
+                                }));
+                                if (autoItems.length === 0) return null;
+                                return (
+                                    <div style={{ padding: '10px 14px', borderRadius: 10, background: 'rgba(124,58,237,0.04)', border: '1px dashed rgba(124,58,237,0.2)', marginBottom: 16 }}>
+                                        <div style={{ fontSize: 11, fontWeight: 700, color: '#7C3AED', marginBottom: 8 }}>📐 Materijali iz specifikacija (auto-izračun)</div>
+                                        {autoItems.map((a, i) => (
+                                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: C.textDim, padding: '3px 0', borderBottom: i < autoItems.length - 1 ? `1px solid ${C.border}44` : 'none' }}>
+                                                <span>{a.name} — {a.profile}{a.qty > 1 ? ` × ${a.qty}` : ''}</span>
+                                                <span style={{ fontWeight: 700, color: '#7C3AED' }}>{a.weight.toFixed(1)} kg</span>
+                                            </div>
+                                        ))}
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 800, color: '#7C3AED', marginTop: 6, paddingTop: 6, borderTop: '1px solid rgba(124,58,237,0.2)' }}>
+                                            <span>Ukupno materijal</span>
+                                            <span>{autoItems.reduce((s, a) => s + a.weight, 0).toFixed(1)} kg</span>
+                                        </div>
+                                    </div>
+                                );
+                            })()}
                             {costItems.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, textAlign: 'center', padding: 20 }}>Nema stavki troškova</div> : (
                                 <div style={{ overflowX: 'auto' }}>
                                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
