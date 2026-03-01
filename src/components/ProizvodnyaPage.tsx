@@ -13,6 +13,23 @@ const STAGES = [
     { id: 'zavrseno', label: 'Završeno', emoji: '✓', color: '#047857' },
 ];
 
+const QC_CHECKLISTS = {
+    priprema: ['📌 Nacrti pregledani', '🧱 Materijal naručen', '📝 Radni nalog izdan', '👷 Radnici dodijeljeni'],
+    proizvodnja: ['✂️ Rezanje završeno', '🔩 Bušenje', '🔥 Zavarivanje', '✨ Brušenje i čišćenje', '📏 Dimenzijska kontrola'],
+    kontrola: ['📐 Dimenzije usklađene', '🔍 Zavareni spojevi OK', '🧴 Antikorozivna zaštita', '📄 Certifikat izdan', '📸 Foto dokumentacija'],
+    isporuka: ['📦 Pakiranje', '🚚 Transport organiziran', '📂 Dokumentacija klijentu', '✍️ Potpis primljeno'],
+};
+
+const fmtDuration = (start, end) => {
+    if (!start || !end) return null;
+    const ms = new Date(end).getTime() - new Date(start).getTime();
+    const hours = Math.floor(ms / 3600000);
+    if (hours < 24) return `${hours}h`;
+    const days = Math.floor(hours / 24);
+    const remH = hours % 24;
+    return remH > 0 ? `${days}d ${remH}h` : `${days}d`;
+};
+
 const COST_CATEGORIES = [
     { value: 'materijal', label: '🧱 Materijal' },
     { value: 'rad', label: '👷 Rad' },
@@ -456,6 +473,41 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                                     {record.signedBy && <span style={{ color: '#10B981', fontWeight: 600 }}>{' '}✍️ {record.signedBy}</span>}
                                                 </div>}
                                                 {record?.signNote && <div style={{ fontSize: 11, color: C.accent, fontStyle: 'italic', marginTop: 2 }}>📝 {record.signNote}</div>}
+                                                {/* Time tracking */}
+                                                {record?.enteredAt && record?.completedAt && <div style={{ fontSize: 10, color: '#7C3AED', fontWeight: 600, marginTop: 2 }}>⏱️ {fmtDuration(record.enteredAt, record.completedAt)}</div>}
+                                                {/* QC Checklist */}
+                                                {canManage && isCurrent && QC_CHECKLISTS[s.id] && (() => {
+                                                    const cl = record?.checklist || QC_CHECKLISTS[s.id].map((item, idx) => ({ id: idx, label: item, checked: false }));
+                                                    const done = cl.filter(c => c.checked).length;
+                                                    const toggleCheck = async (checkIdx) => {
+                                                        const stages = [...(detailOrder.stages || [])];
+                                                        const stg = stages.find(st => st.stage === s.id && !st.completedAt) || stages.findLast(st => st.stage === s.id);
+                                                        if (!stg) return;
+                                                        const newCl = (stg.checklist || QC_CHECKLISTS[s.id].map((item, i) => ({ id: i, label: item, checked: false }))).map(c => c.id === checkIdx ? { ...c, checked: !c.checked } : c);
+                                                        stg.checklist = newCl;
+                                                        await updateDoc('production', detailOrder.id, { stages });
+                                                    };
+                                                    return (
+                                                        <div style={{ marginTop: 8, padding: '8px 10px', borderRadius: 8, background: 'rgba(16,185,129,0.04)', border: `1px solid rgba(16,185,129,0.12)` }}>
+                                                            <div style={{ fontSize: 10, fontWeight: 700, color: C.textMuted, marginBottom: 6, display: 'flex', justifyContent: 'space-between' }}>
+                                                                <span>Kontrolna lista</span>
+                                                                <span style={{ color: done === cl.length ? '#10B981' : C.accent }}>{done}/{cl.length}</span>
+                                                            </div>
+                                                            <div style={{ width: '100%', height: 3, borderRadius: 2, background: 'var(--border)', marginBottom: 6 }}><div style={{ width: `${(done / cl.length) * 100}%`, height: 3, borderRadius: 2, background: '#10B981', transition: 'width 0.3s' }} /></div>
+                                                            {cl.map(c => (
+                                                                <label key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: c.checked ? '#10B981' : C.textDim, cursor: 'pointer', padding: '2px 0', textDecoration: c.checked ? 'line-through' : 'none' }}>
+                                                                    <input type="checkbox" checked={c.checked} onChange={() => toggleCheck(c.id)} style={{ width: 14, height: 14, accentColor: '#10B981' }} />
+                                                                    {c.label}
+                                                                </label>
+                                                            ))}
+                                                        </div>
+                                                    );
+                                                })()}
+                                                {/* Completed stage checklist (read-only) */}
+                                                {!isCurrent && record?.checklist && (() => {
+                                                    const done = record.checklist.filter(c => c.checked).length;
+                                                    return <div style={{ fontSize: 10, color: '#10B981', marginTop: 2 }}>✅ {done}/{record.checklist.length} kontrolnih točaka</div>;
+                                                })()}
                                                 {/* Stage photos */}
                                                 {(record?.photos || []).length > 0 && (
                                                     <div style={{ display: 'flex', gap: 4, marginTop: 6, flexWrap: 'wrap' }}>
@@ -763,13 +815,32 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                 </div>
             </div>
 
-            {/* Stats */}
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)', gap: 10, marginBottom: 20 }}>
+            {/* Stats + Mini Dashboard */}
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(6, 1fr)', gap: 10, marginBottom: 20 }}>
                 <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Ukupno</div><div style={{ fontSize: 22, fontWeight: 800, color: C.accent }}>{stats.total}</div></div>
                 <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>U tijeku</div><div style={{ fontSize: 22, fontWeight: 800, color: '#3B82F6' }}>{stats.inProgress}</div></div>
                 <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Na čekanju</div><div style={{ fontSize: 22, fontWeight: 800, color: '#F59E0B' }}>{stats.waiting}</div></div>
                 <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Završeno</div><div style={{ fontSize: 22, fontWeight: 800, color: C.green }}>{stats.doneTotal}</div><div style={{ fontSize: 10, color: C.textMuted }}>{stats.doneMonth > 0 ? `+${stats.doneMonth} ovaj mj.` : ''}</div></div>
                 <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Troškovi</div><div style={{ fontSize: 22, fontWeight: 800, color: '#EF4444' }}>{stats.totalCost > 0 ? `${stats.totalCost.toFixed(0)}€` : '0€'}</div></div>
+                {/* Mini pie chart */}
+                <div style={{ ...styles.card, textAlign: 'center', padding: '10px' }}>
+                    <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Faze</div>
+                    {activeOrders.length > 0 ? (() => {
+                        const counts = STAGES.map(s => ({ ...s, count: activeOrders.filter(o => o.stage === s.id).length })).filter(s => s.count > 0);
+                        let offset = 0;
+                        return (
+                            <svg viewBox="0 0 36 36" style={{ width: 44, height: 44, display: 'block', margin: '0 auto' }}>
+                                {counts.map((s, i) => {
+                                    const pct = (s.count / activeOrders.length) * 100;
+                                    const dash = `${pct} ${100 - pct}`;
+                                    const el = <circle key={s.id} cx="18" cy="18" r="15.9" fill="none" stroke={s.color} strokeWidth="3" strokeDasharray={dash} strokeDashoffset={-offset} />;
+                                    offset += pct;
+                                    return el;
+                                })}
+                            </svg>
+                        );
+                    })() : <div style={{ fontSize: 20, color: C.textMuted }}>—</div>}
+                </div>
             </div>
 
             {/* Tabs */}
