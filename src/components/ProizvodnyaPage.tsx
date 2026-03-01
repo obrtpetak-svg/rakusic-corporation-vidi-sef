@@ -377,6 +377,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                 <div style={{ fontSize: 11, color: C.accent, fontWeight: 700, marginBottom: 4 }}>{detailOrder.orderNumber}</div>
                                 <div style={{ fontSize: 22, fontWeight: 800, color: C.text }}>{detailOrder.name}</div>
                                 <div style={{ fontSize: 13, color: C.textMuted, marginTop: 4 }}>🏢 {detailOrder.client || '—'} {detailOrder.quantity && `• ${detailOrder.quantity} ${detailOrder.unit}`}</div>
+                                {detailOrder.projectId && (() => { const proj = projects.find(p => p.id === detailOrder.projectId); return proj ? <div style={{ fontSize: 12, color: '#7C3AED', fontWeight: 600, marginTop: 2 }}>📁 Projekt: {proj.name}</div> : null; })()}
                             </div>
                             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                                 {detailOrder.priority === 'hitno' && <span style={{ fontSize: 11, fontWeight: 700, color: '#EF4444', background: 'rgba(239,68,68,0.1)', padding: '4px 10px', borderRadius: 6 }}>🔴 HITNO</span>}
@@ -445,21 +446,28 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                 const o = detailOrder;
                                 const specs = o.specifications || { materials: [] };
                                 const stg = STAGES.find(s => s.id === o.stage);
-                                let txt = `NARUDŽBA: ${o.orderNumber}\n${'='.repeat(40)}\n`;
-                                txt += `Naziv: ${o.name}\nKlijent: ${o.client || '—'}\nPrioritet: ${o.priority}\nFaza: ${stg?.label || o.stage}\n`;
-                                txt += `Količina: ${o.quantity} ${o.unit}\nRok: ${o.deadline || '—'}\n`;
-                                if (o.notes) txt += `Napomena: ${o.notes}\n`;
-                                txt += `\nMATERIJALI\n${'-'.repeat(30)}\n`;
-                                (specs.materials || []).forEach(m => {
+                                const proj = o.projectId ? projects.find(p => p.id === o.projectId)?.name : null;
+                                let matRows = (specs.materials || []).map(m => {
                                     const autoW = m.profile && m.length && PROFILE_WEIGHTS[m.profile] ? ` (≈${(PROFILE_WEIGHTS[m.profile] * (parseFloat(m.length) / 1000)).toFixed(1)}kg)` : '';
-                                    txt += `• ${m.name} | ${m.profile} | ${m.quantity} ${m.unit} | ${m.length || '—'}mm × ${m.thickness || '—'}mm | ${m.steelGrade}${autoW}\n`;
-                                });
-                                txt += `\nTROŠKOVNIK\n${'-'.repeat(30)}\n`;
-                                (o.costItems || []).forEach(c => txt += `• ${c.description} | ${c.total?.toFixed(2)}€\n`);
-                                txt += `UKUPNO: ${(o.totalCost || 0).toFixed(2)}€\n`;
-                                if ((o.subtasks || []).length > 0) { txt += `\nZADACI\n${'-'.repeat(30)}\n`; o.subtasks.forEach(t => txt += `[${t.status === 'gotovo' ? '✓' : ' '}] ${t.title}${t.assignedTo ? ' → ' + t.assignedTo : ''}\n`); }
-                                const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
-                                const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${o.orderNumber}.txt`; a.click();
+                                    return `<tr><td>${m.name}</td><td>${m.profile}</td><td>${m.quantity} ${m.unit}</td><td>${m.length || '—'}mm</td><td>${m.thickness || '—'}mm</td><td>${m.steelGrade}${autoW}</td></tr>`;
+                                }).join('');
+                                let costRows = (o.costItems || []).map(c => `<tr><td>${c.description}</td><td style="text-align:right">${(c.total || 0).toFixed(2)}€</td></tr>`).join('');
+                                let taskRows = (o.subtasks || []).map(t => `<tr><td>${t.status === 'gotovo' ? '✅' : '⬜'}</td><td>${t.title}</td><td>${t.assignedTo || '—'}</td></tr>`).join('');
+                                const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${o.orderNumber}</title>
+                                <style>body{font-family:system-ui,sans-serif;padding:30px;color:#1a1a1a;font-size:13px}h1{font-size:20px;margin:0}h2{font-size:14px;margin:20px 0 8px;padding-bottom:4px;border-bottom:1px solid #ddd}.meta{color:#666;font-size:12px;margin:4px 0}table{width:100%;border-collapse:collapse;margin:8px 0}th,td{padding:6px 10px;border:1px solid #ddd;text-align:left;font-size:11px}th{background:#f5f5f5;font-weight:700}.total{font-size:16px;font-weight:800;text-align:right;margin:8px 0}@media print{body{padding:15px}}</style></head><body>
+                                <h1>${o.orderNumber} — ${o.name}</h1>
+                                <div class="meta">🏢 Klijent: ${o.client || '—'} | Faza: ${stg?.emoji || ''} ${stg?.label || o.stage} | Prioritet: ${o.priority}</div>
+                                <div class="meta">📦 Količina: ${o.quantity} ${o.unit} | 📅 Rok: ${o.deadline || '—'}${proj ? ` | 📁 Projekt: ${proj}` : ''}</div>
+                                ${o.notes ? `<div class="meta">📝 ${o.notes}</div>` : ''}
+                                <h2>🧱 Materijali</h2>
+                                ${matRows ? `<table><thead><tr><th>Naziv</th><th>Profil</th><th>Kol.</th><th>Dimenzije</th><th>Debljina</th><th>Čelik</th></tr></thead><tbody>${matRows}</tbody></table>` : '<div>Nema materijala</div>'}
+                                <h2>💰 Troškovnik</h2>
+                                ${costRows ? `<table><thead><tr><th>Opis</th><th style="text-align:right">Iznos</th></tr></thead><tbody>${costRows}</tbody></table>` : '<div>Nema troškova</div>'}
+                                <div class="total">UKUPNO: ${(o.totalCost || 0).toFixed(2)}€</div>
+                                ${taskRows ? `<h2>☑️ Zadaci</h2><table><thead><tr><th>✔</th><th>Zadatak</th><th>Radnik</th></tr></thead><tbody>${taskRows}</tbody></table>` : ''}
+                                <div style="margin-top:30px;font-size:10px;color:#999;border-top:1px solid #eee;padding-top:8px">Generirano: ${new Date().toLocaleString('hr')} | ViDiSef Proizvodnja</div>
+                                </body></html>`;
+                                const w = window.open('', '_blank'); w?.document.write(html); w?.document.close(); setTimeout(() => w?.print(), 300);
                             }} style={{ ...styles.btnSecondary, fontSize: 12 }}>📄 PDF</button>
                             <button onClick={() => {
                                 const o = detailOrder;
