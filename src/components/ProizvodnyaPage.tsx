@@ -343,7 +343,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
     const exportPDF = () => {
         const data = (activeTab === 'archive' ? archivedOrders : filtered);
         const rows = data.map(o => `<tr><td>${o.orderNumber}</td><td>${o.name}</td><td>${o.client || '—'}</td><td>${STAGES.find(s => s.id === o.stage)?.label || '—'}</td><td>${o.priority}</td><td>${o.quantity} ${o.unit}</td><td>${o.deadline || '—'}</td><td>${(o.totalCost || 0).toFixed(2)}€</td></tr>`).join('');
-        const html = `<!DOCTYPE html><html><head><title>Proizvodnja - ${today()}</title><style>body{font-family:Arial,sans-serif;padding:20px}h1{font-size:18px}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{border:1px solid #ddd;padding:8px 10px;text-align:left;font-size:12px}th{background:#f5f5f5;font-weight:700}tr:nth-child(even){background:#fafafa}.footer{margin-top:20px;font-size:10px;color:#999}</style></head><body><h1>🏭 Proizvodnja — Izvještaj</h1><p>Datum: ${fmtDate(new Date().toISOString())} • Ukupno: ${data.length} narudžbi</p><table><thead><tr><th>Broj</th><th>Naziv</th><th>Naručitelj</th><th>Faza</th><th>Prioritet</th><th>Količina</th><th>Rok</th><th>Trošak</th></tr></thead><tbody>${rows}</tbody></table><div class="footer">Generirano iz Vi-Di-Sef • ${new Date().toLocaleString('hr-HR')}</div></body></html>`;
+        const html = `<!DOCTYPE html><html><head><title>Proizvodnja - ${today()}</title><style>body{font-family:Arial,sans-serif;padding:20px}h1{font-size:18px}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{border:1px solid #ddd;padding:8px 10px;text-align:left;font-size:12px}th{background:#f5f5f5;font-weight:700}tr:nth-child(even){background:#fafafa}.footer{margin-top:20px;font-size:10px;color:#999}</style></head><body><h1>Proizvodnja — Izvještaj</h1><p>Datum: ${fmtDate(new Date().toISOString())} • Ukupno: ${data.length} narudžbi</p><table><thead><tr><th>Broj</th><th>Naziv</th><th>Naručitelj</th><th>Faza</th><th>Prioritet</th><th>Količina</th><th>Rok</th><th>Trošak</th></tr></thead><tbody>${rows}</tbody></table><div class="footer">Generirano iz Vi-Di-Sef • ${new Date().toLocaleString('hr-HR')}</div></body></html>`;
         const w = window.open('', '_blank');
         w.document.write(html);
         w.document.close();
@@ -922,7 +922,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
                 <div>
-                    <div style={{ fontSize: 24, fontWeight: 800, color: C.text }}>🏭 Proizvodnja</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, color: C.text }}>Proizvodnja</div>
                     <div style={{ fontSize: 12, color: C.textMuted, marginTop: 2 }}>{activeOrders.length} narudžbi • Praćenje proizvodnog procesa</div>
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
