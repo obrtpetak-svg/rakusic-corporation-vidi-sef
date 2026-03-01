@@ -27,9 +27,10 @@ export function AppLogin() {
         <div style={{ ...styles.page, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div style={{ width: '100%', maxWidth: 420 }}>
                 <div style={{ textAlign: 'center', marginBottom: 40 }}>
-                    <img src="/icon-192.png" alt="Vi-Di-Sef" style={{ width: 72, height: 72, borderRadius: 20, marginBottom: 16 }} />
-                    <div style={{ fontSize: 28, fontWeight: 900, color: C.text, letterSpacing: '-0.02em' }}>Vi-Di-Sef</div>
-                    <a href="https://www.vi-di.me" target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, color: C.accent, fontWeight: 600, textDecoration: 'none', marginTop: 6, display: 'inline-block' }}>www.Vi-Di.me</a>
+                    <img src="/icon-192.png" alt="Rakušić Corporation" style={{ width: 72, height: 72, borderRadius: 20, marginBottom: 16 }} />
+                    <div style={{ fontSize: 26, fontWeight: 900, color: C.text, letterSpacing: '0.02em' }}>RAKUŠIĆ corporation</div>
+                    <div style={{ fontSize: 13, color: C.textMuted, marginTop: 4 }}>Operativni centar upravljanja</div>
+                    <a href="https://vi-di-sef.com" target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: C.accent, fontWeight: 600, textDecoration: 'none', marginTop: 8, display: 'inline-block' }}>powered by Vi-Di-Sef</a>
                 </div>
                 <div style={styles.card}>
                     <div style={{ fontSize: 16, fontWeight: 700, color: C.text, marginBottom: 20 }}>Pristup aplikaciji</div>

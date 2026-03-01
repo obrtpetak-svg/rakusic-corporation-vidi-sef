@@ -25,10 +25,9 @@ export function CompanySetup() {
         <div style={{ ...styles.page, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div style={{ width: '100%', maxWidth: 600 }}>
                 <div style={{ textAlign: 'center', marginBottom: 40 }}>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 80, height: 80, background: C.accent, borderRadius: 20, marginBottom: 20 }}>
-                        <Icon name="project" size={42} />
-                    </div>
-                    <div style={{ fontSize: 28, fontWeight: 900, color: C.text }}>Dobrodošli u Vi-Di-Sef</div>
+                    <img src="/icon-192.png" alt="Rakušić Corporation" style={{ width: 80, height: 80, borderRadius: 20, marginBottom: 20 }} />
+                    <div style={{ fontSize: 26, fontWeight: 900, color: C.text, letterSpacing: '0.02em' }}>RAKUŠIĆ corporation</div>
+                    <div style={{ fontSize: 13, color: C.textMuted, marginTop: 2 }}>Operativni centar upravljanja</div>
                     <div style={{ fontSize: 15, color: C.textMuted, lineHeight: 1.6 }}>Kreirajte profil vaše tvrtke za početak rada</div>
                 </div>
                 <div style={styles.card}>
