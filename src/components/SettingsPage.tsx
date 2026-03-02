@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useConfirm } from './ui/ConfirmModal';
-import { useApp, setDoc, clearCollection, batchSet, update as updateDoc, restoreItem, permanentDelete } from '../context/AppContext';
+import { useApp, setDoc, clearCollection, batchSet, update as updateDoc, restoreItem, permanentDelete, add, remove } from '../context/AppContext';
 import { Icon, Modal, Field, Input, Textarea, useIsMobile } from './ui/SharedComponents';
 import { C, styles, genId, fmtDateTime } from '../utils/helpers';
 
@@ -13,6 +13,11 @@ export function SettingsPage({ workerFilterId }) {
     const [editing, setEditing] = useState(false);
     const [trashItems, setTrashItems] = useState(null);
     const [trashLoading, setTrashLoading] = useState(false);
+    // User management state
+    const [showAddUser, setShowAddUser] = useState(false);
+    const [editingUser, setEditingUser] = useState(null);
+    const [userForm, setUserForm] = useState({ name: '', username: '', role: 'radnik', password: '' });
+    const [userMsg, setUserMsg] = useState('');
     const [form, setForm] = useState({});
     const [showAudit, setShowAudit] = useState(false);
     const [backupStatus, setBackupStatus] = useState('');
@@ -425,6 +430,104 @@ export function SettingsPage({ workerFilterId }) {
                 <div style={{ fontSize: 13, color: C.textMuted, marginBottom: 16 }}>Potpuni reset aplikacije: briše sve lokalne podatke i resetira Firebase konfiguraciju.</div>
                 <button onClick={resetApp} style={{ ...styles.btn, background: C.red }}>🗑️ Potpuni reset aplikacije</button>
             </div>
+
+            {/* ── KORISNICI (User Management) ──────────────── */}
+            <div style={{ ...styles.card, marginTop: 16, borderColor: 'rgba(99,102,241,0.3)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                    <div>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>👥 Korisnici sustava</div>
+                        <div style={{ fontSize: 12, color: C.textMuted, marginTop: 2 }}>Upravljanje korisnicima koji se mogu prijaviti u aplikaciju ({users?.length || 0})</div>
+                    </div>
+                    <button onClick={() => { setShowAddUser(true); setUserForm({ name: '', username: '', role: 'radnik', password: '' }); setUserMsg(''); setEditingUser(null); }} style={{ ...styles.btn, fontSize: 12, padding: '8px 16px' }}>+ Dodaj korisnika</button>
+                </div>
+
+                {/* User list */}
+                <div style={{ display: 'grid', gap: 8 }}>
+                    {(users || []).map(u => (
+                        <div key={u.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: C.bg, borderRadius: 10, padding: '10px 14px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1 }}>
+                                <div style={{ width: 36, height: 36, borderRadius: '50%', background: u.role === 'admin' ? 'rgba(239,68,68,0.12)' : u.role === 'leader' ? 'rgba(245,158,11,0.12)' : 'rgba(99,102,241,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>
+                                    {u.role === 'admin' ? '👑' : u.role === 'leader' ? '⭐' : '👷'}
+                                </div>
+                                <div>
+                                    <div style={{ fontWeight: 600, fontSize: 13, color: C.text }}>{u.name || u.username}</div>
+                                    <div style={{ fontSize: 11, color: C.textMuted }}>{u.username} · <span style={{ fontWeight: 600, color: u.role === 'admin' ? C.red : u.role === 'leader' ? '#F59E0B' : '#6366F1' }}>{u.role || 'radnik'}</span></div>
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', gap: 6 }}>
+                                <button onClick={() => { setEditingUser(u); setUserForm({ name: u.name || '', username: u.username || '', role: u.role || 'radnik', password: '' }); setShowAddUser(true); setUserMsg(''); }} style={{ ...styles.btnSecondary, fontSize: 11, padding: '6px 10px' }}>✏️</button>
+                                {u.id !== currentUser?.id && <button onClick={async () => {
+                                    if (await confirm('Obrisati korisnika ' + (u.name || u.username) + '?')) {
+                                        await remove('users', u.id);
+                                        await addAuditLog('USER_DELETED', `${currentUser?.name} obrisao korisnika ${u.name}`);
+                                    }
+                                }} style={{ ...styles.btnSecondary, fontSize: 11, padding: '6px 10px', color: C.red }}>🗑️</button>}
+                            </div>
+                        </div>
+                    ))}
+                    {(!users || users.length === 0) && <div style={{ fontSize: 13, color: C.textMuted, textAlign: 'center', padding: 20 }}>Nema korisnika</div>}
+                </div>
+                {userMsg && <div style={{ fontSize: 13, fontWeight: 600, color: userMsg.startsWith('✅') ? C.green : C.red, marginTop: 12, textAlign: 'center' }}>{userMsg}</div>}
+            </div>
+
+            {/* Add/Edit User Modal */}
+            {showAddUser && (
+                <Modal title={editingUser ? '✏️ Uredi korisnika' : '👤 Novi korisnik'} onClose={() => setShowAddUser(false)} wide>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
+                        <Field label="Ime i prezime" required><Input value={userForm.name} onChange={e => setUserForm(f => ({ ...f, name: e.target.value }))} placeholder="npr. Ivan Horvat" /></Field>
+                        <Field label="Korisničko ime" required><Input value={userForm.username} onChange={e => setUserForm(f => ({ ...f, username: e.target.value.toLowerCase().replace(/\s+/g, '.') }))} placeholder="npr. ivan.horvat" disabled={!!editingUser} /></Field>
+                        <Field label="Uloga" required>
+                            <select value={userForm.role} onChange={e => setUserForm(f => ({ ...f, role: e.target.value }))} style={{ width: '100%', padding: 10, borderRadius: 10, border: `1px solid ${C.border}`, background: C.bg, color: C.text, fontSize: 13 }}>
+                                <option value="radnik">👷 Radnik</option>
+                                <option value="leader">⭐ Voditelj</option>
+                                <option value="admin">👑 Admin</option>
+                            </select>
+                        </Field>
+                        {!editingUser && <Field label="Lozinka" required><Input type="password" value={userForm.password} onChange={e => setUserForm(f => ({ ...f, password: e.target.value }))} placeholder="Min 8, 1 veliko, 1 broj" /></Field>}
+                    </div>
+                    {userMsg && <div style={{ fontSize: 13, fontWeight: 600, color: userMsg.startsWith('✅') ? C.green : C.red, marginTop: 12 }}>{userMsg}</div>}
+                    <div style={{ display: 'flex', gap: 12, marginTop: 20, justifyContent: 'flex-end' }}>
+                        <button onClick={() => setShowAddUser(false)} style={styles.btnSecondary}>Odustani</button>
+                        <button onClick={async () => {
+                            setUserMsg('');
+                            if (!userForm.name.trim() || !userForm.username.trim()) { setUserMsg('❌ Ime i korisničko ime su obavezni'); return; }
+                            try {
+                                if (editingUser) {
+                                    // Update existing user
+                                    await updateDoc('users', editingUser.id, { name: userForm.name.trim(), role: userForm.role });
+                                    await addAuditLog('USER_UPDATED', `${currentUser?.name} ažurirao korisnika ${userForm.name} (${userForm.role})`);
+                                    setUserMsg('✅ Korisnik ažuriran!');
+                                } else {
+                                    // Create new user
+                                    if (!userForm.password || userForm.password.length < 8) { setUserMsg('❌ Lozinka mora imati min 8 znakova'); return; }
+                                    if (!/[A-Z]/.test(userForm.password)) { setUserMsg('❌ Lozinka mora sadržavati barem 1 veliko slovo'); return; }
+                                    if (!/[0-9]/.test(userForm.password)) { setUserMsg('❌ Lozinka mora sadržavati barem 1 broj'); return; }
+                                    // Check duplicate username
+                                    if (users?.some(u => u.username === userForm.username.trim())) { setUserMsg('❌ Korisničko ime već postoji'); return; }
+                                    // Create Firebase Auth account
+                                    const auth = (window as any).firebase?.auth();
+                                    if (auth) {
+                                        const email = `${userForm.username.trim()}@rakusic-corporation.live`;
+                                        const wrapped = `vds_${userForm.password}_auth`;
+                                        try {
+                                            await auth.createUserWithEmailAndPassword(email, wrapped);
+                                        } catch (authErr: any) {
+                                            if (authErr.code !== 'auth/email-already-in-use') throw authErr;
+                                        }
+                                    }
+                                    const newUser = { id: genId(), name: userForm.name.trim(), username: userForm.username.trim(), role: userForm.role, createdAt: new Date().toISOString(), createdBy: currentUser?.name || 'admin' };
+                                    await add('users', newUser);
+                                    await addAuditLog('USER_CREATED', `${currentUser?.name} kreirao korisnika ${userForm.name} (${userForm.role})`);
+                                    setUserMsg('✅ Korisnik kreiran!');
+                                }
+                                setTimeout(() => setShowAddUser(false), 1000);
+                            } catch (e: any) {
+                                setUserMsg('❌ ' + (e.message || 'Greška'));
+                            }
+                        }} style={{ ...styles.btn, minWidth: 140 }} disabled={!userForm.name.trim() || !userForm.username.trim()}>{editingUser ? '💾 Spremi' : '✅ Kreiraj'}</button>
+                    </div>
+                </Modal>
+            )}
 
             {/* Password change (Firebase Auth) — Admin */}
             <div style={{ ...styles.card, marginTop: 16 }}>
