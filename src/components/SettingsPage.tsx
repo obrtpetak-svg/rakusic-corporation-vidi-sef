@@ -9,7 +9,7 @@ export function SettingsPage({ workerFilterId }) {
     const { companyProfile, currentUser, auditLog, addAuditLog, loadAuditLog, handleResetFirebase,
         projects, workers, users, timesheets, invoices, otpremnice, vehicles, smjestaj, obaveze, dailyLogs,
         sessionConfig, forceLogoutAll, updateSessionDuration, updateSyncMode, lastSync,
-        loadDeletedItems, cleanupOldDeleted } = useApp();
+        loadDeletedItems, cleanupOldDeleted, changePassword, exportUserData } = useApp();
     const [editing, setEditing] = useState(false);
     const [trashItems, setTrashItems] = useState(null);
     const [trashLoading, setTrashLoading] = useState(false);
@@ -25,6 +25,39 @@ export function SettingsPage({ workerFilterId }) {
     // PIN change state
     const [pinForm, setPinForm] = useState({ currentPin: '', newPin: '', confirmPin: '' });
     const [pinMsg, setPinMsg] = useState('');
+
+    // Password change state (Firebase Auth)
+    const [pwForm, setPwForm] = useState({ currentPw: '', newPw: '', confirmPw: '' });
+    const [pwMsg, setPwMsg] = useState('');
+    const [pwLoading, setPwLoading] = useState(false);
+    const [exportLoading, setExportLoading] = useState(false);
+    const [exportMsg, setExportMsg] = useState('');
+
+    const doChangePassword = async () => {
+        setPwMsg(''); setPwLoading(true);
+        if (!pwForm.currentPw || !pwForm.newPw) { setPwMsg('❌ Unesite trenutnu i novu lozinku'); setPwLoading(false); return; }
+        if (pwForm.newPw !== pwForm.confirmPw) { setPwMsg('❌ Nove lozinke se ne podudaraju'); setPwLoading(false); return; }
+        try {
+            await changePassword(pwForm.currentPw, pwForm.newPw);
+            setPwForm({ currentPw: '', newPw: '', confirmPw: '' });
+            setPwMsg('✅ Lozinka uspješno promijenjena!');
+        } catch (e) {
+            setPwMsg('❌ ' + (e.message || 'Greška pri promjeni lozinke'));
+        }
+        setPwLoading(false);
+    };
+
+    const doExportData = async () => {
+        setExportLoading(true); setExportMsg('');
+        try {
+            await exportUserData();
+            setExportMsg('✅ Podatci preuzeti!');
+        } catch (e) {
+            setExportMsg('❌ ' + e.message);
+        }
+        setExportLoading(false);
+        setTimeout(() => setExportMsg(''), 4000);
+    };
 
     const startEdit = () => {
         setForm({
@@ -202,7 +235,7 @@ export function SettingsPage({ workerFilterId }) {
 
                 {/* PIN change for worker */}
                 <div style={styles.card}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16 }}> Promjena PIN-a</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16 }}>🔑 Promjena PIN-a</div>
                     <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 16 }}>Promijenite PIN za pristup aplikaciji. PIN mora imati najmanje 4 znaka.</div>
                     <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: 12, maxWidth: 600 }}>
                         <Field label="Trenutni PIN" required><Input type="password" value={pinForm.currentPin} onChange={e => setPinForm(f => ({ ...f, currentPin: e.target.value }))} placeholder="Unesite trenutni PIN" maxLength={10} /></Field>
@@ -210,12 +243,39 @@ export function SettingsPage({ workerFilterId }) {
                         <Field label="Potvrdi novi PIN" required><Input type="password" value={pinForm.confirmPin} onChange={e => setPinForm(f => ({ ...f, confirmPin: e.target.value }))} placeholder="Ponovi novi PIN" maxLength={10} /></Field>
                     </div>
                     {pinMsg && <div style={{ fontSize: 13, fontWeight: 600, color: pinMsg.startsWith('✅') ? C.green : C.red, marginTop: 12 }}>{pinMsg}</div>}
-                    <button onClick={changePin} disabled={!pinForm.currentPin || !pinForm.newPin} style={{ ...styles.btn, marginTop: 16, opacity: !pinForm.currentPin || !pinForm.newPin ? 0.5 : 1 }}> Promijeni PIN</button>
+                    <button onClick={changePin} disabled={!pinForm.currentPin || !pinForm.newPin} style={{ ...styles.btn, marginTop: 16, opacity: !pinForm.currentPin || !pinForm.newPin ? 0.5 : 1 }}>🔑 Promijeni PIN</button>
+                </div>
+
+                {/* Password change (Firebase Auth) */}
+                <div style={{ ...styles.card, marginTop: 16 }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 8 }}>🔐 Promjena lozinke (Firebase Auth)</div>
+                    <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 16 }}>Lozinka za prijavu u sustav. Pravila: najmanje 8 znakova, 1 veliko slovo, 1 broj.</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: 12, maxWidth: 600 }}>
+                        <Field label="Trenutna lozinka" required><Input type="password" value={pwForm.currentPw} onChange={e => setPwForm(f => ({ ...f, currentPw: e.target.value }))} placeholder="Unesite trenutnu" /></Field>
+                        <Field label="Nova lozinka" required><Input type="password" value={pwForm.newPw} onChange={e => setPwForm(f => ({ ...f, newPw: e.target.value }))} placeholder="Min 8, 1 veliko, 1 broj" /></Field>
+                        <Field label="Potvrdi novu" required><Input type="password" value={pwForm.confirmPw} onChange={e => setPwForm(f => ({ ...f, confirmPw: e.target.value }))} placeholder="Ponovi novu lozinku" /></Field>
+                    </div>
+                    {pwMsg && <div style={{ fontSize: 13, fontWeight: 600, color: pwMsg.startsWith('✅') ? C.green : C.red, marginTop: 12 }}>{pwMsg}</div>}
+                    <button onClick={doChangePassword} disabled={pwLoading || !pwForm.currentPw || !pwForm.newPw} style={{ ...styles.btn, marginTop: 16, opacity: pwLoading ? 0.5 : 1 }}>
+                        {pwLoading ? '⏳ Mijenjam...' : '🔐 Promijeni lozinku'}
+                    </button>
+                </div>
+
+                {/* GDPR Data Export */}
+                <div style={{ ...styles.card, marginTop: 16 }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 8 }}>📦 Preuzmi moje podatke</div>
+                    <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 16 }}>GDPR — preuzmite sve svoje osobne podatke u JSON formatu (evidencija sati, dnevni logovi, zahtjevi za dopust).</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <button onClick={doExportData} disabled={exportLoading} style={{ ...styles.btn, opacity: exportLoading ? 0.5 : 1 }}>
+                            {exportLoading ? '⏳ Pripremam...' : '📦 Preuzmi moje podatke'}
+                        </button>
+                        {exportMsg && <span style={{ fontSize: 13, fontWeight: 600, color: exportMsg.startsWith('✅') ? C.green : C.red }}>{exportMsg}</span>}
+                    </div>
                 </div>
 
                 {/* App info */}
                 <div style={{ ...styles.card, marginTop: 16 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}> Aplikacija</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>ℹ️ Aplikacija</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                         <div><span style={styles.label}>Verzija</span><div style={{ fontSize: 14, fontWeight: 600, color: C.accent }}>3.0.0</div></div>
                         <div><span style={styles.label}>Korisnik</span><div style={{ fontSize: 14, fontWeight: 600 }}>{currentUser?.name}</div></div>
@@ -406,9 +466,24 @@ export function SettingsPage({ workerFilterId }) {
                 <button onClick={resetApp} style={{ ...styles.btn, background: C.red }}>🗑️ Potpuni reset aplikacije</button>
             </div>
 
+            {/* Password change (Firebase Auth) — Admin */}
+            <div style={{ ...styles.card, marginTop: 16 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 8 }}>🔐 Promjena lozinke (Firebase Auth)</div>
+                <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 16 }}>Lozinka za prijavu u sustav. Pravila: najmanje 8 znakova, 1 veliko slovo, 1 broj.</div>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: 12, maxWidth: 600 }}>
+                    <Field label="Trenutna lozinka" required><Input type="password" value={pwForm.currentPw} onChange={e => setPwForm(f => ({ ...f, currentPw: e.target.value }))} placeholder="Unesite trenutnu" /></Field>
+                    <Field label="Nova lozinka" required><Input type="password" value={pwForm.newPw} onChange={e => setPwForm(f => ({ ...f, newPw: e.target.value }))} placeholder="Min 8, 1 veliko, 1 broj" /></Field>
+                    <Field label="Potvrdi novu" required><Input type="password" value={pwForm.confirmPw} onChange={e => setPwForm(f => ({ ...f, confirmPw: e.target.value }))} placeholder="Ponovi novu lozinku" /></Field>
+                </div>
+                {pwMsg && <div style={{ fontSize: 13, fontWeight: 600, color: pwMsg.startsWith('✅') ? C.green : C.red, marginTop: 12 }}>{pwMsg}</div>}
+                <button onClick={doChangePassword} disabled={pwLoading || !pwForm.currentPw || !pwForm.newPw} style={{ ...styles.btn, marginTop: 16, opacity: pwLoading ? 0.5 : 1 }}>
+                    {pwLoading ? '⏳ Mijenjam...' : '🔐 Promijeni lozinku'}
+                </button>
+            </div>
+
             {/* PIN change for admin */}
             <div style={{ ...styles.card, marginTop: 16 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16 }}> Promjena PIN-a</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16 }}>🔑 Promjena PIN-a</div>
                 <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 16 }}>Promijenite PIN za pristup admin računu.</div>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: 12, maxWidth: 600 }}>
                     <Field label="Trenutni PIN" required><Input type="password" value={pinForm.currentPin} onChange={e => setPinForm(f => ({ ...f, currentPin: e.target.value }))} placeholder="Unesite trenutni PIN" maxLength={10} /></Field>
