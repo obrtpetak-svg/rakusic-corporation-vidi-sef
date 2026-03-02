@@ -73,32 +73,54 @@ export default function FleetDashboard() {
     });
 
     useEffect(() => {
-        const db = (window as any).firebase?.firestore?.();
-        if (!db) return;
+        // Primary: fetch from API directly (always works)
+        const fetchVehicles = () => {
+            fetch('/api/gps/vehicles')
+                .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+                .then(data => {
+                    if (data?.vehicles && Object.keys(data.vehicles).length > 0) {
+                        setCacheDoc({
+                            updatedAt: data.updatedAt || new Date().toISOString(),
+                            dataAgeSeconds: data.dataAgeSeconds || 0,
+                            providerStatus: data.providerStatus || 'OK',
+                            dataSource: data.dataSource || 'poll',
+                            vehicleCount: data.vehicleCount || Object.keys(data.vehicles).length,
+                            vehicles: data.vehicles,
+                        });
+                    }
+                })
+                .catch(err => console.warn('[Fleet] API fetch failed:', err.message));
+        };
 
-        // Listen for live updates from Firestore cache doc
-        const unsub = db.doc('gps/cache').onSnapshot((snap: any) => {
-            if (!snap.exists) return;
-            const data = snap.data();
-            const lp = data?.lastPositions;
-            if (lp && lp.vehicles && Object.keys(lp.vehicles).length > 0) {
-                setCacheDoc({
-                    updatedAt: lp.updatedAt || new Date().toISOString(),
-                    dataAgeSeconds: lp.dataAgeSeconds || 0,
-                    providerStatus: lp.providerStatus || 'OK',
-                    dataSource: lp.dataSource || 'push',
-                    vehicleCount: lp.vehicleCount || Object.keys(lp.vehicles).length,
-                    vehicles: lp.vehicles,
+        fetchVehicles(); // immediate
+        const pollInterval = setInterval(fetchVehicles, 30000); // poll every 30s
+
+        // Secondary: Firestore onSnapshot for push-based live updates
+        let unsub = () => { };
+        try {
+            const db = (window as any).firebase?.firestore?.();
+            if (db) {
+                unsub = db.doc('gps/cache').onSnapshot((snap: any) => {
+                    if (!snap.exists) return;
+                    const data = snap.data();
+                    const lp = data?.lastPositions;
+                    if (lp?.vehicles && Object.keys(lp.vehicles).length > 0) {
+                        setCacheDoc({
+                            updatedAt: lp.updatedAt || new Date().toISOString(),
+                            dataAgeSeconds: lp.dataAgeSeconds || 0,
+                            providerStatus: lp.providerStatus || 'OK',
+                            dataSource: lp.dataSource || 'push',
+                            vehicleCount: lp.vehicleCount || Object.keys(lp.vehicles).length,
+                            vehicles: lp.vehicles,
+                        });
+                    }
                 });
             }
-        });
+        } catch (e) {
+            console.warn('[Fleet] Firestore listener failed:', e);
+        }
 
-        // Initial fetch: trigger API to populate cache if empty
-        fetch('/api/gps/vehicles').catch(() => {
-            console.warn('[Fleet] API call to /api/gps/vehicles failed — using mock data');
-        });
-
-        return () => unsub();
+        return () => { clearInterval(pollInterval); unsub(); };
     }, []);
 
     // ── Computed stats ──
@@ -173,10 +195,10 @@ export default function FleetDashboard() {
                         🚛 GPS Vozila
                         <span style={{
                             fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 6,
-                            background: cacheDoc.providerStatus === 'OK' ? 'rgba(16,185,129,0.12)' : 'rgba(245,158,11,0.12)',
-                            color: cacheDoc.providerStatus === 'OK' ? '#10B981' : '#F59E0B',
+                            background: cacheDoc.dataSource !== 'mock' ? 'rgba(16,185,129,0.12)' : 'rgba(245,158,11,0.12)',
+                            color: cacheDoc.dataSource !== 'mock' ? '#10B981' : '#F59E0B',
                         }}>
-                            {cacheDoc.dataSource === 'mock' ? 'DEMO' : cacheDoc.providerStatus}
+                            {cacheDoc.dataSource !== 'mock' ? 'LIVE' : 'OFFLINE'}
                         </span>
                     </div>
                     <div style={{ fontSize: 12, color: C.textMuted, marginTop: 2 }}>
