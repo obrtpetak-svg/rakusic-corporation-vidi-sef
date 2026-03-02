@@ -548,7 +548,7 @@ export function Layout() {
                 const groupBadge = group.items.reduce((sum, i) => sum + (i.badge || 0), 0);
                 return (
                     <div key={group.label} style={{ marginBottom: 4 }}>
-                        <button onClick={() => toggleGroup(group.label)} style={{ display: 'flex', alignItems: 'center', width: '100%', padding: '6px 14px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 10, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase', color: C.textMuted, marginTop: gi > 0 ? 8 : 0 }}>
+                        <button onClick={() => toggleGroup(group.label)} aria-expanded={!isCollapsed} aria-label={`${isCollapsed ? 'Otvori' : 'Zatvori'} grupu ${group.label}`} style={{ display: 'flex', alignItems: 'center', width: '100%', padding: '6px 14px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 10, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase', color: C.textMuted, marginTop: gi > 0 ? 8 : 0 }}>
                             <span style={{ transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0)', transition: 'transform 0.15s', marginRight: 6, fontSize: 8 }}>▼</span>
                             {group.label}
                             {groupBadge > 0 && <span style={{ marginLeft: 'auto', background: C.red, color: '#fff', borderRadius: 20, fontSize: 9, fontWeight: 800, padding: '1px 5px' }}>{groupBadge}</span>}
@@ -587,7 +587,7 @@ export function Layout() {
             {mobileOpen && <div onClick={() => setMobileOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', zIndex: 98, animation: 'fadeIn 0.2s ease' }} />}
 
             {/* Sidebar */}
-            <div className={mobileOpen ? 'sidebar sidebar-open' : 'sidebar'} style={{ width: 240, background: 'var(--sidebar-bg)', borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', height: '100vh', position: 'fixed', left: 0, top: 0, zIndex: 99, transition: 'transform 0.25s cubic-bezier(0.16,1,0.3,1), background 0.4s ease' }}>
+            <div className={mobileOpen ? 'sidebar sidebar-open' : 'sidebar'} role="navigation" aria-label="Glavni izbornik" style={{ width: 240, background: 'var(--sidebar-bg)', borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', height: '100vh', position: 'fixed', left: 0, top: 0, zIndex: 99, transition: 'transform 0.25s cubic-bezier(0.16,1,0.3,1), background 0.4s ease' }}>
                 {/* Logo */}
                 <div style={{ padding: '20px 20px 16px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -597,13 +597,13 @@ export function Layout() {
                             <a href="https://www.vi-di.me" target="_blank" rel="noopener noreferrer" style={{ fontSize: 10, color: C.accent, fontWeight: 600, textDecoration: 'none', display: 'block', marginTop: 2 }}>www.Vi-Di.me</a>
                         </div>
                     </div>
-                    <button onClick={() => setMobileOpen(false)} className="mob-close-btn" style={{ background: 'none', border: 'none', color: C.textMuted, cursor: 'pointer', padding: 6, display: 'none' }}>
+                    <button onClick={() => setMobileOpen(false)} className="mob-close-btn" aria-label="Zatvori izbornik" style={{ background: 'none', border: 'none', color: C.textMuted, cursor: 'pointer', padding: 6, display: 'none' }}>
                         <Icon name="close" size={18} />
                     </button>
                 </div>
 
                 {/* Nav */}
-                <nav style={{ flex: 1, padding: '12px 10px', overflowY: 'auto' }}>
+                <nav aria-label="Navigacija" style={{ flex: 1, padding: '12px 10px', overflowY: 'auto' }}>
                     {renderSidebar()}
                     {/* User info + dark mode + logout */}
                     <div style={{ padding: '12px 4px', marginTop: 8, borderTop: `1px solid ${C.border}` }}>
@@ -648,7 +648,7 @@ export function Layout() {
                 {/* Mobile header */}
                 {isMobile && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, position: 'sticky', top: 0, background: 'var(--card-solid)', zIndex: 50, padding: '8px 0', marginTop: -8, borderBottom: '1px solid var(--border)' }}>
-                        <button onClick={() => setMobileOpen(true)} style={{ background: 'none', border: 'none', color: C.text, cursor: 'pointer', padding: 8, WebkitTapHighlightColor: 'transparent' }}>
+                        <button onClick={() => setMobileOpen(true)} aria-label="Otvori navigaciju" style={{ background: 'none', border: 'none', color: C.text, cursor: 'pointer', padding: 8, WebkitTapHighlightColor: 'transparent' }}>
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
                         </button>
                         <div style={{ fontSize: 16, fontWeight: 700, color: C.text, flex: 1 }}>{companyProfile?.companyName || 'Vi-Di-Sef'}</div>
@@ -683,7 +683,7 @@ export function Layout() {
             {/* FAB (mobile only) */}
             {isMobile && (
                 <>
-                    <button className="fab" onClick={() => { haptic(); setShowFab(!showFab); }} style={{ transform: showFab ? 'rotate(45deg)' : 'none' }}>+</button>
+                    <button className="fab" onClick={() => { haptic(); setShowFab(!showFab); }} aria-label="Brze akcije" aria-expanded={showFab} style={{ transform: showFab ? 'rotate(45deg)' : 'none' }}>+</button>
                     {showFab && (
                         <div className="fab-menu">
                             {[
@@ -701,13 +701,13 @@ export function Layout() {
             )}
             {showSearch && <GlobalSearch navItems={navItems.filter(n => !n.separator)} workers={workers} projects={projects} onNavigate={navigate} onClose={() => setShowSearch(false)} />}
             {sessionWarning && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999, background: 'rgba(239,68,68,0.95)', color: '#fff', padding: '12px 20px', textAlign: 'center', fontSize: 14, fontWeight: 600, backdropFilter: 'blur(8px)' }}>
+                <div role="alert" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999, background: 'rgba(239,68,68,0.95)', color: '#fff', padding: '12px 20px', textAlign: 'center', fontSize: 14, fontWeight: 600, backdropFilter: 'blur(8px)' }}>
                     Sesija istječe za 5 minuta — pomaknite miš ili dodirnite ekran za nastavak
                 </div>
             )}
             {/* Offline Indicator */}
             {isOffline && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9998, background: 'var(--yellow)', color: '#000', padding: '8px 20px', textAlign: 'center', fontSize: 13, fontWeight: 700, animation: 'slideDown 0.3s ease', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <div role="status" aria-live="polite" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9998, background: 'var(--yellow)', color: '#000', padding: '8px 20px', textAlign: 'center', fontSize: 13, fontWeight: 700, animation: 'slideDown 0.3s ease', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                     Offline — promjene čekaju sync
                 </div>
             )}
@@ -776,7 +776,7 @@ export function Layout() {
 
             {/* Mobile Bottom Tab Bar */}
             {isMobile && (
-                <div className="bottom-tab-bar">
+                <div className="bottom-tab-bar" role="tablist" aria-label="Glavna navigacija">
                     {[
                         { id: 'dashboard', icon: '', label: 'Pregled' },
                         { id: 'radni-sati', icon: '', label: 'Sati' },
@@ -788,6 +788,9 @@ export function Layout() {
                             key={tab.id}
                             className={`tab-item ${(tab.id === '__more__' ? showMoreSheet : page === tab.id) ? 'active' : ''}`}
                             onClick={() => tab.id === '__more__' ? setShowMoreSheet(!showMoreSheet) : (navigate(tab.id), setShowMoreSheet(false))}
+                            role="tab"
+                            aria-selected={page === tab.id}
+                            aria-label={tab.label}
                         >
                             <span className="tab-icon" style={{ position: 'relative' }}>
                                 {tab.icon}
