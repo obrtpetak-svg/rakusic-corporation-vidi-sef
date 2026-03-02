@@ -9,6 +9,20 @@ export default defineConfig({
     },
     build: {
         outDir: 'dist',
-        sourcemap: false
-    }
+        sourcemap: false,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    // Split React into its own chunk (cached separately)
+                    'react-vendor': ['react', 'react-dom'],
+                    // Firebase compat SDK — largest dependency
+                    'firebase-vendor': [
+                        'firebase/app',
+                        'firebase/auth',
+                        'firebase/firestore',
+                    ],
+                },
+            },
+        },
+    },
 })

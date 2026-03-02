@@ -4,7 +4,6 @@ import { Icon, useIsMobile, useDarkMode, DarkModeToggle, GlobalSearch, PageError
 import { C, styles } from '../utils/helpers';
 import { PwaInstallBanner } from './PwaInstallBanner';
 import { UndoToast } from './ui/UndoToast';
-import { AiChatAgent } from './AiChatAgent';
 import { GeolocationService } from '../services/GeolocationService';
 import { writeGpsLocation, writeGpsEvent, initSyncQueue } from '../services/GpsDataWriter';
 import { GPS_DEFAULTS } from '../services/GpsSettingsManager';
@@ -17,7 +16,6 @@ import { WorkersPage } from './WorkersPage';
 import { TimesheetsPage } from './TimesheetsPage';
 import { TimesheetEntry } from './TimesheetEntry';
 import { InvoicesPage } from './InvoicesPage';
-import { SettingsPage } from './SettingsPage';
 import { WorkerEvidencija } from './WorkerEvidencija';
 import { useNotifications, requestNotificationPermission } from '../hooks/useNotifications';
 
@@ -40,6 +38,8 @@ const QrAdminPage = lazy(() => import('./QrCheckIn').then(m => ({ default: m.QrA
 const LeaveTrackerPage = lazy(() => import('./LeaveTracker').then(m => ({ default: m.LeaveTracker })));
 const ProizvodnyaPage = lazy(() => import('./ProizvodnyaPage').then(m => ({ default: m.ProizvodnyaPage })));
 const FleetDashboard = lazy(() => import('./fleet/FleetDashboard'));
+const SettingsPage = lazy(() => import('./SettingsPage').then(m => ({ default: m.SettingsPage })));
+const AiChatAgentLazy = lazy(() => import('./AiChatAgent').then(m => ({ default: m.AiChatAgent })));
 
 
 const SkeletonBlock = ({ w = '100%', h = 16, r = 8, style = {} }) => (
@@ -770,7 +770,7 @@ export function Layout() {
                     </div>
                 )
             }
-            <AiChatAgent />
+            <Suspense fallback={null}><AiChatAgentLazy /></Suspense>
 
             {/* Mobile Bottom Tab Bar */}
             {isMobile && (
