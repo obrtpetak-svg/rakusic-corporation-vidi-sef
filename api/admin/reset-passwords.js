@@ -1,32 +1,33 @@
-// ── Admin: Reset All User Passwords (Emergency — secret key auth) ──
-// Uses a secret key instead of Firebase Auth to avoid chicken-and-egg problem
-// when password format changes make login impossible.
+// ── Admin: Reset All User Passwords (Emergency) ──
+// Uses a secret key since Firebase Auth login may be broken.
+// Matches the exact firebase-admin init pattern from _mapon-client.js
 
-import admin from 'firebase-admin';
-
-// Initialize Firebase Admin
-if (!admin.apps.length) {
+let _admin = null;
+async function getAdmin() {
+    if (_admin) return _admin;
     try {
-        const sa = process.env.FIREBASE_SERVICE_ACCOUNT;
-        if (sa) {
+        const { default: admin } = await import('firebase-admin');
+        if (!admin.apps.length) {
             admin.initializeApp({
-                credential: admin.credential.cert(JSON.parse(sa)),
+                credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || '{}')),
             });
         }
+        _admin = admin;
+        return admin;
     } catch (e) {
-        console.error('[Admin] Firebase init error:', e.message);
+        console.error('[Admin Reset] Firebase init error:', e.message);
+        return null;
     }
 }
 
 export default async function handler(req, res) {
-    // CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Admin-Secret');
     if (req.method === 'OPTIONS') return res.status(204).end();
     if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
 
-    // ── Secret key auth (since Firebase Auth login is broken) ──
+    // Secret key auth
     const ADMIN_SECRET = process.env.ADMIN_RESET_SECRET || 'RakusicResetAll2026!';
     const provided = req.headers['x-admin-secret'] || req.body?.secret;
     if (provided !== ADMIN_SECRET) {
@@ -39,37 +40,35 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'newPassword required (min 6 chars)' });
         }
 
-        if (!admin.apps.length) {
-            return res.status(500).json({ error: 'Firebase Admin not initialized — check FIREBASE_SERVICE_ACCOUNT env var' });
+        const admin = await getAdmin();
+        if (!admin) {
+            return res.status(500).json({ error: 'Firebase Admin SDK failed to initialize' });
         }
 
         const auth = admin.auth();
-        const results = { updated: [], failed: [], total: 0 };
+        const updated = [];
+        const failed = [];
 
-        // List all Firebase Auth users
         const listResult = await auth.listUsers(1000);
-        results.total = listResult.users.length;
 
         for (const user of listResult.users) {
             try {
                 await auth.updateUser(user.uid, { password: newPassword });
-                results.updated.push({ uid: user.uid, email: user.email });
+                updated.push(user.email);
             } catch (err) {
-                results.failed.push({ uid: user.uid, email: user.email, error: err.message });
+                failed.push({ email: user.email, error: err.message });
             }
         }
 
         return res.status(200).json({
             success: true,
-            message: `✅ Updated ${results.updated.length}/${results.total} users to new password`,
-            updated: results.updated.length,
-            failed: results.failed.length,
-            failedDetails: results.failed,
-            updatedEmails: results.updated.map(u => u.email),
+            message: `Updated ${updated.length}/${listResult.users.length} users`,
+            updated,
+            failed,
         });
 
     } catch (err) {
-        console.error('[Admin] Reset error:', err);
+        console.error('[Admin Reset] Error:', err);
         return res.status(500).json({ error: err.message });
     }
 }
