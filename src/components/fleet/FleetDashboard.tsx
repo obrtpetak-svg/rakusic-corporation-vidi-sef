@@ -73,11 +73,12 @@ export default function FleetDashboard() {
     });
 
     useEffect(() => {
-        // Primary: fetch from API with auth token
+        // Primary: fetch from API with auth token (modular Firebase SDK)
         const fetchVehicles = async () => {
             try {
-                const fbAuth = (window as any).firebase?.auth?.();
-                const user = fbAuth?.currentUser;
+                const { getAuth } = await import('firebase/auth');
+                const auth = getAuth();
+                const user = auth?.currentUser;
                 const token = user ? await user.getIdToken() : null;
                 if (!token) { console.warn('[Fleet] No auth token available'); return; }
 
@@ -104,30 +105,34 @@ export default function FleetDashboard() {
         fetchVehicles(); // immediate
         const pollInterval = setInterval(fetchVehicles, 30000); // poll every 30s
 
-        // Secondary: Firestore onSnapshot for push-based live updates
+        // Secondary: Firestore onSnapshot for push-based live updates (modular SDK)
         let unsub = () => { };
-        try {
-            const db = (window as any).firebase?.firestore?.();
-            if (db) {
-                unsub = db.doc('gps/cache').onSnapshot((snap: any) => {
-                    if (!snap.exists) return;
-                    const data = snap.data();
-                    const lp = data?.lastPositions;
-                    if (lp?.vehicles && Object.keys(lp.vehicles).length > 0) {
-                        setCacheDoc({
-                            updatedAt: lp.updatedAt || new Date().toISOString(),
-                            dataAgeSeconds: lp.dataAgeSeconds || 0,
-                            providerStatus: lp.providerStatus || 'OK',
-                            dataSource: lp.dataSource || 'push',
-                            vehicleCount: lp.vehicleCount || Object.keys(lp.vehicles).length,
-                            vehicles: lp.vehicles,
-                        });
-                    }
-                });
+        (async () => {
+            try {
+                const { getDb } = await import('../../context/firebaseCore');
+                const { onSnapshot, doc } = await import('firebase/firestore');
+                const db = getDb();
+                if (db) {
+                    unsub = onSnapshot(doc(db, 'gps', 'cache'), (snap) => {
+                        if (!snap.exists()) return;
+                        const data = snap.data();
+                        const lp = data?.lastPositions;
+                        if (lp?.vehicles && Object.keys(lp.vehicles).length > 0) {
+                            setCacheDoc({
+                                updatedAt: lp.updatedAt || new Date().toISOString(),
+                                dataAgeSeconds: lp.dataAgeSeconds || 0,
+                                providerStatus: lp.providerStatus || 'OK',
+                                dataSource: lp.dataSource || 'push',
+                                vehicleCount: lp.vehicleCount || Object.keys(lp.vehicles).length,
+                                vehicles: lp.vehicles,
+                            });
+                        }
+                    });
+                }
+            } catch (e) {
+                console.warn('[Fleet] Firestore listener failed:', e);
             }
-        } catch (e) {
-            console.warn('[Fleet] Firestore listener failed:', e);
-        }
+        })();
 
         return () => { clearInterval(pollInterval); unsub(); };
     }, []);
