@@ -505,7 +505,8 @@ export function AppProvider({ children }) {
                             if (prev.sessionVersion && sc.sessionVersion && sc.sessionVersion > prev.sessionVersion) {
                                 clearSession();
                                 setCurrentUser(null);
-                                setStep('userLogin');
+                                const a = getAuth(); if (a) a.signOut();
+                                setStep('appLogin');
                             }
                             return { sessionDuration: sc.sessionDuration || 60, sessionVersion: sc.sessionVersion || 1, syncMode: sc.syncMode || 0 };
                         });
@@ -529,14 +530,14 @@ export function AppProvider({ children }) {
                             const s = loadSession();
                             if (!s) return;
                             const age = (Date.now() - new Date(s.loginAt).getTime()) / 60000;
-                            if (age >= maxDuration) { clearSession(); setCurrentUser(null); setStep('userLogin'); }
+                            if (age >= maxDuration) { clearSession(); setCurrentUser(null); const a = getAuth(); if (a) a.signOut(); setStep('appLogin'); }
                         }, 30000); // check every 30s
                         return;
                     }
                 }
                 clearSession(); // expired or user not found
             }
-            setStep('userLogin');
+            setStep('appLogin');
         } catch (err) {
             console.error('[AppContext] Firebase load error:', err);
             setLoadError(err.message);
@@ -616,9 +617,9 @@ export function AppProvider({ children }) {
                 await writeAuthMapping(firebaseUser.uid, matchedUser);
                 handleUserLogin(matchedUser);
             } else {
-                // No matching Firestore user — still authenticated, show userLogin
+                // No matching Firestore user — still authenticated, show appLogin
                 console.warn('[Auth] No Firestore user matches username:', username);
-                setStep('userLogin');
+                setStep('appLogin');
             }
         }
 
@@ -634,7 +635,7 @@ export function AppProvider({ children }) {
         await setDoc('config', 'companyProfile', profile);
         const u = snapToArray(await getDb().collection('users').get());
         if (!u.length) setStep('adminCreate');
-        else setStep('userLogin');
+        else setStep('appLogin');
     };
 
     const handleAdminCreate = async (admin) => {
@@ -654,10 +655,10 @@ export function AppProvider({ children }) {
             const s = loadSession();
             if (!s) return;
             const age = (Date.now() - new Date(s.loginAt).getTime()) / 60000;
-            if (age >= (sessionConfig.sessionDuration || 60)) { clearSession(); setCurrentUser(null); setStep('userLogin'); }
+            if (age >= (sessionConfig.sessionDuration || 60)) { clearSession(); setCurrentUser(null); const a = getAuth(); if (a) a.signOut(); setStep('appLogin'); }
         }, 30000);
     };
-    const handleLogout = () => { clearSession(); if (sessionCheckRef.current) clearInterval(sessionCheckRef.current); setCurrentUser(null); setStep('userLogin'); };
+    const handleLogout = () => { clearSession(); if (sessionCheckRef.current) clearInterval(sessionCheckRef.current); setCurrentUser(null); const a = getAuth(); if (a) a.signOut(); setStep('appLogin'); };
     const handleResetFirebase = () => {
         localStorage.removeItem('vidime-firebase-config-v9');
         localStorage.removeItem('vidime-app-login');
