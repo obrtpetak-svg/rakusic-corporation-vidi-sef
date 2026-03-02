@@ -173,9 +173,9 @@ export function normalizeVehicle(unit) {
     };
 }
 
-// ── Auth middleware — verify Firebase ID token ──
+// ── Shared Firebase Admin lazy init ──
 let _authAdmin = null;
-export async function getAuthAdmin() {
+export async function getFirebaseAdmin() {
     if (_authAdmin) return _authAdmin;
     try {
         const { default: admin } = await import('firebase-admin');
@@ -198,7 +198,7 @@ export async function verifyAuth(req) {
     if (!token) return null;
 
     try {
-        const admin = await getAuthAdmin();
+        const admin = await getFirebaseAdmin();
         if (!admin) return null;
         const decoded = await admin.auth().verifyIdToken(token);
         return decoded; // { uid, email, ... }

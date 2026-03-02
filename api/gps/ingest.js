@@ -2,7 +2,7 @@
 // POST /api/gps/ingest — Mapon Data Forwarding webhook
 // Receives push position packs, validates, writes Firestore
 // ═══════════════════════════════════════════════════════
-import { normalizeVehicle, corsHeaders } from './_mapon-client.js';
+import { normalizeVehicle, corsHeaders, getFirebaseAdmin } from './_mapon-client.js';
 
 export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).json({});
@@ -118,20 +118,3 @@ export default async function handler(req, res) {
     }
 }
 
-// Firebase Admin lazy init
-let _admin = null;
-async function getFirebaseAdmin() {
-    if (_admin) return _admin;
-    try {
-        const { default: admin } = await import('firebase-admin');
-        if (!admin.apps.length) {
-            admin.initializeApp({
-                credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || '{}')),
-            });
-        }
-        _admin = admin;
-        return admin;
-    } catch {
-        return null;
-    }
-}

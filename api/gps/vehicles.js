@@ -2,7 +2,7 @@
 // GET /api/gps/vehicles — Fetch all vehicles from Mapon
 // Writes to Firestore gps/cache/lastPositions + returns
 // ═══════════════════════════════════════════════════════
-import { maponGet, normalizeVehicle, corsHeaders, verifyAuth } from './_mapon-client.js';
+import { maponGet, normalizeVehicle, corsHeaders, verifyAuth, getFirebaseAdmin } from './_mapon-client.js';
 
 export default async function handler(req, res) {
     // CORS
@@ -67,20 +67,3 @@ export default async function handler(req, res) {
     }
 }
 
-// Firebase Admin lazy init
-let _admin = null;
-async function getFirebaseAdmin() {
-    if (_admin) return _admin;
-    try {
-        const { default: admin } = await import('firebase-admin');
-        if (!admin.apps.length) {
-            admin.initializeApp({
-                credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || '{}')),
-            });
-        }
-        _admin = admin;
-        return admin;
-    } catch {
-        return null;
-    }
-}

@@ -2,7 +2,7 @@
 // POST /api/gps/route-planning — Route Planning workflows
 // Orders CRUD, route create/optimize/send
 // ═══════════════════════════════════════════════════════
-import { maponGet, maponPost, corsHeaders, verifyAuth } from './_mapon-client.js';
+import { maponGet, maponPost, corsHeaders, verifyAuth, getFirebaseAdmin } from './_mapon-client.js';
 
 export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).json({});
@@ -144,15 +144,3 @@ export default async function handler(req, res) {
     }
 }
 
-let _admin = null;
-async function getFirebaseAdmin() {
-    if (_admin) return _admin;
-    try {
-        const { default: admin } = await import('firebase-admin');
-        if (!admin.apps.length) {
-            admin.initializeApp({ credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || '{}')) });
-        }
-        _admin = admin;
-        return admin;
-    } catch { return null; }
-}

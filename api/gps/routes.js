@@ -2,7 +2,7 @@
 // GET /api/gps/routes — Fetch route history from Mapon
 // Cache results in Firestore for 24h
 // ═══════════════════════════════════════════════════════
-import { maponGet, corsHeaders, verifyAuth } from './_mapon-client.js';
+import { maponGet, corsHeaders, verifyAuth, getFirebaseAdmin } from './_mapon-client.js';
 
 export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).json({});
@@ -146,20 +146,3 @@ function decodePolyline(encoded) {
     return points;
 }
 
-// Firebase Admin lazy init
-let _admin = null;
-async function getFirebaseAdmin() {
-    if (_admin) return _admin;
-    try {
-        const { default: admin } = await import('firebase-admin');
-        if (!admin.apps.length) {
-            admin.initializeApp({
-                credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || '{}')),
-            });
-        }
-        _admin = admin;
-        return admin;
-    } catch {
-        return null;
-    }
-}

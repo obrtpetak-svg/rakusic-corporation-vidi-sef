@@ -11,39 +11,45 @@ import {
     doc, setDoc, updateDoc, deleteDoc, getDoc, getDocs,
     collection, writeBatch,
 } from 'firebase/firestore';
+import type { BaseDoc } from '../types';
+
+/** Generic document type for CRUD ops — must have at least an id */
+type DocData = Record<string, unknown> & { id?: string };
 
 // ── Error handler ────────────────────────────────────────────────────────
-function handleError(e: any, op: string) {
-    if (e.code === 'permission-denied' || (e.message && e.message.includes('permissions'))) {
+function handleError(e: unknown, op: string) {
+    const err = e as { code?: string; message?: string };
+    if (err.code === 'permission-denied' || (err.message && err.message.includes('permissions'))) {
         throw new Error('Nemate dozvolu za ovu operaciju. Kontaktirajte administratora.');
     }
     console.error(`Firestore ${op} error:`, e);
 }
 
 // ── Global setter registry for optimistic updates ────────────────────────
-const _setterMap: Record<string, any> = {};
-export function _registerSetters(map: Record<string, any>) { Object.assign(_setterMap, map); }
+type SetterFn = (updater: (prev: BaseDoc[]) => BaseDoc[]) => void;
+const _setterMap: Record<string, SetterFn> = {};
+export function _registerSetters(map: Record<string, SetterFn>) { Object.assign(_setterMap, map); }
 
 // ── CRUD Operations ──────────────────────────────────────────────────────
-export async function add(col: string, data: any) {
+export async function add(col: string, data: DocData) {
     const db = getDb(); if (!db) return null;
     const id = data.id || genId();
     const docData = { ...data, id };
     try {
         validateOrThrow(col, docData);
         await setDoc(doc(db, col, id), docData);
-        if (_setterMap[col]) _setterMap[col]((prev: any[]) => [...prev, docData]);
+        if (_setterMap[col]) _setterMap[col]((prev) => [...prev, docData as BaseDoc]);
         return docData;
     }
     catch (e) { handleError(e, 'add'); throw e; }
 }
 
-export async function update(col: string, id: string, updates: any) {
+export async function update(col: string, id: string, updates: Record<string, unknown>) {
     const db = getDb(); if (!db) return;
     try {
         const stamped = { ...updates, updatedAt: new Date().toISOString() };
         await updateDoc(doc(db, col, id), stamped);
-        if (_setterMap[col]) _setterMap[col]((prev: any[]) => prev.map((d: any) => d.id === id ? { ...d, ...stamped } : d));
+        if (_setterMap[col]) _setterMap[col]((prev) => prev.map(d => d.id === id ? { ...d, ...stamped } : d));
     }
     catch (e) { handleError(e, 'update'); throw e; }
 }
@@ -54,7 +60,7 @@ export async function remove(col: string, id: string) {
     try {
         const deletedAt = new Date().toISOString();
         await updateDoc(doc(db, col, id), { deletedAt });
-        if (_setterMap[col]) _setterMap[col]((prev: any[]) => prev.filter((d: any) => d.id !== id));
+        if (_setterMap[col]) _setterMap[col]((prev) => prev.filter(d => d.id !== id));
         _lastDeleted = { collection: col, id, deletedAt };
     }
     catch (e) { handleError(e, 'remove'); throw e; }
@@ -72,7 +78,7 @@ export async function restoreItem(col: string, id: string) {
         const data = { ...snap.data() };
         delete data.deletedAt;
         await setDoc(doc(db, col, id), data);
-        if (_setterMap[col]) _setterMap[col]((prev: any[]) => [...prev, { ...data, id }]);
+        if (_setterMap[col]) _setterMap[col]((prev) => [...prev, { ...data, id } as BaseDoc]);
         _lastDeleted = null;
     }
     catch (e) { handleError(e, 'restore'); throw e; }
@@ -84,18 +90,18 @@ export async function permanentDelete(col: string, id: string) {
     catch (e) { handleError(e, 'permanentDelete'); throw e; }
 }
 
-export async function setDocument(col: string, docId: string, data: any) {
+export async function setDocument(col: string, docId: string, data: Record<string, unknown>) {
     const db = getDb(); if (!db) return;
     try { await setDoc(doc(db, col, docId), data); }
     catch (e) { handleError(e, 'setDoc'); throw e; }
 }
 
 // Batch operations for backup/restore
-export async function batchSet(col: string, items: any[]) {
+export async function batchSet(col: string, items: DocData[]) {
     const db = getDb(); if (!db) return;
     for (let i = 0; i < items.length; i += 450) {
         const batch = writeBatch(db);
-        items.slice(i, i + 450).forEach((item: any) => {
+        items.slice(i, i + 450).forEach((item) => {
             const id = item.id || genId();
             batch.set(doc(db, col, id), { ...item, id });
         });
