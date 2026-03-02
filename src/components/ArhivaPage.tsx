@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useConfirm } from './ui/ConfirmModal';
 import { useApp, batchSet, clearCollection, setDoc } from '../context/AppContext';
 import { Icon, Select, Input, SvgBarChart, SvgHBarChart, SvgDonutChart, SvgLineChart, useIsMobile } from './ui/SharedComponents';

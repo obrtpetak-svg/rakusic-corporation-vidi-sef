@@ -1,4 +1,3 @@
-import React from 'react';
 import { C, styles } from '../../utils/helpers';
 
 /**

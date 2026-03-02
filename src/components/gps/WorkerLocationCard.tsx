@@ -1,7 +1,6 @@
 // ═══════════════════════════════════════════════════════
 // Worker Location Card — Individual worker GPS info card
 // ═══════════════════════════════════════════════════════
-import React from 'react';
 import { C, styles } from '../../utils/helpers';
 import { formatDistance, timeAgo } from '../../services/GpsSettingsManager';
 

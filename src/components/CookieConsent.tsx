@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { C, styles } from '../utils/helpers';
 
 const CONSENT_KEY = 'vidisef-cookie-consent';

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useConfirm } from './ui/ConfirmModal';
 import { useApp, update as updateDoc, remove as removeDoc } from '../context/AppContext';
 import { Icon, StatusBadge, Pagination, usePagination, useIsMobile } from './ui/SharedComponents';

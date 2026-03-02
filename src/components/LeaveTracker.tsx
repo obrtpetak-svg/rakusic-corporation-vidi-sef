@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useApp, add as addDoc, update as updateDoc } from '../context/AppContext';
 import { Icon, Modal, Field, Input, Select, useIsMobile } from './ui/SharedComponents';
 import { C, styles, genId, today, fmtDate } from '../utils/helpers';

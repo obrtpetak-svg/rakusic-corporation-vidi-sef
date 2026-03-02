@@ -1,4 +1,4 @@
-import React, { useState, useEffect, type ChangeEvent } from 'react';
+import { useState, useEffect, type ChangeEvent } from 'react';
 import { useApp, initFirebase } from '../context/AppContext';
 import { Icon, Field, Input } from './ui/SharedComponents';
 import { C, styles } from '../utils/helpers';

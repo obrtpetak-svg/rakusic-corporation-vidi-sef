@@ -2,7 +2,7 @@
 // GPS Admin Panel — Orchestrator
 // Slim 120-line container that wires tabs to data via useGpsData hook
 // ═══════════════════════════════════════════════════════
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { C, styles } from '../utils/helpers';
 import { formatDistance } from '../services/GpsSettingsManager';
 import { useGpsData } from '../hooks/useGpsData';

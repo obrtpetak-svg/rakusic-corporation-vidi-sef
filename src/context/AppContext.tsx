@@ -7,7 +7,7 @@
  * New components should prefer useAuth() or useData() for better
  * render performance (only re-renders when relevant state changes).
  */
-import React, { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext, useMemo } from 'react';
 import { AuthProvider, useAuth } from './AuthContext';
 import { DataProvider, useData } from './DataContext';
 

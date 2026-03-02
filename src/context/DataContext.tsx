@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { genId, hashPin } from '../utils/helpers';
 import { log } from '../utils/logger';
 import { validateOrThrow } from '../utils/validate';

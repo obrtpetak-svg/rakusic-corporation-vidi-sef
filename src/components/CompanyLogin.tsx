@@ -1,4 +1,4 @@
-import React, { useState, type FormEvent, type ChangeEvent } from 'react';
+import { useState, type FormEvent, type ChangeEvent } from 'react';
 import { useApp } from '../context/AppContext';
 
 const COMPANY_USER = 'Vi-Di.me';

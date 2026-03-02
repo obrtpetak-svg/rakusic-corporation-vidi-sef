@@ -1,4 +1,3 @@
-import React from 'react';
 import { useConfirm } from './ConfirmModal';
 import { Icon } from './SharedComponents';
 

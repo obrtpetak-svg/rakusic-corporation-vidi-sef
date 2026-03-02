@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useConfirm } from './ui/ConfirmModal';
 import { useApp, setDoc, clearCollection, batchSet, update as updateDoc, restoreItem, permanentDelete, add, remove } from '../context/AppContext';
 import { Icon, Modal, Field, Input, Textarea, useIsMobile } from './ui/SharedComponents';

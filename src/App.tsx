@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { ConfirmProvider } from './components/ui/ConfirmModal';
 import { AppLogin } from './components/AppLogin';

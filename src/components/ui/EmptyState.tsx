@@ -1,4 +1,3 @@
-import React from 'react';
 import { Icon } from './SharedComponents';
 import { styles } from '../../utils/helpers';
 
