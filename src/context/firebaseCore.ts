@@ -51,7 +51,12 @@ export function initFirebase(config: FirebaseConfig | null): boolean {
         fb.initializeApp(config);
         _db = fb.firestore();
         _auth = fb.auth();
-        _db.enablePersistence({ synchronizeTabs: true }).catch(() => { });
+        // Ensure auth session persists across page refreshes
+        try { _auth.setPersistence((win.firebase as any).auth.Auth.Persistence.LOCAL); } catch (e) { console.warn('[Firebase] setPersistence error:', e); }
+        _db.enablePersistence({ synchronizeTabs: true }).catch((err: any) => {
+            if (err.code === 'failed-precondition') console.warn('[Firestore] Persistence failed: multiple tabs open');
+            else if (err.code === 'unimplemented') console.warn('[Firestore] Persistence not supported in this browser');
+        });
         return true;
     } catch (e) { console.error('Firebase init error:', e); return false; }
 }

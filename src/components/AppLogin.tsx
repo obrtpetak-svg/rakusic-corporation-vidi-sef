@@ -96,7 +96,28 @@ export function AppLogin() {
                         {loading ? 'Prijava...' : '🔐 Prijavi se'}
                     </button>
                 </div>
-                <div style={{ textAlign: 'center', color: '#94A3B8', fontSize: 12, marginTop: 20, lineHeight: 1.6 }}>
+                <div style={{ textAlign: 'center', marginTop: 16 }}>
+                    <button onClick={() => {
+                        try {
+                            localStorage.clear();
+                            sessionStorage.clear();
+                            // Clear all IndexedDB databases (Firebase offline cache)
+                            if (window.indexedDB) {
+                                indexedDB.databases?.().then(dbs => dbs.forEach(db => { if (db.name) indexedDB.deleteDatabase(db.name); }));
+                                // Fallback for browsers without databases()
+                                ['firebaseLocalStorageDb', 'firestore/[DEFAULT]/rakusic-corporation-vidi-sef/main'].forEach(name => {
+                                    try { indexedDB.deleteDatabase(name); } catch { }
+                                });
+                            }
+                            // Clear service worker caches
+                            if ('caches' in window) { caches.keys().then(names => names.forEach(n => caches.delete(n))); }
+                            setTimeout(() => window.location.reload(), 300);
+                        } catch { window.location.reload(); }
+                    }} style={{ background: 'none', border: 'none', color: '#64748B', fontSize: 11, cursor: 'pointer', padding: '6px 12px', textDecoration: 'underline' }}>
+                        ⚠️ Problemi s prijavom? Obriši cache
+                    </button>
+                </div>
+                <div style={{ textAlign: 'center', color: '#94A3B8', fontSize: 12, marginTop: 12, lineHeight: 1.6 }}>
                     Za podatke i više informacija javite se na<br />
                     <a href="mailto:info@vi-di.me" style={{ color: C.accent, textDecoration: 'none' }}>info@vi-di.me</a>
                 </div>
