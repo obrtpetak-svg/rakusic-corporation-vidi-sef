@@ -263,6 +263,7 @@ export function AppProvider({ children }) {
     const [safetyTemplates, setSafetyTemplates] = useState([]);
     const [safetyChecklists, setSafetyChecklists] = useState([]);
     const [safetyLoaded, setSafetyLoaded] = useState(false);
+    const [productionLoaded, setProductionLoaded] = useState(false);
     const [sessionConfig, setSessionConfig] = useState({ sessionDuration: 60, sessionVersion: 1, syncMode: 0 });
     const [lastSync, setLastSync] = useState(null);
 
@@ -947,6 +948,23 @@ export function AppProvider({ children }) {
         } catch (e) { console.error('Failed to load safety data:', e); }
     }, [safetyLoaded]);
 
+    // Lazy load production data
+    const loadProduction = useCallback(async () => {
+        if (productionLoaded) return;
+        const db = getDb();
+        if (!db) return;
+        try {
+            const [prodSnap, alertSnap] = await Promise.all([
+                db.collection('production').get(),
+                db.collection('prodAlerts').get(),
+            ]);
+            setProduction(snapToArray(prodSnap));
+            setProdAlerts(snapToArray(alertSnap));
+            setProductionLoaded(true);
+            console.log(`[Lazy] production: ${prodSnap.size} items loaded`);
+        } catch (e) { console.error('Failed to load production:', e); }
+    }, [productionLoaded]);
+
     // Leader role support
     const isLeader = currentUser?.role === 'leader';
     const leaderProjectIds = useMemo(() => currentUser?.assignedProjects || [], [currentUser]);
@@ -979,7 +997,7 @@ export function AppProvider({ children }) {
         workerMap, projectMap, getWorkerName, getProjectName,
         add, update, remove, setDoc,
         addAuditLog, loadAuditLog, allTimesheetsLoaded, loadAllTimesheets,
-        loadDailyLogs, loadWeatherRules, loadSafetyData,
+        loadDailyLogs, loadWeatherRules, loadSafetyData, loadProduction,
         isLeader, leaderProjectIds, leaderWorkerIds,
         handleAppLogin, handleFirebaseLogin, handleFirebaseConfig, handleCompanySetup,
         handleAdminCreate, handleUserLogin, handleLogout, handleResetFirebase,
@@ -996,7 +1014,7 @@ export function AppProvider({ children }) {
         allTimesheetsLoaded, isLeader, leaderProjectIds, leaderWorkerIds,
         sessionConfig, lastSync,
         addAuditLog, loadAuditLog, loadAllTimesheets, loadDailyLogs,
-        loadWeatherRules, loadSafetyData, forceLogoutAll,
+        loadWeatherRules, loadSafetyData, loadProduction, forceLogoutAll,
         updateSessionDuration, updateSyncMode,
         handleAppLogin, handleFirebaseConfig, handleCompanySetup,
         handleAdminCreate, handleUserLogin, handleLogout, handleResetFirebase,

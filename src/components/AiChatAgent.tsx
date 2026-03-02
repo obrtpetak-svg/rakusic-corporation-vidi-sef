@@ -151,7 +151,6 @@ export function AiChatAgent() {
     const chatEndRef = useRef(null);
     const inputRef = useRef(null);
 
-    const apiKey = localStorage.getItem('ai-api-key') || '';
 
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -161,8 +160,7 @@ export function AiChatAgent() {
         if (open && inputRef.current) inputRef.current.focus();
     }, [open]);
 
-    const saveSettings = (key, prov) => {
-        localStorage.setItem('ai-api-key', key);
+    const saveSettings = (prov) => {
         localStorage.setItem('ai-provider', prov);
         setProvider(prov);
         setShowSettings(false);
@@ -171,9 +169,6 @@ export function AiChatAgent() {
     const sendMessage = async () => {
         if (!input.trim() || loading) return;
 
-        const key = localStorage.getItem('ai-api-key');
-        if (!key) { setShowSettings(true); return; }
-
         const userMsg = { role: 'user', content: input.trim() };
         setMessages(prev => [...prev, userMsg]);
         setInput('');
@@ -181,58 +176,35 @@ export function AiChatAgent() {
 
         try {
             const dataContext = buildDataContext({ projects, workers, timesheets, invoices, otpremnice, vehicles, smjestaj, obaveze, companyProfile });
-            const systemMsg = { role: 'system', content: `${SYSTEM_PROMPT}\n\n--- PODACI TVRTKE ---\n${dataContext}` };
+            const systemPromptWithData = `${SYSTEM_PROMPT}\n\n--- PODACI TVRTKE ---\n${dataContext}`;
 
             // Keep last 10 messages for context window
             const chatHistory = messages.slice(-10).filter(m => m.role !== 'system');
+            const prov = provider;
 
-            const prov = localStorage.getItem('ai-provider') || 'openai';
-            let response;
+            // Use server-side proxy (secure — API keys stay on server)
+            const auth = window.firebase?.auth?.();
+            const token = auth?.currentUser ? await auth.currentUser.getIdToken() : null;
 
-            if (prov === 'anthropic') {
-                // Claude API
-                try {
-                    response = await fetch('https://api.anthropic.com/v1/messages', {
-                        method: 'POST',
-                        headers: {
-                            'x-api-key': key,
-                            'anthropic-version': '2023-06-01',
-                            'anthropic-dangerous-direct-browser-access': 'true',
-                            'content-type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            model: 'claude-3-haiku-20240307',
-                            max_tokens: 1024,
-                            system: systemMsg.content,
-                            messages: [...chatHistory, userMsg].map(m => ({ role: m.role, content: m.content }))
-                        })
-                    });
-                } catch (fetchErr) {
-                    // CORS blocked — fallback to OpenAI suggestion
-                    throw new Error('Claude API ne dopušta pozive iz browsera. Prebaci na OpenAI u postavkama (⚙️).');
-                }
-                const data = await response.json();
-                if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
-                setMessages(prev => [...prev, { role: 'assistant', content: data.content[0].text }]);
-            } else {
-                // OpenAI API
-                response = await fetch('https://api.openai.com/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${key}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        model: 'gpt-4o-mini',
-                        messages: [systemMsg, ...chatHistory, userMsg],
-                        max_tokens: 1024,
-                        temperature: 0.3
-                    })
-                });
-                const data = await response.json();
-                if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
-                setMessages(prev => [...prev, { role: 'assistant', content: data.choices[0].message.content }]);
+            const response = await fetch('/api/ai/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+                },
+                body: JSON.stringify({
+                    provider: prov,
+                    systemPrompt: systemPromptWithData,
+                    messages: [...chatHistory, userMsg].map(m => ({ role: m.role, content: m.content })),
+                }),
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.error || `Server error: ${response.status}`);
             }
+
+            setMessages(prev => [...prev, { role: 'assistant', content: data.content }]);
         } catch (err) {
             setMessages(prev => [...prev, { role: 'assistant', content: `❌ Greška: ${err.message}` }]);
         }
@@ -245,7 +217,7 @@ export function AiChatAgent() {
 
     // Settings mini-form
     if (showSettings) {
-        return <SettingsForm onSave={saveSettings} onClose={() => setShowSettings(false)} currentKey={apiKey} currentProvider={provider} />;
+        return <SettingsForm onSave={saveSettings} onClose={() => setShowSettings(false)} currentProvider={provider} />;
     }
 
     return (
@@ -354,17 +326,6 @@ export function AiChatAgent() {
                             transition: 'opacity 0.15s'
                         }}>➤</button>
                     </div>
-
-                    {/* No API key notice */}
-                    {!apiKey && (
-                        <div onClick={() => setShowSettings(true)} style={{
-                            padding: '8px 12px', background: 'var(--yellow-light)',
-                            cursor: 'pointer', fontSize: 12, color: 'var(--yellow)',
-                            textAlign: 'center', fontWeight: 600
-                        }}>
-                            ⚠️ Klikni za unos API ključa (OpenAI ili Claude)
-                        </div>
-                    )}
                 </div>
             )}
 
@@ -373,8 +334,7 @@ export function AiChatAgent() {
 }
 
 // Settings mini-form component
-function SettingsForm({ onSave, onClose, currentKey, currentProvider }) {
-    const [key, setKey] = useState(currentKey);
+function SettingsForm({ onSave, onClose, currentProvider }) {
     const [prov, setProv] = useState(currentProvider);
 
     return (
@@ -409,29 +369,13 @@ function SettingsForm({ onSave, onClose, currentKey, currentProvider }) {
                 </div>
             </div>
 
-            <div style={{ marginBottom: 20 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5 }}>API Ključ</div>
-                <input
-                    value={key}
-                    onChange={e => setKey(e.target.value)}
-                    placeholder={prov === 'openai' ? 'sk-...' : 'sk-ant-...'}
-                    type="password"
-                    style={{
-                        width: '100%', padding: '10px 14px',
-                        border: '1.5px solid var(--input-border)',
-                        borderRadius: 10, fontSize: 14,
-                        fontFamily: 'var(--font-mono)', outline: 'none',
-                        background: 'var(--input-bg)', color: 'var(--text)'
-                    }}
-                />
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
-                    {prov === 'openai' ? 'platform.openai.com → API Keys' : 'console.anthropic.com → API Keys'}
-                </div>
+            <div style={{ padding: '10px 14px', borderRadius: 10, background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.15)', marginBottom: 20, fontSize: 12, color: '#10B981' }}>
+                🔒 API ključevi su sigurno pohranjeni na serveru. Ne trebate ih unositi ovdje.
             </div>
 
             <div style={{ display: 'flex', gap: 8 }}>
                 <button onClick={onClose} style={{ ...styles.btnSecondary, flex: 1, justifyContent: 'center' }}>Odustani</button>
-                <button onClick={() => onSave(key, prov)} style={{ ...styles.btn, flex: 1, justifyContent: 'center' }}>✅ Spremi</button>
+                <button onClick={() => onSave(prov)} style={{ ...styles.btn, flex: 1, justifyContent: 'center' }}>✅ Spremi</button>
             </div>
         </div>
     );

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useCallback } from 'react';
+import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useConfirm } from './ui/ConfirmModal';
 import { useApp, add as addDoc, update as updateDoc, remove as removeDoc } from '../context/AppContext';
 import { Icon, Modal, Field, Input, Textarea, Select, StatusBadge, WorkerCheckboxList, useIsMobile } from './ui/SharedComponents';
@@ -86,7 +86,11 @@ const genOrderNumber = () => {
 
 export function ProizvodnyaPage({ leaderProjectIds }) {
     const confirm = useConfirm();
-    const { production, workers, projects, currentUser, addAuditLog } = useApp();
+    const { production, workers, projects, currentUser, addAuditLog, loadProduction } = useApp();
+
+    // Lazy load production data on mount
+    useEffect(() => { loadProduction?.(); }, [loadProduction]);
+
     const [activeTab, setActiveTab] = useState('pipeline');
     const [showForm, setShowForm] = useState(false);
     const [editId, setEditId] = useState(null);
