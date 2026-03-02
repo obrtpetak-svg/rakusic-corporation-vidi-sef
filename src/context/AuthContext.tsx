@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { genId } from '../utils/helpers';
+import { log } from '../utils/logger';
 import { firebaseSignIn, firebaseSignOut, writeAuthMapping, clearFirestoreCache } from './firebaseCore';
 import {
     initFirebase, getDb, getAuth,
@@ -111,7 +112,7 @@ function clearStaleCache() {
         if ('caches' in window) {
             caches.keys().then(names => names.forEach(n => caches.delete(n)));
         }
-        console.log('[ClearCache] Stale cache cleared');
+        log('[ClearCache] Stale cache cleared');
     } catch (e) { console.warn('[ClearCache] Error:', e); }
 }
 
@@ -179,7 +180,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     });
 
                     if (firebaseUser && !(firebaseUser as { isAnonymous: boolean }).isAnonymous) {
-                        console.log('[Boot] Firebase Auth session restored');
+                        log('[Boot] Firebase Auth session restored');
                         try {
                             await Promise.race([
                                 new Promise<void>((resolve, reject) => {
@@ -204,7 +205,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
                     const savedSession = loadSession();
                     if (savedSession) {
-                        console.log('[Boot] No Firebase Auth but localStorage session exists, trying to load...');
+                        log('[Boot] No Firebase Auth but localStorage session exists, trying to load...');
                         try {
                             await Promise.race([
                                 new Promise<void>((resolve, reject) => {
@@ -226,7 +227,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     }
                 }
 
-                console.log('[Boot] No Firebase Auth session, showing login...');
+                log('[Boot] No Firebase Auth session, showing login...');
                 setStep('appLogin');
             } else {
                 setStep('appLogin');
@@ -257,11 +258,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         const cleanUser = username.toLowerCase().replace(/\s+/g, '.');
         const email = cleanUser.includes('@') ? cleanUser : `${cleanUser}@rakusic-corporation.live`;
-        console.log('[Auth] Attempting login for:', email);
+        log('[Auth] Attempting login for:', email);
 
         try {
             const cred = await signInWithEmailAndPassword(auth, email, password);
-            console.log('[Auth] Sign-in OK:', email);
+            log('[Auth] Sign-in OK:', email);
 
             localStorage.setItem('vidime-app-login', 'true');
             triggerDataLoad(config);

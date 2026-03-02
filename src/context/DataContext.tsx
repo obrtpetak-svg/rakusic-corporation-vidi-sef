@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { genId, hashPin } from '../utils/helpers';
+import { log } from '../utils/logger';
 import { validateOrThrow } from '../utils/validate';
 import { writeAuthMapping, getDb, getAuth, initFirebase, loadFirebaseConfig, type FirebaseConfig } from './firebaseCore';
 import { useAuth } from './AuthContext';
@@ -94,7 +95,7 @@ function snapToArray<T extends BaseDoc = BaseDoc>(snap: QuerySnapshot): T[] {
 // ── Reads telemetry ──────────────────────────────────────────────────────
 function logReads(source: string, collection: string, count: number, type = 'get') {
     if (import.meta.env?.DEV) {
-        console.log(`[READS] ${type.toUpperCase()} ${collection}: ${count} docs (${source})`);
+        log(`[READS] ${type.toUpperCase()} ${collection}: ${count} docs (${source})`);
     }
 }
 
@@ -215,12 +216,12 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     const initFirebaseAndLoad = useCallback(async (config: Record<string, string> | FirebaseConfig) => {
         auth.setLoadError(null);
         try {
-            console.log('[DataContext] Starting data load...');
+            log('[DataContext] Starting data load...');
             if (!initFirebase(config as FirebaseConfig)) { auth.setLoadError('Firebase init failed — check config'); auth.setStep('appLogin'); return; }
 
             const fbAuth = getAuth();
             if (fbAuth && fbAuth.currentUser) {
-                console.log('[DataContext] Using authenticated user:', fbAuth.currentUser.email || fbAuth.currentUser.uid);
+                log('[DataContext] Using authenticated user:', fbAuth.currentUser.email || fbAuth.currentUser.uid);
             } else {
                 console.warn('[DataContext] No authenticated user — redirecting to login');
                 auth.setStep('appLogin');
@@ -268,7 +269,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
                 for (const user of usersToMigrate) {
                     await updateDoc(doc(db, 'users', user.id), { pin: defaultHashedPin });
                 }
-                console.log(`Migrated ${usersToMigrate.length} user PINs to hashed default.`);
+                log(`Migrated ${usersToMigrate.length} user PINs to hashed default.`);
             }
 
             // Realtime listeners (MODULAR)
@@ -343,7 +344,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
                 if (elapsed < maxDuration) {
                     const restoredUser = u.find((usr) => (usr as User).id === saved.userId);
                     if (restoredUser) {
-                        console.log('[Session] Restored:', (restoredUser as User).name, `(${Math.round(elapsed)}min ago)`);
+                        log('[Session] Restored:', (restoredUser as User).name, `(${Math.round(elapsed)}min ago)`);
                         auth.handleUserLogin(restoredUser as User);
                         return;
                     }
