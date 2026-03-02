@@ -8,6 +8,8 @@ import { GeolocationService } from '../services/GeolocationService';
 import { writeGpsLocation, writeGpsEvent, initSyncQueue } from '../services/GpsDataWriter';
 import { GPS_DEFAULTS } from '../services/GpsSettingsManager';
 import { log } from '../utils/logger';
+import { getDb } from '../context/firebaseCore';
+import { getDoc, doc } from 'firebase/firestore';
 
 // Direct imports for the most frequently accessed pages
 import { Dashboard } from './Dashboard';
@@ -256,14 +258,14 @@ export function Layout() {
         if (!currentUser || isAdmin || !userId) return;
 
         // Load GPS settings from Firestore (or use defaults)
-        const db = window.firebase?.firestore?.();
+        const db = getDb();
         if (!db) return;
 
         let destroyed = false;
 
-        db.collection('gpsSettings').doc('company').get().then(doc => {
+        getDoc(doc(db, 'gpsSettings', 'company')).then(snap => {
             if (destroyed) return;
-            const settings = doc.exists ? { ...GPS_DEFAULTS, ...doc.data() } : { ...GPS_DEFAULTS, enabled: true, gpsMode: 'PING_ON_OPEN' };
+            const settings = snap.exists() ? { ...GPS_DEFAULTS, ...snap.data() } : { ...GPS_DEFAULTS, enabled: true, gpsMode: 'PING_ON_OPEN' };
 
             // Find the worker's current project for geofence
             const workerProjects = projects.filter(p => (p.workers || []).includes(userId) && p.status === 'aktivan');

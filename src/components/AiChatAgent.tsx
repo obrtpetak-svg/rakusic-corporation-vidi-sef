@@ -183,8 +183,9 @@ export function AiChatAgent() {
             const prov = provider;
 
             // Use server-side proxy (secure — API keys stay on server)
-            const auth = window.firebase?.auth?.();
-            const token = auth?.currentUser ? await auth.currentUser.getIdToken() : null;
+            const { getAuth: getFirebaseAuth } = await import('../context/firebaseCore');
+            const fbAuth = getFirebaseAuth();
+            const token = fbAuth?.currentUser ? await fbAuth.currentUser.getIdToken() : null;
 
             const response = await fetch('/api/ai/chat', {
                 method: 'POST',

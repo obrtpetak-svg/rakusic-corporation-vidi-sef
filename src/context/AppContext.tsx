@@ -14,11 +14,11 @@ import { DataProvider, useData } from './DataContext';
 // Re-export everything from sub-contexts for external use
 export { useAuth } from './AuthContext';
 export { useData } from './DataContext';
-export { getDb, getAuth, initFirebase, loadFirebaseConfig, saveFirebaseConfig } from './AuthContext';
+export { getDb, getAuth, initFirebase, loadFirebaseConfig, saveFirebaseConfig } from './firebaseCore';
 
 // Also re-export CRUD functions that were previously exported from here
 // Components like ArhivaPage import add/update/remove/setDoc directly
-export { add, update, remove, setDoc, batchSet, clearCollection, restoreItem, permanentDelete, getLastDeleted } from './crud';
+export { add, update, remove, setDocument as setDoc, batchSet, clearCollection, restoreItem, permanentDelete, getLastDeleted } from './crud';
 
 // ── Legacy context ──────────────────────────────────────────────────────
 const AppContext = createContext<any>(null);

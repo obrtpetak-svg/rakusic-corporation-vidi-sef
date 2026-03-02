@@ -40,9 +40,6 @@ export function FirebaseConfigScreen(): React.JSX.Element {
         setLoading(true); setError('');
         try {
             localStorage.setItem('vidime-firebase-config-v9', JSON.stringify(config));
-            let tries = 0;
-            while (!window.firebase && tries < 50) { await new Promise(r => setTimeout(r, 100)); tries++; }
-            if (!window.firebase) { setError('Firebase library nije učitana. Osvježi stranicu (Ctrl+F5).'); setLoading(false); return; }
             if (!initFirebase(config)) { setError('Greška pri povezivanju sa Firebase. Provjeri config.'); setLoading(false); return; }
             handleFirebaseConfig(config);
         } catch (e) { setError('Greška: ' + (e as Error).message); setLoading(false); }

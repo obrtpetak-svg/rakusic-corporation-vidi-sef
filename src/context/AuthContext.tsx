@@ -1,6 +1,21 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { genId } from '../utils/helpers';
 import { firebaseSignIn, firebaseSignOut, writeAuthMapping, clearFirestoreCache } from './firebaseCore';
+import {
+    initFirebase, getDb, getAuth,
+    loadFirebaseConfig, saveFirebaseConfig,
+    type FirebaseConfig as FBConfig,
+} from './firebaseCore';
+import {
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    reauthenticateWithCredential,
+    updatePassword,
+    EmailAuthProvider,
+} from 'firebase/auth';
+import {
+    doc, setDoc, getDocs, collection, addDoc,
+} from 'firebase/firestore';
 import type { User, CompanyProfile, AppStep } from '../types';
 
 // ── Types ────────────────────────────────────────────────────────────────
@@ -10,14 +25,7 @@ export interface SessionConfig {
     syncMode: number;
 }
 
-export interface FirebaseConfig {
-    apiKey: string;
-    authDomain: string;
-    projectId: string;
-    storageBucket: string;
-    messagingSenderId: string;
-    appId: string;
-}
+export type { FBConfig as FirebaseConfig };
 
 export interface SavedSession {
     userId: string;
@@ -48,7 +56,7 @@ export interface AuthContextValue {
     // Handlers
     handleAppLogin: () => void;
     handleFirebaseLogin: (username: string, password: string) => Promise<unknown>;
-    handleFirebaseConfig: (config: FirebaseConfig) => void;
+    handleFirebaseConfig: (config: FBConfig) => void;
     handleCompanySetup: (profile: CompanyProfile) => Promise<void>;
     handleAdminCreate: (admin: Partial<User>) => Promise<void>;
     handleUserLogin: (user: User) => void;
@@ -65,43 +73,12 @@ export interface AuthContextValue {
     unsubsRef: React.MutableRefObject<Array<() => void>>;
     sessionCheckRef: React.MutableRefObject<ReturnType<typeof setInterval> | null>;
     // Trigger data load
-    triggerDataLoad: (config: FirebaseConfig) => void;
-    setTriggerDataLoad: (fn: (config: FirebaseConfig) => void) => void;
-}
-
-// ── Firebase core (shared singletons) ────────────────────────────────────
-let _db: any = null;
-let _auth: any = null;
-export function getDb() { return _db; }
-export function getAuth() { return _auth; }
-
-export function initFirebase(config: any): boolean {
-    try {
-        const w = window as any;
-        if (!w.firebase) return false;
-        if (!w.firebase.apps?.length) {
-            w.firebase.initializeApp(config);
-        }
-        _db = w.firebase.firestore();
-        _auth = w.firebase.auth();
-        return true;
-    } catch (e) {
-        console.error('[initFirebase]', e);
-        return false;
-    }
-}
-
-// Config persistence
-export function loadFirebaseConfig(): any {
-    try { const c = localStorage.getItem('vidime-firebase-config-v9'); return c ? JSON.parse(c) : null; }
-    catch { return null; }
-}
-export function saveFirebaseConfig(config: any) {
-    localStorage.setItem('vidime-firebase-config-v9', JSON.stringify(config));
+    triggerDataLoad: (config: FBConfig) => void;
+    setTriggerDataLoad: (fn: (config: FBConfig) => void) => void;
 }
 
 // Built-in Firebase config (production)
-function getBuiltInConfig() {
+function getBuiltInConfig(): FBConfig {
     return {
         apiKey: 'AIzaSyDVcFE2dlnOyv8s12rKjp3IvJh1LUGZKOs',
         authDomain: 'rakusic-corporation-vidi-sef.firebaseapp.com',
@@ -121,7 +98,6 @@ function clearStaleCache() {
         if (window.indexedDB) {
             if (typeof indexedDB.databases === 'function') {
                 indexedDB.databases().then(dbs => dbs.forEach(db => {
-                    // PRESERVE firebaseLocalStorageDb — it stores Firebase Auth tokens!
                     if (db.name && db.name !== 'firebaseLocalStorageDb') {
                         indexedDB.deleteDatabase(db.name);
                     }
@@ -157,32 +133,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [lastSync, setLastSync] = useState<Date | null>(null);
 
     const unsubsRef = useRef<Array<() => void>>([]);
-    const sessionCheckRef = useRef<any>(null);
+    const sessionCheckRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     // DataContext will register its load function here
-    const _triggerDataLoadRef = useRef<((config: any) => void) | null>(null);
-    const triggerDataLoad = (config: any) => {
+    const _triggerDataLoadRef = useRef<((config: FBConfig) => void) | null>(null);
+    const triggerDataLoad = (config: FBConfig) => {
         if (_triggerDataLoadRef.current) _triggerDataLoadRef.current(config);
     };
-    const setTriggerDataLoad = (fn: (config: any) => void) => {
+    const setTriggerDataLoad = (fn: (config: FBConfig) => void) => {
         _triggerDataLoadRef.current = fn;
     };
 
     // ── Session persistence helpers ──
     const SESSION_KEY = 'vidime-session';
-    const saveSession = useCallback((user: any, version?: number | null) => {
+    const saveSession = useCallback((user: User, version?: number | null) => {
         localStorage.setItem(SESSION_KEY, JSON.stringify({
             userId: user.id, userName: user.name, userRole: user.role,
             loginAt: new Date().toISOString(), sessionVersion: version || 1,
         }));
     }, []);
-    const loadSession = useCallback(() => {
+    const loadSession = useCallback((): SavedSession | null => {
         try { const s = localStorage.getItem(SESSION_KEY); return s ? JSON.parse(s) : null; }
         catch { return null; }
     }, []);
     const clearSession = useCallback(() => localStorage.removeItem(SESSION_KEY), []);
 
-    // ── Boot app ──
+    // ── Boot app (MODULAR — no CDN wait needed) ──
     useEffect(() => {
         const bootApp = async () => {
             const builtIn = getBuiltInConfig();
@@ -190,27 +166,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             if (config) {
                 saveFirebaseConfig(config);
-                let tries = 0;
-                while (!(window as any).firebase && tries < 50) { await new Promise(r => setTimeout(r, 100)); tries++; }
-                if (!(window as any).firebase) { setLoadError('Firebase library not loaded'); setStep('appLogin'); return; }
                 if (!initFirebase(config)) { setLoadError('Firebase init failed'); setStep('appLogin'); return; }
 
                 const auth = getAuth();
                 if (auth) {
-                    const firebaseUser: any = await new Promise((resolve) => {
-                        const unsub = auth.onAuthStateChanged((user: any) => {
+                    const firebaseUser = await new Promise<unknown>((resolve) => {
+                        const unsub = onAuthStateChanged(auth, (user) => {
                             unsub();
                             resolve(user);
                         });
                         setTimeout(() => resolve(null), 8000);
                     });
 
-                    if (firebaseUser && !firebaseUser.isAnonymous) {
-                        console.log('[Boot] Firebase Auth session restored:', firebaseUser.email);
+                    if (firebaseUser && !(firebaseUser as { isAnonymous: boolean }).isAnonymous) {
+                        console.log('[Boot] Firebase Auth session restored');
                         try {
                             await Promise.race([
                                 new Promise<void>((resolve, reject) => {
-                                    // Wait for DataContext to be ready, then trigger load
                                     const waitForDataCtx = setInterval(() => {
                                         if (_triggerDataLoadRef.current) {
                                             clearInterval(waitForDataCtx);
@@ -221,10 +193,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                                     setTimeout(() => { clearInterval(waitForDataCtx); reject(new Error('Boot timeout')); }, 15000);
                                 }),
                             ]);
-                        } catch (bootErr: any) {
-                            console.error('[Boot] Session restore failed:', bootErr.message);
+                        } catch (bootErr: unknown) {
+                            console.error('[Boot] Session restore failed:', (bootErr as Error).message);
                             clearSession();
-                            try { auth.signOut(); } catch { }
+                            try { const a = getAuth(); if (a) { const { signOut: so } = await import('firebase/auth'); await so(a); } } catch { }
                             setStep('appLogin');
                         }
                         return;
@@ -277,9 +249,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!config) config = getBuiltInConfig();
         if (config && !firebaseReady) {
             saveFirebaseConfig(config);
-            let tries = 0;
-            while (!(window as any).firebase && tries < 50) { await new Promise(r => setTimeout(r, 100)); tries++; }
-            if (!(window as any).firebase) throw new Error('Firebase library not loaded');
             initFirebase(config);
         }
 
@@ -290,52 +259,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const email = cleanUser.includes('@') ? cleanUser : `${cleanUser}@rakusic-corporation.live`;
         console.log('[Auth] Attempting login for:', email);
 
-        let firebaseUser: any = null;
         try {
-            const cred = await auth.signInWithEmailAndPassword(email, password);
+            const cred = await signInWithEmailAndPassword(auth, email, password);
             console.log('[Auth] Sign-in OK:', email);
-            firebaseUser = cred.user;
-        } catch (signInErr: any) {
-            console.error('[Auth] Sign-in failed:', signInErr.code);
+
+            localStorage.setItem('vidime-app-login', 'true');
+            triggerDataLoad(config);
+
+            return cred.user;
+        } catch (signInErr: unknown) {
+            console.error('[Auth] Sign-in failed:', (signInErr as { code: string }).code);
             throw signInErr;
         }
-
-        if (!firebaseUser) return null;
-
-        localStorage.setItem('vidime-app-login', 'true');
-        triggerDataLoad(config);
-
-        return firebaseUser;
     }, [firebaseReady]);
 
-    const handleFirebaseConfig = useCallback((config: any) => {
+    const handleFirebaseConfig = useCallback((config: FBConfig) => {
         saveFirebaseConfig(config);
         triggerDataLoad(config);
     }, []);
 
-    const handleCompanySetup = useCallback(async (profile: any) => {
+    const handleCompanySetup = useCallback(async (profile: CompanyProfile) => {
         const db = getDb();
         if (!db) return;
-        await db.collection('config').doc('companyProfile').set(profile);
-        const snap = await db.collection('users').get();
-        const u: any[] = [];
-        snap.forEach((doc: any) => { const d = { ...doc.data(), id: doc.id }; if (!d.deletedAt) u.push(d); });
+        await setDoc(doc(db, 'config', 'companyProfile'), profile as Record<string, unknown>);
+        const snap = await getDocs(collection(db, 'users'));
+        const u: Array<Record<string, unknown>> = [];
+        snap.forEach((d) => { const data = { ...d.data(), id: d.id }; if (!(data as { deletedAt?: string }).deletedAt) u.push(data); });
         if (!u.length) setStep('adminCreate');
         else setStep('appLogin');
     }, []);
 
-    const handleAdminCreate = useCallback(async (admin: any) => {
+    const handleAdminCreate = useCallback(async (admin: Partial<User>) => {
         const db = getDb();
         if (!db) return;
         const id = admin.id || genId();
-        const doc = { ...admin, id };
-        await db.collection('users').doc(id).set(doc);
-        await db.collection('workers').doc(id).set({ ...doc, role: 'admin' });
-        setCurrentUser(doc);
+        const adminDoc = { ...admin, id };
+        await setDoc(doc(db, 'users', id), adminDoc);
+        await setDoc(doc(db, 'workers', id), { ...adminDoc, role: 'admin' });
+        setCurrentUser(adminDoc as User);
         setStep('app');
     }, []);
 
-    const handleUserLogin = useCallback((user: any) => {
+    const handleUserLogin = useCallback((user: User) => {
         setCurrentUser(user);
         saveSession(user, sessionConfig.sessionVersion);
         setStep('app');
@@ -346,7 +311,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const age = (Date.now() - new Date(s.loginAt).getTime()) / 60000;
             if (age >= (sessionConfig.sessionDuration || 60)) {
                 clearSession(); setCurrentUser(null);
-                const a = getAuth(); if (a) a.signOut();
+                firebaseSignOut();
                 setStep('appLogin');
             }
         }, 30000);
@@ -356,7 +321,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
             const db = getDb();
             if (db && currentUser) {
-                db.collection('auditLog').add({
+                addDoc(collection(db, 'auditLog'), {
                     id: genId(), action: 'LOGOUT', user: currentUser.name || 'unknown',
                     userId: currentUser.id, timestamp: new Date().toISOString(),
                 });
@@ -365,7 +330,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         clearSession();
         if (sessionCheckRef.current) clearInterval(sessionCheckRef.current);
         setCurrentUser(null);
-        const a = getAuth(); if (a) a.signOut();
+        firebaseSignOut();
         setStep('appLogin');
     }, [currentUser, clearSession]);
 
@@ -382,25 +347,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const db = getDb();
         if (!db) return;
         const newVersion = (sessionConfig.sessionVersion || 1) + 1;
-        await db.collection('config').doc('session').set({ ...sessionConfig, sessionVersion: newVersion }, { merge: true });
+        await setDoc(doc(db, 'config', 'session'), { ...sessionConfig, sessionVersion: newVersion }, { merge: true });
         setSessionConfig(prev => ({ ...prev, sessionVersion: newVersion }));
     }, [sessionConfig]);
 
     const updateSessionDuration = useCallback(async (minutes: number) => {
         const db = getDb();
         if (!db) return;
-        await db.collection('config').doc('session').set({ ...sessionConfig, sessionDuration: minutes }, { merge: true });
+        await setDoc(doc(db, 'config', 'session'), { ...sessionConfig, sessionDuration: minutes }, { merge: true });
         setSessionConfig(prev => ({ ...prev, sessionDuration: minutes }));
     }, [sessionConfig]);
 
     const updateSyncMode = useCallback(async (mode: number) => {
         const db = getDb();
         if (!db) return;
-        await db.collection('config').doc('session').set({ ...sessionConfig, syncMode: mode }, { merge: true });
+        await setDoc(doc(db, 'config', 'session'), { ...sessionConfig, syncMode: mode }, { merge: true });
         setSessionConfig(prev => ({ ...prev, syncMode: mode }));
     }, [sessionConfig]);
 
-    // Password change
+    // Password change (MODULAR)
     const changePassword = useCallback(async (currentPassword: string, newPassword: string) => {
         const auth = getAuth();
         if (!auth || !auth.currentUser) throw new Error('Not authenticated');
@@ -408,13 +373,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!/[A-Z]/.test(newPassword)) throw new Error('Lozinka mora imati barem 1 veliko slovo');
         if (!/[0-9]/.test(newPassword)) throw new Error('Lozinka mora imati barem 1 broj');
         const email = auth.currentUser.email;
-        const fb = (window as any).firebase;
-        const credential = fb.auth.EmailAuthProvider.credential(email, currentPassword);
-        await auth.currentUser.reauthenticateWithCredential(credential);
-        await auth.currentUser.updatePassword(newPassword);
+        if (!email) throw new Error('No email on current user');
+        const credential = EmailAuthProvider.credential(email, currentPassword);
+        await reauthenticateWithCredential(auth.currentUser, credential);
+        await updatePassword(auth.currentUser, newPassword);
         try {
             const db = getDb();
-            if (db) await db.collection('auditLog').add({
+            if (db) await addDoc(collection(db, 'auditLog'), {
                 id: genId(), action: 'PASSWORD_CHANGED', user: currentUser?.name || 'unknown',
                 userId: currentUser?.id, timestamp: new Date().toISOString(),
             });
@@ -426,7 +391,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!currentUser) throw new Error('Not logged in');
         const db = getDb();
         if (!db) throw new Error('Database not available');
-        const data: any = {
+        const data: Record<string, unknown> = {
             exportDate: new Date().toISOString(),
             user: currentUser,
             timesheets: [],
@@ -434,8 +399,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             leaveRequests: [],
         };
         try {
-            const snap = await db.collection('leaveRequests').where('workerId', '==', currentUser.id).get();
-            snap.forEach((doc: any) => data.leaveRequests.push({ ...doc.data(), id: doc.id }));
+            const { query, where, getDocs: gd } = await import('firebase/firestore');
+            const snap = await gd(query(collection(db, 'leaveRequests'), where('workerId', '==', currentUser.id)));
+            const leaves: Array<Record<string, unknown>> = [];
+            snap.forEach((d) => leaves.push({ ...d.data(), id: d.id }));
+            data.leaveRequests = leaves;
         } catch { /* ignore */ }
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -445,7 +413,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         a.click();
         URL.revokeObjectURL(url);
         try {
-            await db.collection('auditLog').add({
+            await addDoc(collection(db, 'auditLog'), {
                 id: genId(), action: 'DATA_EXPORT', user: currentUser.name,
                 userId: currentUser.id, timestamp: new Date().toISOString(),
             });

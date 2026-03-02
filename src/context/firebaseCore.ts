@@ -1,15 +1,24 @@
 import { log, warn } from '../utils/logger';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// FIREBASE CORE — module-level singletons shared across all contexts
+// FIREBASE CORE — Modular SDK (v9+) with typed singletons
 // ═══════════════════════════════════════════════════════════════════════════
+import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
+import {
+    getFirestore, type Firestore,
+    doc, setDoc as firestoreSetDoc,
+} from 'firebase/firestore';
+import {
+    getAuth as firebaseGetAuth, type Auth,
+    setPersistence, browserLocalPersistence,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    linkWithCredential,
+    EmailAuthProvider,
+    signOut,
+} from 'firebase/auth';
 
-// TODO: Replace with typed Firestore SDK imports when migrating off compat
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type FirestoreDb = any;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type FirebaseAuth = any;
-
+// ── Types ────────────────────────────────────────────────────────────────
 export interface FirebaseConfig {
     apiKey: string;
     authDomain: string;
@@ -33,28 +42,26 @@ export interface AppUser {
     [key: string]: unknown;
 }
 
-let _db: FirestoreDb = null;
-let _auth: FirebaseAuth = null;
-export function getDb(): FirestoreDb { return _db; }
-export function getAuth(): FirebaseAuth { return _auth; }
+// ── Singletons ───────────────────────────────────────────────────────────
+let _db: Firestore | null = null;
+let _auth: Auth | null = null;
+let _app: FirebaseApp | null = null;
+
+export function getDb(): Firestore | null { return _db; }
+export function getAuth(): Auth | null { return _auth; }
 
 export function initFirebase(config: FirebaseConfig | null): boolean {
     try {
-        const win = window as Record<string, unknown>;
-        const fb = win.firebase as { apps: unknown[]; initializeApp: (c: FirebaseConfig) => void; firestore: () => FirestoreDb; auth: () => FirebaseAuth } | undefined;
-        if (!fb || !config) return false;
-        if (fb.apps.length > 0) {
-            _db = fb.firestore();
-            _auth = fb.auth();
-            return true;
+        if (!config) return false;
+        if (getApps().length > 0) {
+            _app = getApps()[0];
+        } else {
+            _app = initializeApp(config);
         }
-        fb.initializeApp(config);
-        _db = fb.firestore();
-        _auth = fb.auth();
-        // Ensure auth session persists across page refreshes
-        try { _auth.setPersistence((win.firebase as any).auth.Auth.Persistence.LOCAL); } catch (e) { console.warn('[Firebase] setPersistence error:', e); }
-        // NOTE: enablePersistence REMOVED — offline cache caused stale auth tokens
-        // and hung Firestore queries after password resets. Online-only is fine for 50-100 users.
+        _db = getFirestore(_app);
+        _auth = firebaseGetAuth(_app);
+        // Ensure auth session persists across refreshes
+        try { setPersistence(_auth, browserLocalPersistence); } catch (e) { console.warn('[Firebase] setPersistence error:', e); }
         return true;
     } catch (e) { console.error('Firebase init error:', e); return false; }
 }
@@ -89,7 +96,7 @@ export function saveFirebaseConfig(config: FirebaseConfig): void {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// AUTH HELPERS — Firebase Auth sign-in/sign-out/mapping
+// AUTH HELPERS — Firebase Auth sign-in/sign-out/mapping (modular)
 // ═══════════════════════════════════════════════════════════════════════════
 const AUTH_DOMAIN = 'rakusic-corporation.live';
 
@@ -102,14 +109,12 @@ export async function firebaseSignIn(username: string, pin: string): Promise<unk
     if (!auth) return null;
     const email = usernameToEmail(username);
     const password = pin;
-    const win = window as Record<string, unknown>;
-    const fb = win.firebase as { auth: { EmailAuthProvider: { credential: (e: string, p: string) => unknown } } };
-    const credential = fb.auth.EmailAuthProvider.credential(email, password);
 
     const currentUser = auth.currentUser;
     if (currentUser && currentUser.isAnonymous) {
         try {
-            const result = await currentUser.linkWithCredential(credential);
+            const credential = EmailAuthProvider.credential(email, password);
+            const result = await linkWithCredential(currentUser, credential);
             log('[Auth] Upgraded anonymous → email for', email);
             return result.user;
         } catch (linkErr) {
@@ -118,19 +123,19 @@ export async function firebaseSignIn(username: string, pin: string): Promise<unk
     }
 
     try {
-        const cred = await auth.signInWithEmailAndPassword(email, password);
+        const cred = await signInWithEmailAndPassword(auth, email, password);
         log('[Auth] Sign-in success for', email);
         return cred.user;
     } catch (signInErr) {
         log('[Auth] Sign-in failed:', (signInErr as { code: string }).code, '— trying create...');
         try {
-            const cred = await auth.createUserWithEmailAndPassword(email, password);
+            const cred = await createUserWithEmailAndPassword(auth, email, password);
             log('[Auth] Auto-created user:', email);
             return cred.user;
         } catch (createErr) {
             if ((createErr as { code: string }).code === 'auth/email-already-in-use') {
                 try {
-                    const cred = await auth.signInWithEmailAndPassword(email, pin);
+                    const cred = await signInWithEmailAndPassword(auth, email, pin);
                     log('[Auth] Sign-in with raw PIN succeeded for', email);
                     return cred.user;
                 } catch (rawPinErr) {
@@ -147,7 +152,7 @@ export async function firebaseSignIn(username: string, pin: string): Promise<unk
 export async function firebaseSignOut(): Promise<void> {
     const auth = getAuth();
     if (auth) {
-        try { await auth.signOut(); }
+        try { await signOut(auth); }
         catch (e) { warn('[Auth] Sign-out error:', e); }
     }
 }
@@ -156,7 +161,7 @@ export async function writeAuthMapping(firebaseUid: string, user: AppUser): Prom
     const db = getDb();
     if (!db || !firebaseUid) return;
     try {
-        await db.collection('authMapping').doc(firebaseUid).set({
+        await firestoreSetDoc(doc(db, 'authMapping', firebaseUid), {
             role: user.role || 'radnik',
             userId: user.id,
             username: user.username,
@@ -182,13 +187,13 @@ export async function migrateUsersToFirebaseAuth(users: AppUser[], rawPin?: stri
         const email = usernameToEmail(user.username);
         let fbUid: string | null = null;
         try {
-            const cred = await auth.signInWithEmailAndPassword(email, password);
+            const cred = await signInWithEmailAndPassword(auth, email, password);
             fbUid = cred.user.uid;
             success++;
         } catch (signInErr) {
             if ((signInErr as { code: string }).code === 'auth/user-not-found') {
                 try {
-                    const cred = await auth.createUserWithEmailAndPassword(email, password);
+                    const cred = await createUserWithEmailAndPassword(auth, email, password);
                     fbUid = cred.user.uid;
                     success++;
                 } catch (createErr) {

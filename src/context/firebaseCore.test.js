@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ─── Polyfill browser globals for Node environment ───────────────────
 const store = {};
@@ -19,8 +19,41 @@ vi.mock('../utils/helpers', () => ({
     hashPin: vi.fn().mockResolvedValue('hashed-pin-value'),
 }));
 
+// ─── Mock Firebase Modular SDK ────────────────────────────────────────
+const mockGetFirestore = vi.fn(() => ({ type: 'firestore' }));
+const mockGetAuth = vi.fn(() => ({ type: 'auth' }));
+const mockInitializeApp = vi.fn(() => ({ name: 'test-app' }));
+const mockGetApps = vi.fn(() => []);
+const mockEnablePersistence = vi.fn().mockResolvedValue(undefined);
+
+vi.mock('firebase/app', () => ({
+    initializeApp: (...args) => mockInitializeApp(...args),
+    getApps: () => mockGetApps(),
+}));
+
+vi.mock('firebase/firestore', () => ({
+    getFirestore: (...args) => mockGetFirestore(...args),
+    enableMultiTabIndexedDbPersistence: (...args) => mockEnablePersistence(...args),
+    collection: vi.fn(),
+    doc: vi.fn(),
+    setDoc: vi.fn(),
+    getDoc: vi.fn(),
+    getDocs: vi.fn(),
+}));
+
+vi.mock('firebase/auth', () => ({
+    getAuth: (...args) => mockGetAuth(...args),
+    signInWithEmailAndPassword: vi.fn(),
+    signOut: vi.fn(),
+    createUserWithEmailAndPassword: vi.fn(),
+    onAuthStateChanged: vi.fn(),
+    EmailAuthProvider: { credential: vi.fn() },
+    reauthenticateWithCredential: vi.fn(),
+    updatePassword: vi.fn(),
+}));
+
 // We test pure functions that don't depend on Firebase SDK
-import { loadFirebaseConfig, saveFirebaseConfig, getDb, getAuth } from './firebaseCore';
+import { loadFirebaseConfig, saveFirebaseConfig, getDb, getAuth, initFirebase } from './firebaseCore';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // getDb / getAuth — singletons before initialization
@@ -76,47 +109,37 @@ describe('saveFirebaseConfig', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// initFirebase — with mocked window.firebase
+// initFirebase — with mocked modular SDK
 // ═══════════════════════════════════════════════════════════════════════════
 describe('initFirebase', () => {
-    let originalFirebase;
-
     beforeEach(() => {
-        originalFirebase = window.firebase;
+        mockGetApps.mockReturnValue([]);
+        mockInitializeApp.mockClear();
+        mockGetFirestore.mockClear();
+        mockGetAuth.mockClear();
     });
 
-    afterEach(() => {
-        if (originalFirebase === undefined) {
-            delete window.firebase;
-        } else {
-            window.firebase = originalFirebase;
-        }
-    });
-
-    it('returns false when window.firebase is missing', async () => {
-        delete window.firebase;
-        const { initFirebase } = await import('./firebaseCore');
-        expect(initFirebase({})).toBe(false);
-    });
-
-    it('returns false when config is falsy', async () => {
-        window.firebase = { apps: [] };
-        const { initFirebase } = await import('./firebaseCore');
+    it('returns false when config is falsy', () => {
         expect(initFirebase(null)).toBe(false);
+        expect(initFirebase(undefined)).toBe(false);
     });
 
-    it('reuses existing app if already initialized', async () => {
-        const mockFirestore = vi.fn(() => ({ enablePersistence: vi.fn().mockResolvedValue() }));
-        const mockAuthFn = vi.fn(() => ({}));
-        window.firebase = {
-            apps: [{}], // Already has an app
-            firestore: mockFirestore,
-            auth: mockAuthFn,
-        };
-        const { initFirebase } = await import('./firebaseCore');
-        const result = initFirebase({ apiKey: 'test' });
+    it('initializes app and returns true with valid config', () => {
+        mockGetApps.mockReturnValue([]); // No existing apps
+        const result = initFirebase({ apiKey: 'test-key', projectId: 'demo' });
         expect(result).toBe(true);
-        expect(mockFirestore).toHaveBeenCalled();
+        expect(mockInitializeApp).toHaveBeenCalledWith({ apiKey: 'test-key', projectId: 'demo' });
+        expect(mockGetFirestore).toHaveBeenCalled();
+        expect(mockGetAuth).toHaveBeenCalled();
+    });
+
+    it('reuses existing app if already initialized', () => {
+        mockGetApps.mockReturnValue([{ name: 'existing' }]); // App exists
+        const result = initFirebase({ apiKey: 'test-key', projectId: 'demo' });
+        expect(result).toBe(true);
+        // Should NOT call initializeApp again
+        expect(mockInitializeApp).not.toHaveBeenCalled();
+        expect(mockGetFirestore).toHaveBeenCalled();
     });
 });
 
@@ -124,9 +147,6 @@ describe('initFirebase', () => {
 // usernameToEmail — tested indirectly through import
 // ═══════════════════════════════════════════════════════════════════════════
 describe('usernameToEmail (via internal)', () => {
-    // This is a private function, but we can verify its behavior by checking
-    // that firebaseSignIn constructs the right email pattern.
-    // We test the pattern: username.toLowerCase().replace(/\s+/g, '.') + '@vidisef.app'
     it('converts "Ivan Horvat" to "ivan.horvat@vidisef.app" pattern', () => {
         const username = 'Ivan Horvat';
         const expected = `${username.toLowerCase().replace(/\s+/g, '.')}@vidisef.app`;

@@ -1,8 +1,15 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { genId, hashPin } from '../utils/helpers';
 import { validateOrThrow } from '../utils/validate';
-import { writeAuthMapping } from './firebaseCore';
-import { useAuth, getDb, getAuth, initFirebase, loadFirebaseConfig, getBuiltInConfig as _noop } from './AuthContext';
+import { writeAuthMapping, getDb, getAuth, initFirebase, loadFirebaseConfig } from './firebaseCore';
+import { useAuth } from './AuthContext';
+import {
+    collection, doc, setDoc, updateDoc, deleteDoc,
+    getDocs, getDoc, addDoc, onSnapshot, writeBatch,
+    query, where, orderBy, limit,
+    type QuerySnapshot, type DocumentSnapshot,
+} from 'firebase/firestore';
+import { signOut } from 'firebase/auth';
 import type {
     User, Worker, Project, Timesheet, Invoice, Vehicle,
     Smjestaj, Obaveza, Otpremnica, ProductionEntry, ProductionAlert,
@@ -155,47 +162,47 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }, [isLeader, leaderProjectIds, projects]);
 
     // ── CRUD ──
-    const add = useCallback(async (collection: string, data: any) => {
+    const addFn = useCallback(async (col: string, data: any) => {
         const db = getDb(); if (!db) return null;
         const id = data.id || genId();
-        const doc = { ...data, id };
+        const docData = { ...data, id };
         try {
-            validateOrThrow(collection, doc);
-            await db.collection(collection).doc(id).set(doc);
-            if (_setterMap[collection]) _setterMap[collection]((prev: any[]) => [...prev, doc]);
-            return doc;
+            validateOrThrow(col, docData);
+            await setDoc(doc(db, col, id), docData);
+            if (_setterMap[col]) _setterMap[col]((prev: any[]) => [...prev, docData]);
+            return docData;
         } catch (e) { handleError(e, 'add'); throw e; }
     }, []);
 
-    const update = useCallback(async (collection: string, id: string, updates: any) => {
+    const updateFn = useCallback(async (col: string, id: string, updates: any) => {
         const db = getDb(); if (!db) return;
         try {
             const stamped = { ...updates, updatedAt: new Date().toISOString() };
-            await db.collection(collection).doc(id).update(stamped);
-            if (_setterMap[collection]) _setterMap[collection]((prev: any[]) => prev.map(d => d.id === id ? { ...d, ...stamped } : d));
+            await updateDoc(doc(db, col, id), stamped);
+            if (_setterMap[col]) _setterMap[col]((prev: any[]) => prev.map(d => d.id === id ? { ...d, ...stamped } : d));
         } catch (e) { handleError(e, 'update'); throw e; }
     }, []);
 
-    const remove = useCallback(async (collection: string, id: string) => {
-        if (collection === 'auditLog') { console.warn('Audit log entries cannot be deleted'); return; }
+    const removeFn = useCallback(async (col: string, id: string) => {
+        if (col === 'auditLog') { console.warn('Audit log entries cannot be deleted'); return; }
         const db = getDb(); if (!db) return;
         try {
             const deletedAt = new Date().toISOString();
-            await db.collection(collection).doc(id).update({ deletedAt });
-            if (_setterMap[collection]) _setterMap[collection]((prev: any[]) => prev.filter(d => d.id !== id));
+            await updateDoc(doc(db, col, id), { deletedAt });
+            if (_setterMap[col]) _setterMap[col]((prev: any[]) => prev.filter(d => d.id !== id));
         } catch (e) { handleError(e, 'remove'); throw e; }
     }, []);
 
-    const setDocFn = useCallback(async (collection: string, docId: string, data: any) => {
+    const setDocFn = useCallback(async (col: string, docId: string, data: any) => {
         const db = getDb(); if (!db) return;
-        try { await db.collection(collection).doc(docId).set(data); }
+        try { await setDoc(doc(db, col, docId), data); }
         catch (e) { handleError(e, 'setDoc'); throw e; }
     }, []);
 
     // ── Refresh helper ──
     const refreshCollection = useCallback(async (name: string, setter: any) => {
         const db = getDb(); if (!db) return;
-        const snap = await db.collection(name).get();
+        const snap = await getDocs(collection(db, name));
         const items = snapToArray(snap);
         logReads('refresh', name, items.length);
         setter(items);
@@ -206,9 +213,6 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         auth.setLoadError(null);
         try {
             console.log('[DataContext] Starting data load...');
-            let tries = 0;
-            while (!(window as any).firebase && tries < 50) { await new Promise(r => setTimeout(r, 100)); tries++; }
-            if (!(window as any).firebase) { auth.setLoadError('Firebase library not loaded'); auth.setStep('appLogin'); return; }
             if (!initFirebase(config)) { auth.setLoadError('Firebase init failed — check config'); auth.setStep('appLogin'); return; }
 
             const fbAuth = getAuth();
@@ -222,17 +226,18 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
             auth.setFirebaseReady(true);
             const db = getDb();
+            if (!db) { auth.setLoadError('Database not available'); auth.setStep('appLogin'); return; }
 
             const loadCol = async (name: string) => {
-                const snap = await db.collection(name).get();
+                const snap = await getDocs(collection(db, name));
                 const items = snapToArray(snap);
                 logReads('boot', name, items.length);
                 return items;
             };
-            const loadDoc = async (col: string, id: string) => {
-                const d = await db.collection(col).doc(id).get();
-                logReads('boot', `${col}/${id}`, d.exists ? 1 : 0);
-                return d.exists ? d.data() : null;
+            const loadSingleDoc = async (col: string, id: string) => {
+                const d = await getDoc(doc(db, col, id));
+                logReads('boot', `${col}/${id}`, d.exists() ? 1 : 0);
+                return d.exists() ? d.data() : null;
             };
 
             const cutoff30 = new Date();
@@ -240,7 +245,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             const cutoff30Str = cutoff30.toISOString().slice(0, 10);
 
             // Batch 1: Critical
-            const [u, cp] = await Promise.all([loadCol('users'), loadDoc('config', 'companyProfile')]);
+            const [u, cp] = await Promise.all([loadCol('users'), loadSingleDoc('config', 'companyProfile')]);
             setUsers(u);
             setCompanyProfile(cp);
 
@@ -258,27 +263,29 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             if (usersToMigrate.length > 0) {
                 const defaultHashedPin = await hashPin('1234');
                 for (const user of usersToMigrate) {
-                    await db.collection('users').doc(user.id).update({ pin: defaultHashedPin });
+                    await updateDoc(doc(db, 'users', user.id), { pin: defaultHashedPin });
                 }
                 console.log(`Migrated ${usersToMigrate.length} user PINs to hashed default.`);
             }
 
-            // Realtime listeners
-            const listenWithLog = (col: string, setter: any, query?: any) => {
-                const src = query || db.collection(col);
-                return src.onSnapshot((snap: any) => {
+            // Realtime listeners (MODULAR)
+            const listenWithLog = (col: string, setter: any, q?: any) => {
+                const src = q || collection(db, col);
+                return onSnapshot(src, (snap: QuerySnapshot) => {
                     const items = snapToArray(snap);
                     logReads('listener', col, items.length, 'onSnapshot');
                     setter(items);
                 });
             };
 
-            const tsQuery = db.collection('timesheets')
-                .where('date', '>=', cutoff30Str)
-                .orderBy('date', 'desc')
-                .limit(200);
+            const tsQuery = query(
+                collection(db, 'timesheets'),
+                where('date', '>=', cutoff30Str),
+                orderBy('date', 'desc'),
+                limit(200)
+            );
 
-            const tsUnsub = tsQuery.onSnapshot((snap: any) => {
+            const tsUnsub = onSnapshot(tsQuery, (snap: QuerySnapshot) => {
                 const recentDocs = snapToArray(snap);
                 logReads('listener', 'timesheets', recentDocs.length, 'onSnapshot');
                 setTimesheets(prev => {
@@ -295,11 +302,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
                     listenWithLog('workers', setWorkers),
                     tsUnsub,
                     listenWithLog('obaveze', setObaveze),
-                    db.collection('config').doc('companyProfile').onSnapshot((doc: any) => setCompanyProfile(doc.exists ? doc.data() : null)),
+                    onSnapshot(doc(db, 'config', 'companyProfile'), (snap: DocumentSnapshot) => setCompanyProfile(snap.exists() ? snap.data() : null)),
                 ];
             } else {
                 auth.unsubsRef.current = [
-                    db.collection('config').doc('companyProfile').onSnapshot((doc: any) => setCompanyProfile(doc.exists ? doc.data() : null)),
+                    onSnapshot(doc(db, 'config', 'companyProfile'), (snap: DocumentSnapshot) => setCompanyProfile(snap.exists() ? snap.data() : null)),
                 ];
                 auth.setLastSync(new Date());
             }
@@ -307,16 +314,16 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             if (!cp) { auth.setStep('companySetup'); return; }
             if (!u.length) { auth.setStep('adminCreate'); return; }
 
-            // Session config listener
+            // Session config listener (MODULAR)
             auth.unsubsRef.current.push(
-                db.collection('config').doc('session').onSnapshot((doc: any) => {
-                    if (doc.exists) {
-                        const sc = doc.data();
+                onSnapshot(doc(db, 'config', 'session'), (snap: DocumentSnapshot) => {
+                    if (snap.exists()) {
+                        const sc = snap.data() as any;
                         auth.setSessionConfig(prev => {
                             if (prev.sessionVersion !== null && sc.sessionVersion && sc.sessionVersion > prev.sessionVersion) {
                                 auth.clearSession();
                                 auth.setCurrentUser(null);
-                                const a = getAuth(); if (a) a.signOut();
+                                const a = getAuth(); if (a) signOut(a);
                                 auth.setStep('appLogin');
                             }
                             return { sessionDuration: sc.sessionDuration || 60, sessionVersion: sc.sessionVersion || 1, syncMode: sc.syncMode || 0 };
@@ -351,7 +358,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
                     await writeAuthMapping(fbAuth2.currentUser.uid, matchedUser);
                     auth.handleUserLogin(matchedUser);
                     try {
-                        await db.collection('auditLog').add({
+                        await addDoc(collection(db, 'auditLog'), {
                             id: genId(), action: 'LOGIN_SUCCESS', user: matchedUser.name || matchName,
                             userId: matchedUser.id, email, timestamp: new Date().toISOString(),
                             userAgent: navigator.userAgent.slice(0, 200),
@@ -359,7 +366,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
                     } catch { /* ignore */ }
                 } else {
                     try {
-                        await db.collection('auditLog').add({
+                        await addDoc(collection(db, 'auditLog'), {
                             id: genId(), action: 'LOGIN_NO_MATCH', user: matchName,
                             email, timestamp: new Date().toISOString(),
                         });
@@ -373,7 +380,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             console.error('[DataContext] Firebase load error:', err);
             if (err.code === 'permission-denied' || err.message?.includes('permission') || err.message?.includes('offline')) {
                 auth.clearStaleCache();
-                try { const a = getAuth(); if (a) a.signOut(); } catch { }
+                try { const a = getAuth(); if (a) signOut(a); } catch { }
             }
             auth.setLoadError(err.message);
             auth.setStep('appLogin');
@@ -394,7 +401,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             const db = getDb(); if (!db) return;
             try {
                 const loadCol = async (name: string) => {
-                    const snap = await db.collection(name).get();
+                    const snap = await getDocs(collection(db, name));
                     return snapToArray(snap);
                 };
                 const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 30);
@@ -404,7 +411,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
                     loadCol('invoices'), loadCol('vehicles'), loadCol('smjestaj'),
                     loadCol('obaveze'), loadCol('otpremnice'),
                 ]);
-                const tsSnap = await db.collection('timesheets').where('date', '>=', cutStr).limit(200).get();
+                const tsSnap = await getDocs(query(collection(db, 'timesheets'), where('date', '>=', cutStr), limit(200)));
                 const ts = snapToArray(tsSnap);
                 setUsers(u); setProjects(p); setWorkers(w);
                 setTimesheets(prev => {
@@ -422,36 +429,36 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     // ── Audit log helper ──
     const addAuditLog = useCallback(async (action: string, details: any) => {
         const entry = { id: genId(), action, user: auth.currentUser?.name || 'System', timestamp: new Date().toISOString(), details };
-        await add('auditLog', entry);
+        await addFn('auditLog', entry);
         setAuditLog(prev => [...prev, entry]);
-    }, [auth.currentUser, add]);
+    }, [auth.currentUser, addFn]);
 
     // ── Lazy loaders ──
     const loadAuditLog = useCallback(async () => {
         if (auditLogLoaded) return;
         const db = getDb(); if (!db) return;
-        try { const snap = await db.collection('auditLog').get(); setAuditLog(snapToArray(snap)); setAuditLogLoaded(true); }
+        try { const snap = await getDocs(collection(db, 'auditLog')); setAuditLog(snapToArray(snap)); setAuditLogLoaded(true); }
         catch (e) { console.error('Failed to load auditLog:', e); }
     }, [auditLogLoaded]);
 
     const loadAllTimesheets = useCallback(async () => {
         if (allTimesheetsLoaded) return;
         const db = getDb(); if (!db) return;
-        try { const snap = await db.collection('timesheets').get(); setTimesheets(snapToArray(snap)); setAllTimesheetsLoaded(true); }
+        try { const snap = await getDocs(collection(db, 'timesheets')); setTimesheets(snapToArray(snap)); setAllTimesheetsLoaded(true); }
         catch (e) { console.error('Failed to load all timesheets:', e); }
     }, [allTimesheetsLoaded]);
 
     const loadDailyLogs = useCallback(async () => {
         if (dailyLogsLoaded) return;
         const db = getDb(); if (!db) return;
-        try { const snap = await db.collection('dailyLogs').get(); setDailyLogs(snapToArray(snap)); setDailyLogsLoaded(true); }
+        try { const snap = await getDocs(collection(db, 'dailyLogs')); setDailyLogs(snapToArray(snap)); setDailyLogsLoaded(true); }
         catch (e) { console.error('Failed to load dailyLogs:', e); }
     }, [dailyLogsLoaded]);
 
     const loadWeatherRules = useCallback(async () => {
         if (weatherRulesLoaded) return;
         const db = getDb(); if (!db) return;
-        try { const snap = await db.collection('weatherRules').get(); setWeatherRules(snapToArray(snap)); setWeatherRulesLoaded(true); }
+        try { const snap = await getDocs(collection(db, 'weatherRules')); setWeatherRules(snapToArray(snap)); setWeatherRulesLoaded(true); }
         catch (e) { console.error('Failed to load weatherRules:', e); }
     }, [weatherRulesLoaded]);
 
@@ -459,7 +466,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         if (safetyLoaded) return;
         const db = getDb(); if (!db) return;
         try {
-            const [tSnap, cSnap] = await Promise.all([db.collection('safetyTemplates').get(), db.collection('safetyChecklists').get()]);
+            const [tSnap, cSnap] = await Promise.all([getDocs(collection(db, 'safetyTemplates')), getDocs(collection(db, 'safetyChecklists'))]);
             setSafetyTemplates(snapToArray(tSnap)); setSafetyChecklists(snapToArray(cSnap)); setSafetyLoaded(true);
         } catch (e) { console.error('Failed to load safety data:', e); }
     }, [safetyLoaded]);
@@ -468,7 +475,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         if (productionLoaded) return;
         const db = getDb(); if (!db) return;
         try {
-            const [prodSnap, alertSnap] = await Promise.all([db.collection('production').get(), db.collection('prodAlerts').get()]);
+            const [prodSnap, alertSnap] = await Promise.all([getDocs(collection(db, 'production')), getDocs(collection(db, 'prodAlerts'))]);
             setProduction(snapToArray(prodSnap)); setProdAlerts(snapToArray(alertSnap)); setProductionLoaded(true);
         } catch (e) { console.error('Failed to load production:', e); }
     }, [productionLoaded]);
@@ -478,8 +485,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         const results: any[] = [];
         for (const col of TRASH_COLLECTIONS) {
             try {
-                const snap = await db.collection(col).where('deletedAt', '!=', null).get();
-                snap.forEach((doc: any) => results.push({ ...doc.data(), id: doc.id, _collection: col }));
+                const snap = await getDocs(query(collection(db, col), where('deletedAt', '!=', null)));
+                snap.forEach((d) => results.push({ ...d.data(), id: d.id, _collection: col }));
             } catch { /* skip */ }
         }
         return results.sort((a: any, b: any) => (b.deletedAt || '').localeCompare(a.deletedAt || ''));
@@ -492,9 +499,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         let count = 0;
         for (const col of TRASH_COLLECTIONS) {
             try {
-                const snap = await db.collection(col).where('deletedAt', '!=', null).get();
-                for (const doc of snap.docs) {
-                    if (doc.data().deletedAt < cutStr) { await db.collection(col).doc(doc.id).delete(); count++; }
+                const snap = await getDocs(query(collection(db, col), where('deletedAt', '!=', null)));
+                for (const d of snap.docs) {
+                    if (d.data().deletedAt < cutStr) { await deleteDoc(doc(db, col, d.id)); count++; }
                 }
             } catch { /* skip */ }
         }
@@ -519,7 +526,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         safetyTemplates, setSafetyTemplates, safetyChecklists, setSafetyChecklists,
         workerMap, projectMap, getWorkerName, getProjectName,
         isLeader, leaderProjectIds, leaderWorkerIds,
-        add, update, remove, setDoc: setDocFn,
+        add: addFn, update: updateFn, remove: removeFn, setDoc: setDocFn,
         addAuditLog, loadAuditLog, allTimesheetsLoaded, loadAllTimesheets,
         loadDailyLogs, loadWeatherRules, loadSafetyData, loadProduction,
         loadDeletedItems, cleanupOldDeleted,
@@ -530,7 +537,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         workerMap, projectMap, getWorkerName, getProjectName,
         isLeader, leaderProjectIds, leaderWorkerIds,
         allTimesheetsLoaded,
-        add, update, remove, setDocFn,
+        addFn, updateFn, removeFn, setDocFn,
         addAuditLog, loadAuditLog, loadAllTimesheets, loadDailyLogs,
         loadWeatherRules, loadSafetyData, loadProduction,
         loadDeletedItems, cleanupOldDeleted,

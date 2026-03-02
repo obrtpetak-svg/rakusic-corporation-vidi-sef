@@ -6,6 +6,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { C, styles } from '../../utils/helpers';
 import { formatDistance, timeAgo, EVENT_LABELS, GPS_COL } from '../../services/GpsSettingsManager';
+import { getDb } from '../../context/firebaseCore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 const ALERT_TYPES = ['LEFT_SITE', 'RETURNED_TO_SITE', 'PERMISSION_DENIED', 'ACCURACY_TOO_HIGH'];
 
@@ -21,11 +23,11 @@ export default function GpsAlertTab({
 
     // ── Load alerts enabled from Firestore ──
     useEffect(() => {
-        const db = window.firebase?.firestore?.();
+        const db = getDb();
         if (!db) { setLoadingToggle(false); return; }
-        db.collection(GPS_COL.settings).doc('company').get().then(doc => {
-            if (doc.exists && doc.data().alertsEnabled !== undefined) {
-                setAlertsEnabled(doc.data().alertsEnabled);
+        getDoc(doc(db, GPS_COL.settings, 'company')).then(snap => {
+            if (snap.exists() && snap.data().alertsEnabled !== undefined) {
+                setAlertsEnabled(snap.data().alertsEnabled);
             }
             setLoadingToggle(false);
         }).catch(() => setLoadingToggle(false));
@@ -35,9 +37,9 @@ export default function GpsAlertTab({
     const toggleAlerts = useCallback(() => {
         const newVal = !alertsEnabled;
         setAlertsEnabled(newVal);
-        const db = window.firebase?.firestore?.();
+        const db = getDb();
         if (db) {
-            db.collection(GPS_COL.settings).doc('company').set({ alertsEnabled: newVal }, { merge: true })
+            setDoc(doc(db, GPS_COL.settings, 'company'), { alertsEnabled: newVal }, { merge: true })
                 .catch(err => console.warn('[GpsAlerts] Toggle save failed:', err));
         }
     }, [alertsEnabled]);
