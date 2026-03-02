@@ -1,7 +1,8 @@
 // ═══════════════════════════════════════════════════════
 // GET /api/gps/health — Fleet GPS system health check
+// Fixed: uses shared getAuthAdmin instead of duplicate init
 // ═══════════════════════════════════════════════════════
-import { corsHeaders } from './_mapon-client.js';
+import { corsHeaders, getAuthAdmin } from './_mapon-client.js';
 
 export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).json({});
@@ -12,7 +13,7 @@ export default async function handler(req, res) {
 
         // Check Firestore cache
         try {
-            const admin = await getFirebaseAdmin();
+            const admin = await getAuthAdmin();
             if (admin) {
                 const doc = await admin.firestore().doc('gps/cache').get();
                 if (doc.exists) {
@@ -32,6 +33,7 @@ export default async function handler(req, res) {
             }
         } catch (fbErr) {
             cacheStatus.status = 'ERROR';
+            console.error('[health] Firestore check failed:', fbErr.message);
         }
 
         return res.status(200).json({
@@ -39,21 +41,10 @@ export default async function handler(req, res) {
             status: cacheStatus.status,
             timestamp: new Date().toISOString(),
             vehicleCount: cacheStatus.vehicleCount,
+            uptime: process.uptime ? Math.round(process.uptime()) : null,
         });
     } catch (err) {
-        return res.status(500).json({ status: 'ERROR', error: err.message });
+        console.error('[health] Error:', err.message);
+        return res.status(500).json({ status: 'ERROR' });
     }
-}
-
-let _admin = null;
-async function getFirebaseAdmin() {
-    if (_admin) return _admin;
-    try {
-        const { default: admin } = await import('firebase-admin');
-        if (!admin.apps.length) {
-            admin.initializeApp({ credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || '{}')) });
-        }
-        _admin = admin;
-        return admin;
-    } catch { return null; }
 }

@@ -175,7 +175,7 @@ export function normalizeVehicle(unit) {
 
 // ── Auth middleware — verify Firebase ID token ──
 let _authAdmin = null;
-async function getAuthAdmin() {
+export async function getAuthAdmin() {
     if (_authAdmin) return _authAdmin;
     try {
         const { default: admin } = await import('firebase-admin');
