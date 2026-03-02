@@ -5,17 +5,21 @@
 import { useMemo, useEffect, useRef } from 'react';
 import { diffMins, today } from '../../utils/helpers';
 import { refreshDashboardStats } from '../../services/DashboardStats';
+import type { Project, Worker, Timesheet, Invoice, Vehicle, Smjestaj, Obaveza, Otpremnica } from '../../types';
+
+// Firestore docs may have extra dynamic fields, so we extend with Record
+type Doc<T> = T & Record<string, any>;
 
 interface DashboardDataInput {
-    projects: any[];
-    workers: any[];
-    timesheets: any[];
-    invoices: any[];
-    otpremnice: any[];
-    obaveze: any[];
-    vehicles: any[];
-    smjestaj: any[];
-    auditLog: any[];
+    projects: Doc<Project>[];
+    workers: Doc<Worker>[];
+    timesheets: Doc<Timesheet>[];
+    invoices: Doc<Invoice>[];
+    otpremnice: Doc<Otpremnica>[];
+    obaveze: Doc<Obaveza>[];
+    vehicles: Doc<Vehicle>[];
+    smjestaj: Doc<Smjestaj>[];
+    auditLog: Record<string, any>[];
 }
 
 export function useDashboardData({ projects, workers, timesheets, invoices, otpremnice, obaveze, vehicles, smjestaj, auditLog }: DashboardDataInput) {
