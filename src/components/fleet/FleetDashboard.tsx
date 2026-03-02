@@ -62,7 +62,7 @@ export default function FleetDashboard() {
     const [tab, setTab] = useState('map');
     const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
 
-    // ── Firestore cache (Sprint 2: replace with onSnapshot) ──
+    // ── Firestore cache — live onSnapshot + mock fallback ──
     const [cacheDoc, setCacheDoc] = useState<CacheDoc>({
         updatedAt: new Date().toISOString(),
         dataAgeSeconds: 0,
@@ -72,14 +72,34 @@ export default function FleetDashboard() {
         vehicles: MOCK_VEHICLES,
     });
 
-    // TODO Sprint 2: Replace with Firestore onSnapshot
-    // useEffect(() => {
-    //     const db = window.firebase?.firestore?.();
-    //     if (!db) return;
-    //     const unsub = db.doc('gps/cache').collection('lastPositions').doc('all')
-    //         .onSnapshot(snap => { if (snap.exists) setCacheDoc(snap.data()); });
-    //     return unsub;
-    // }, []);
+    useEffect(() => {
+        const db = (window as any).firebase?.firestore?.();
+        if (!db) return;
+
+        // Listen for live updates from Firestore cache doc
+        const unsub = db.doc('gps/cache').onSnapshot((snap: any) => {
+            if (!snap.exists) return;
+            const data = snap.data();
+            const lp = data?.lastPositions;
+            if (lp && lp.vehicles && Object.keys(lp.vehicles).length > 0) {
+                setCacheDoc({
+                    updatedAt: lp.updatedAt || new Date().toISOString(),
+                    dataAgeSeconds: lp.dataAgeSeconds || 0,
+                    providerStatus: lp.providerStatus || 'OK',
+                    dataSource: lp.dataSource || 'push',
+                    vehicleCount: lp.vehicleCount || Object.keys(lp.vehicles).length,
+                    vehicles: lp.vehicles,
+                });
+            }
+        });
+
+        // Initial fetch: trigger API to populate cache if empty
+        fetch('/api/gps/vehicles').catch(() => {
+            console.warn('[Fleet] API call to /api/gps/vehicles failed — using mock data');
+        });
+
+        return () => unsub();
+    }, []);
 
     // ── Computed stats ──
     const vehicles = useMemo(() => Object.values(cacheDoc.vehicles || {}), [cacheDoc]);
