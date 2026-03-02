@@ -570,8 +570,10 @@ export function AppProvider({ children }) {
         const auth = getAuth();
         if (!auth) throw new Error('Auth not available');
 
-        // Convert username to email: admin.josi → admin.josi@rakusic-corporation.live
-        const email = `${username.toLowerCase().replace(/\s+/g, '.')}@rakusic-corporation.live`;
+        // Convert username to email: admin.josip → admin.josip@rakusic-corporation.live
+        // If user already typed full email, use it as-is
+        const cleanUser = username.toLowerCase().replace(/\s+/g, '.');
+        const email = cleanUser.includes('@') ? cleanUser : `${cleanUser}@rakusic-corporation.live`;
         const passwordWrapped = `vds_${password}_auth`;
         console.log('[Auth] Attempting login for:', email);
 
@@ -607,12 +609,14 @@ export function AppProvider({ children }) {
         await initFirebaseAndLoad(config);
 
         // Step 4: After data loaded, match Firebase user to Firestore user
+        // Strip @domain if user typed full email
+        const matchName = cleanUser.includes('@') ? cleanUser.split('@')[0] : cleanUser;
         const db = getDb();
         if (db) {
             const usersSnap = await db.collection('users').get();
             const allUsers = [];
             usersSnap.forEach(doc => { const d = { ...doc.data(), id: doc.id }; if (!d.deletedAt) allUsers.push(d); });
-            const matchedUser = allUsers.find(u => u.username === username.toLowerCase());
+            const matchedUser = allUsers.find(u => u.username === matchName);
             if (matchedUser) {
                 await writeAuthMapping(firebaseUser.uid, matchedUser);
                 handleUserLogin(matchedUser);
