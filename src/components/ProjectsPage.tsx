@@ -357,7 +357,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                         <div>
                             {detailPhases.map((ph, i) => (
                                 <div key={ph.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 0', borderBottom: i < detailPhases.length - 1 ? `1px solid ${C.border}7A` : 'none' }}>
-                                    <button onClick={() => togglePhase(ph.id)} disabled={!canManagePhases} style={{ background: 'none', border: `2px solid ${ph.status === 'done' ? C.green : C.accent}`, borderRadius: 5, width: 22, height: 22, cursor: canManagePhases ? 'pointer' : 'default', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 2, background: ph.status === 'done' ? C.green : 'transparent' }}>
+                                    <button onClick={() => togglePhase(ph.id)} disabled={!canManagePhases} style={{ border: `2px solid ${ph.status === 'done' ? C.green : C.accent}`, borderRadius: 5, width: 22, height: 22, cursor: canManagePhases ? 'pointer' : 'default', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 2, background: ph.status === 'done' ? C.green : 'transparent' }}>
                                         {ph.status === 'done' && <span style={{ color: '#fff', fontSize: 12, fontWeight: 800 }}>✓</span>}
                                     </button>
                                     <div style={{ flex: 1 }}>
