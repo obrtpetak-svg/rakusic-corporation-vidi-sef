@@ -317,6 +317,14 @@ export function AppProvider({ children }) {
                 const auth = getAuth();
                 if (auth && auth.currentUser && !auth.currentUser.isAnonymous) {
                     console.log('[Boot] Firebase Auth session found:', auth.currentUser.email);
+                    // Activate App Check if available
+                    try {
+                        const fb = window.firebase;
+                        if (fb && fb.appCheck) {
+                            fb.appCheck().activate('6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI', true);
+                            console.log('[Boot] App Check activated (debug mode)');
+                        }
+                    } catch (e) { console.warn('[Boot] App Check not available:', e); }
                     await initFirebaseAndLoad(config);
                     return;
                 }
@@ -620,8 +628,22 @@ export function AppProvider({ children }) {
             if (matchedUser) {
                 await writeAuthMapping(firebaseUser.uid, matchedUser);
                 handleUserLogin(matchedUser);
+                // 🔒 Audit: successful login
+                try {
+                    await db.collection('auditLog').add({
+                        id: genId(), action: 'LOGIN_SUCCESS', user: matchedUser.name || matchName,
+                        userId: matchedUser.id, email, timestamp: new Date().toISOString(),
+                        userAgent: navigator.userAgent.slice(0, 200),
+                    });
+                } catch (e) { console.warn('[Audit] Could not log login:', e); }
             } else {
-                // No matching Firestore user — still authenticated, show appLogin
+                // 🔒 Audit: no matching user
+                try {
+                    await db.collection('auditLog').add({
+                        id: genId(), action: 'LOGIN_NO_MATCH', user: matchName,
+                        email, timestamp: new Date().toISOString(),
+                    });
+                } catch (e) { /* ignore */ }
                 console.warn('[Auth] No Firestore user matches username:', username);
                 setStep('appLogin');
             }
@@ -662,7 +684,23 @@ export function AppProvider({ children }) {
             if (age >= (sessionConfig.sessionDuration || 60)) { clearSession(); setCurrentUser(null); const a = getAuth(); if (a) a.signOut(); setStep('appLogin'); }
         }, 30000);
     };
-    const handleLogout = () => { clearSession(); if (sessionCheckRef.current) clearInterval(sessionCheckRef.current); setCurrentUser(null); const a = getAuth(); if (a) a.signOut(); setStep('appLogin'); };
+    const handleLogout = () => {
+        // 🔒 Audit: logout
+        try {
+            const db = getDb();
+            if (db && currentUser) {
+                db.collection('auditLog').add({
+                    id: genId(), action: 'LOGOUT', user: currentUser.name || 'unknown',
+                    userId: currentUser.id, timestamp: new Date().toISOString(),
+                });
+            }
+        } catch (e) { /* ignore */ }
+        clearSession();
+        if (sessionCheckRef.current) clearInterval(sessionCheckRef.current);
+        setCurrentUser(null);
+        const a = getAuth(); if (a) a.signOut();
+        setStep('appLogin');
+    };
     const handleResetFirebase = () => {
         localStorage.removeItem('vidime-firebase-config-v9');
         localStorage.removeItem('vidime-app-login');
