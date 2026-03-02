@@ -2,10 +2,15 @@
     "name": "RAKUŠIĆ corporation — Operativni centar upravljanja",
     "short_name": "Rakušić Corp",
     "description": "Profesionalni sustav za upravljanje gradilištem — evidencija radnika, sati, projekata, računa i otpremnica",
-    "start_url": "/",
+    "start_url": "/?source=pwa",
     "scope": "/",
+    "id": "/",
     "display": "standalone",
-    "background_color": "#EEF2F7",
+    "display_override": [
+        "window-controls-overlay",
+        "standalone"
+    ],
+    "background_color": "#1a1d23",
     "theme_color": "#D95D08",
     "lang": "hr",
     "dir": "ltr",
@@ -40,6 +45,45 @@
             "purpose": "maskable"
         }
     ],
+    "shortcuts": [
+        {
+            "name": "Radni sati",
+            "short_name": "Sati",
+            "url": "/?page=timesheets",
+            "icons": [
+                {
+                    "src": "/icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "QR Check-in",
+            "short_name": "QR",
+            "url": "/?page=qr-checkin",
+            "icons": [
+                {
+                    "src": "/icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "GPS Nadzor",
+            "short_name": "GPS",
+            "url": "/?page=gps",
+            "icons": [
+                {
+                    "src": "/icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ],
     "screenshots": [],
-    "prefer_related_applications": false
+    "prefer_related_applications": false,
+    "handle_links": "preferred",
+    "launch_handler": {
+        "client_mode": "navigate-existing"
+    }
 }

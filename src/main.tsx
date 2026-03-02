@@ -16,10 +16,33 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </React.StrictMode>
 )
 
-// Register Service Worker for PWA
+// Register Service Worker for PWA with update detection
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(() => { });
+        navigator.serviceWorker.register('/sw.js').then(reg => {
+            // Check for SW updates every 60 seconds
+            setInterval(() => reg.update(), 60000);
+
+            // When a new SW is waiting, activate it immediately
+            reg.addEventListener('updatefound', () => {
+                const newWorker = reg.installing;
+                if (!newWorker) return;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        console.log('[SW] New version available — activating...');
+                        newWorker.postMessage({ type: 'SKIP_WAITING' });
+                    }
+                });
+            });
+        }).catch(() => { });
+
+        // Handle SW messages (background sync triggers)
+        navigator.serviceWorker.addEventListener('message', event => {
+            if (event.data?.type === 'FLUSH_GPS_QUEUE') {
+                // Trigger GPS queue flush from SyncQueue
+                window.dispatchEvent(new CustomEvent('gps-sync-flush'));
+            }
+        });
     });
 }
 
