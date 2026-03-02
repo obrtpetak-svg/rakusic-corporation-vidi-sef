@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { genId } from '../utils/helpers';
 import { firebaseSignIn, firebaseSignOut, writeAuthMapping, clearFirestoreCache } from './firebaseCore';
+import type { User, CompanyProfile, AppStep } from '../types';
 
 // ── Types ────────────────────────────────────────────────────────────────
 export interface SessionConfig {
@@ -9,11 +10,28 @@ export interface SessionConfig {
     syncMode: number;
 }
 
+export interface FirebaseConfig {
+    apiKey: string;
+    authDomain: string;
+    projectId: string;
+    storageBucket: string;
+    messagingSenderId: string;
+    appId: string;
+}
+
+export interface SavedSession {
+    userId: string;
+    userName: string;
+    userRole: string;
+    loginAt: string;
+    sessionVersion: number;
+}
+
 export interface AuthContextValue {
-    step: string;
-    setStep: (s: string) => void;
-    currentUser: any;
-    setCurrentUser: (u: any) => void;
+    step: AppStep;
+    setStep: (s: AppStep) => void;
+    currentUser: User | null;
+    setCurrentUser: (u: User | null) => void;
     firebaseReady: boolean;
     setFirebaseReady: (b: boolean) => void;
     loadError: string | null;
@@ -23,17 +41,17 @@ export interface AuthContextValue {
     lastSync: Date | null;
     setLastSync: (d: Date | null) => void;
     // Session helpers
-    saveSession: (user: any, version?: number | null) => void;
-    loadSession: () => any;
+    saveSession: (user: User, version?: number | null) => void;
+    loadSession: () => SavedSession | null;
     clearSession: () => void;
     clearStaleCache: () => void;
     // Handlers
     handleAppLogin: () => void;
-    handleFirebaseLogin: (username: string, password: string) => Promise<any>;
-    handleFirebaseConfig: (config: any) => void;
-    handleCompanySetup: (profile: any) => Promise<void>;
-    handleAdminCreate: (admin: any) => Promise<void>;
-    handleUserLogin: (user: any) => void;
+    handleFirebaseLogin: (username: string, password: string) => Promise<unknown>;
+    handleFirebaseConfig: (config: FirebaseConfig) => void;
+    handleCompanySetup: (profile: CompanyProfile) => Promise<void>;
+    handleAdminCreate: (admin: Partial<User>) => Promise<void>;
+    handleUserLogin: (user: User) => void;
     handleLogout: () => void;
     handleResetFirebase: () => void;
     // Session admin
@@ -45,10 +63,10 @@ export interface AuthContextValue {
     exportUserData: () => Promise<void>;
     // Refs for cleanup
     unsubsRef: React.MutableRefObject<Array<() => void>>;
-    sessionCheckRef: React.MutableRefObject<any>;
+    sessionCheckRef: React.MutableRefObject<ReturnType<typeof setInterval> | null>;
     // Trigger data load
-    triggerDataLoad: (config: any) => void;
-    setTriggerDataLoad: (fn: (config: any) => void) => void;
+    triggerDataLoad: (config: FirebaseConfig) => void;
+    setTriggerDataLoad: (fn: (config: FirebaseConfig) => void) => void;
 }
 
 // ── Firebase core (shared singletons) ────────────────────────────────────
@@ -131,8 +149,8 @@ export function useAuth(): AuthContextValue {
 
 // ── Provider ─────────────────────────────────────────────────────────────
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [step, setStep] = useState('loading');
-    const [currentUser, setCurrentUser] = useState<any>(null);
+    const [step, setStep] = useState<AppStep>('loading');
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [firebaseReady, setFirebaseReady] = useState(false);
     const [loadError, setLoadError] = useState<string | null>(null);
     const [sessionConfig, setSessionConfig] = useState<SessionConfig>({ sessionDuration: 60, sessionVersion: null, syncMode: 0 });
