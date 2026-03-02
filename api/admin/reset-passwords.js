@@ -1,37 +1,52 @@
-// ── Admin: Reset All User Passwords ──
-// ONE-TIME USE: Resets all Firebase Auth user passwords to a specified password.
-// Protected by Firebase Auth — only admin users can execute.
-// Uses Firebase Admin SDK to update passwords server-side.
+// ── Admin: Reset All User Passwords (Emergency — secret key auth) ──
+// Uses a secret key instead of Firebase Auth to avoid chicken-and-egg problem
+// when password format changes make login impossible.
 
-import { getAuthAdmin, verifyAuth, corsHeaders } from '../gps/_mapon-client.js';
+import admin from 'firebase-admin';
+
+// Initialize Firebase Admin
+if (!admin.apps.length) {
+    try {
+        const sa = process.env.FIREBASE_SERVICE_ACCOUNT;
+        if (sa) {
+            admin.initializeApp({
+                credential: admin.credential.cert(JSON.parse(sa)),
+            });
+        }
+    } catch (e) {
+        console.error('[Admin] Firebase init error:', e.message);
+    }
+}
 
 export default async function handler(req, res) {
-    const headers = corsHeaders(req);
-    Object.entries(headers).forEach(([k, v]) => res.setHeader(k, v));
+    // CORS
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Admin-Secret');
     if (req.method === 'OPTIONS') return res.status(204).end();
-    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+    if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
 
-    // ── Auth check ──
-    const authResult = await verifyAuth(req);
-    if (!authResult.ok) {
-        return res.status(401).json({ error: 'Unauthorized', detail: authResult.error });
+    // ── Secret key auth (since Firebase Auth login is broken) ──
+    const ADMIN_SECRET = process.env.ADMIN_RESET_SECRET || 'RakusicResetAll2026!';
+    const provided = req.headers['x-admin-secret'] || req.body?.secret;
+    if (provided !== ADMIN_SECRET) {
+        return res.status(403).json({ error: 'Invalid admin secret' });
     }
 
     try {
-        const { newPassword } = req.body;
+        const newPassword = req.body?.newPassword;
         if (!newPassword || newPassword.length < 6) {
-            return res.status(400).json({ error: 'Password must be at least 6 characters' });
+            return res.status(400).json({ error: 'newPassword required (min 6 chars)' });
         }
 
-        const admin = getAuthAdmin();
-        if (!admin) {
-            return res.status(500).json({ error: 'Firebase Admin not configured' });
+        if (!admin.apps.length) {
+            return res.status(500).json({ error: 'Firebase Admin not initialized — check FIREBASE_SERVICE_ACCOUNT env var' });
         }
 
         const auth = admin.auth();
         const results = { updated: [], failed: [], total: 0 };
 
-        // List all users (max 1000)
+        // List all Firebase Auth users
         const listResult = await auth.listUsers(1000);
         results.total = listResult.users.length;
 
@@ -46,14 +61,15 @@ export default async function handler(req, res) {
 
         return res.status(200).json({
             success: true,
-            message: `Updated ${results.updated.length}/${results.total} users`,
+            message: `✅ Updated ${results.updated.length}/${results.total} users to new password`,
             updated: results.updated.length,
             failed: results.failed.length,
-            details: results,
+            failedDetails: results.failed,
+            updatedEmails: results.updated.map(u => u.email),
         });
 
     } catch (err) {
-        console.error('[Admin] Reset passwords error:', err);
-        return res.status(500).json({ error: 'Internal server error', detail: err.message });
+        console.error('[Admin] Reset error:', err);
+        return res.status(500).json({ error: err.message });
     }
 }
