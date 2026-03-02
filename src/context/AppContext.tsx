@@ -295,7 +295,7 @@ export function AppProvider({ children }) {
     const [safetyChecklists, setSafetyChecklists] = useState([]);
     const [safetyLoaded, setSafetyLoaded] = useState(false);
     const [productionLoaded, setProductionLoaded] = useState(false);
-    const [sessionConfig, setSessionConfig] = useState({ sessionDuration: 60, sessionVersion: 1, syncMode: 0 });
+    const [sessionConfig, setSessionConfig] = useState({ sessionDuration: 60, sessionVersion: null as number | null, syncMode: 0 });
     const [lastSync, setLastSync] = useState(null);
 
     const unsubsRef = useRef([]);
@@ -576,8 +576,9 @@ export function AppProvider({ children }) {
                     if (doc.exists) {
                         const sc = doc.data();
                         setSessionConfig(prev => {
-                            // Force logout if remote version changed
-                            if (prev.sessionVersion && sc.sessionVersion && sc.sessionVersion > prev.sessionVersion) {
+                            // Force logout ONLY if version actually changed (not on initial load)
+                            // prev.sessionVersion === null means first load from Firestore, not a real change
+                            if (prev.sessionVersion !== null && sc.sessionVersion && sc.sessionVersion > prev.sessionVersion) {
                                 clearSession();
                                 setCurrentUser(null);
                                 const a = getAuth(); if (a) a.signOut();
