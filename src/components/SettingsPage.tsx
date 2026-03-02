@@ -407,7 +407,7 @@ export function SettingsPage({ workerFilterId }) {
                         {[15, 30, 60, 120, 480].map(min => (
                             <button key={min} onClick={() => updateSessionDuration(min)} style={{
                                 padding: '8px 16px', borderRadius: 10, border: `2px solid ${(sessionConfig?.sessionDuration || 60) === min ? '#6366F1' : C.border}`,
-                                background: (sessionConfig?.sessionDuration || 60) === min ? 'rgba(99,102,241,0.08)' : '#fff',
+                                background: (sessionConfig?.sessionDuration || 60) === min ? 'rgba(99,102,241,0.08)' : 'var(--card-solid)',
                                 color: (sessionConfig?.sessionDuration || 60) === min ? '#6366F1' : C.textDim,
                                 fontWeight: (sessionConfig?.sessionDuration || 60) === min ? 700 : 500, fontSize: 13, cursor: 'pointer', transition: 'all 0.2s',
                             }}>
@@ -441,7 +441,7 @@ export function SettingsPage({ workerFilterId }) {
                                 <button key={opt.val} onClick={() => updateSyncMode(opt.val)} style={{
                                     padding: '8px 16px', borderRadius: 10,
                                     border: `2px solid ${(sessionConfig?.syncMode || 0) === opt.val ? '#6366F1' : C.border}`,
-                                    background: (sessionConfig?.syncMode || 0) === opt.val ? 'rgba(99,102,241,0.08)' : '#fff',
+                                    background: (sessionConfig?.syncMode || 0) === opt.val ? 'rgba(99,102,241,0.08)' : 'var(--card-solid)',
                                     color: (sessionConfig?.syncMode || 0) === opt.val ? '#6366F1' : C.textDim,
                                     fontWeight: (sessionConfig?.syncMode || 0) === opt.val ? 700 : 500,
                                     fontSize: 13, cursor: 'pointer', transition: 'all 0.2s',
