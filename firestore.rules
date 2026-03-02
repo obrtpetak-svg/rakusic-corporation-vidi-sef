@@ -219,6 +219,22 @@ service cloud.firestore {
       allow write: if isAuth();
     }
 
+    // ── GPS Fleet Cache (Mapon integration) ──
+    // Server writes via firebase-admin (bypasses rules)
+    // Frontend reads via onSnapshot
+    match /gps/{docId} {
+      allow read: if isAuth();
+      allow write: if adminOrNoMapping(); // manual admin overrides
+    }
+    match /gpsFleet/{docId} {
+      allow read: if isAuth();
+      allow write: if adminOrNoMapping();
+    }
+    match /gpsDedup/{docId} {
+      allow read: if isAuth();
+      allow write: if false; // only server writes
+    }
+
     // ── GPS Live Data ──
     match /gpsLiveLocations/{docId} {
       allow read: if isAuth();
