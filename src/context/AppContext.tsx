@@ -236,7 +236,10 @@ function clearStaleCache() {
         if (window.indexedDB) {
             if (typeof indexedDB.databases === 'function') {
                 indexedDB.databases().then(dbs => dbs.forEach(db => {
-                    if (db.name) indexedDB.deleteDatabase(db.name);
+                    // PRESERVE firebaseLocalStorageDb — it stores Firebase Auth tokens!
+                    if (db.name && db.name !== 'firebaseLocalStorageDb') {
+                        indexedDB.deleteDatabase(db.name);
+                    }
                 }));
             }
             // Known Firebase database names (fallback)
@@ -352,26 +355,42 @@ export function AppProvider({ children }) {
                             unsub(); // only need first callback
                             resolve(user);
                         });
-                        // Timeout: if Firebase doesn't respond in 3s, proceed without user
-                        setTimeout(() => resolve(null), 3000);
+                        // Timeout: if Firebase doesn't respond in 8s, proceed without user
+                        setTimeout(() => resolve(null), 8000);
                     });
 
                     if (firebaseUser && !firebaseUser.isAnonymous) {
                         console.log('[Boot] Firebase Auth session restored:', firebaseUser.email);
                         try {
-                            // Race: load data OR timeout after 12s
                             await Promise.race([
                                 initFirebaseAndLoad(config),
-                                new Promise((_, reject) => setTimeout(() => reject(new Error('Boot timeout')), 12000)),
+                                new Promise((_, reject) => setTimeout(() => reject(new Error('Boot timeout')), 15000)),
                             ]);
                         } catch (bootErr: any) {
                             console.error('[Boot] Session restore failed:', bootErr.message);
-                            clearStaleCache();
-                            clearFirestoreCache();
+                            // Don't wipe auth tokens — just clear session and go to login
+                            clearSession();
                             try { auth.signOut(); } catch { }
                             setStep('appLogin');
                         }
                         return;
+                    }
+
+                    // No Firebase Auth — but check if we have a localStorage session
+                    // If so, try to init Firebase and load data anyway
+                    const savedSession = loadSession();
+                    if (savedSession) {
+                        console.log('[Boot] No Firebase Auth but localStorage session exists, trying to load...');
+                        try {
+                            await Promise.race([
+                                initFirebaseAndLoad(config),
+                                new Promise((_, reject) => setTimeout(() => reject(new Error('Boot timeout')), 10000)),
+                            ]);
+                            return; // If it worked, data is loaded
+                        } catch (e) {
+                            console.warn('[Boot] localStorage session fallback failed:', e);
+                            clearSession();
+                        }
                     }
                 }
 
