@@ -53,12 +53,30 @@ export function initFirebase(config: FirebaseConfig | null): boolean {
         _auth = fb.auth();
         // Ensure auth session persists across page refreshes
         try { _auth.setPersistence((win.firebase as any).auth.Auth.Persistence.LOCAL); } catch (e) { console.warn('[Firebase] setPersistence error:', e); }
-        _db.enablePersistence({ synchronizeTabs: true }).catch((err: any) => {
-            if (err.code === 'failed-precondition') console.warn('[Firestore] Persistence failed: multiple tabs open');
-            else if (err.code === 'unimplemented') console.warn('[Firestore] Persistence not supported in this browser');
-        });
+        // NOTE: enablePersistence REMOVED — offline cache caused stale auth tokens
+        // and hung Firestore queries after password resets. Online-only is fine for 50-100 users.
         return true;
     } catch (e) { console.error('Firebase init error:', e); return false; }
+}
+
+// Clear all Firestore/Firebase IndexedDB caches (call before login)
+export function clearFirestoreCache(): void {
+    try {
+        if (!window.indexedDB) return;
+        if (typeof indexedDB.databases === 'function') {
+            indexedDB.databases().then(dbs => dbs.forEach(db => {
+                if (db.name && db.name !== 'firebaseLocalStorageDb') {
+                    indexedDB.deleteDatabase(db.name);
+                }
+            }));
+        }
+        // Known Firestore cache DBs
+        ['firestore/[DEFAULT]/rakusic-corporation-vidi-sef/main',
+            'firebase-heartbeat-database', 'firebase-installations-database'].forEach(name => {
+                try { indexedDB.deleteDatabase(name); } catch { }
+            });
+        console.log('[Firebase] Firestore cache cleared');
+    } catch (e) { console.warn('[Firebase] Cache clear error:', e); }
 }
 
 // Config persistence

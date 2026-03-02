@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { genId, hashPin } from '../utils/helpers';
 import { validateOrThrow } from '../utils/validate';
-import { firebaseSignIn, firebaseSignOut, writeAuthMapping } from './firebaseCore';
+import { firebaseSignIn, firebaseSignOut, writeAuthMapping, clearFirestoreCache } from './firebaseCore';
 
 const AppContext = createContext();
 export const useApp = () => useContext(AppContext);
@@ -352,26 +352,22 @@ export function AppProvider({ children }) {
                             unsub(); // only need first callback
                             resolve(user);
                         });
-                        // Timeout: if Firebase doesn't respond in 5s, proceed without user
-                        setTimeout(() => resolve(null), 5000);
+                        // Timeout: if Firebase doesn't respond in 3s, proceed without user
+                        setTimeout(() => resolve(null), 3000);
                     });
 
                     if (firebaseUser && !firebaseUser.isAnonymous) {
                         console.log('[Boot] Firebase Auth session restored:', firebaseUser.email);
-                        // Activate App Check if available
                         try {
-                            const fb = window.firebase;
-                            if (fb && fb.appCheck) {
-                                fb.appCheck().activate('6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI', true);
-                                console.log('[Boot] App Check activated (debug mode)');
-                            }
-                        } catch (e) { console.warn('[Boot] App Check not available:', e); }
-                        try {
-                            await initFirebaseAndLoad(config);
+                            // Race: load data OR timeout after 12s
+                            await Promise.race([
+                                initFirebaseAndLoad(config),
+                                new Promise((_, reject) => setTimeout(() => reject(new Error('Boot timeout')), 12000)),
+                            ]);
                         } catch (bootErr: any) {
                             console.error('[Boot] Session restore failed:', bootErr.message);
-                            // Stale session or permission error — clear everything and go to login
                             clearStaleCache();
+                            clearFirestoreCache();
                             try { auth.signOut(); } catch { }
                             setStep('appLogin');
                         }
@@ -632,12 +628,13 @@ export function AppProvider({ children }) {
             initFirebase(config);
         }
 
-        // Step 2: Sign in with Firebase Auth (email/password)
+        // Step 2: Clear stale Firestore cache BEFORE login to prevent hung queries
+        clearFirestoreCache();
+
         const auth = getAuth();
         if (!auth) throw new Error('Auth not available');
 
         // Convert username to email: admin.josip → admin.josip@rakusic-corporation.live
-        // If user already typed full email, use it as-is
         const cleanUser = username.toLowerCase().replace(/\s+/g, '.');
         const email = cleanUser.includes('@') ? cleanUser : `${cleanUser}@rakusic-corporation.live`;
         const passwordWrapped = password;
