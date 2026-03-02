@@ -3,40 +3,46 @@ import { genId, hashPin } from '../utils/helpers';
 import { validateOrThrow } from '../utils/validate';
 import { writeAuthMapping } from './firebaseCore';
 import { useAuth, getDb, getAuth, initFirebase, loadFirebaseConfig, getBuiltInConfig as _noop } from './AuthContext';
+import type {
+    User, Worker, Project, Timesheet, Invoice, Vehicle,
+    Smjestaj, Obaveza, Otpremnica, ProductionEntry, ProductionAlert,
+    AuditEntry, DailyLog, WeatherRule, SafetyTemplate, SafetyChecklist,
+    CompanyProfile, BaseDoc,
+} from '../types';
 
 // ── Types ────────────────────────────────────────────────────────────────
 export interface DataContextValue {
-    users: any[]; setUsers: React.Dispatch<React.SetStateAction<any[]>>;
-    projects: any[]; setProjects: React.Dispatch<React.SetStateAction<any[]>>;
-    workers: any[]; setWorkers: React.Dispatch<React.SetStateAction<any[]>>;
-    timesheets: any[]; setTimesheets: React.Dispatch<React.SetStateAction<any[]>>;
-    invoices: any[]; setInvoices: React.Dispatch<React.SetStateAction<any[]>>;
-    vehicles: any[]; setVehicles: React.Dispatch<React.SetStateAction<any[]>>;
-    smjestaj: any[]; setSmjestaj: React.Dispatch<React.SetStateAction<any[]>>;
-    obaveze: any[]; setObaveze: React.Dispatch<React.SetStateAction<any[]>>;
-    otpremnice: any[]; setOtpremnice: React.Dispatch<React.SetStateAction<any[]>>;
-    production: any[]; setProduction: React.Dispatch<React.SetStateAction<any[]>>;
-    prodAlerts: any[]; setProdAlerts: React.Dispatch<React.SetStateAction<any[]>>;
-    auditLog: any[]; setAuditLog: React.Dispatch<React.SetStateAction<any[]>>;
-    companyProfile: any; setCompanyProfile: (cp: any) => void;
-    dailyLogs: any[]; setDailyLogs: React.Dispatch<React.SetStateAction<any[]>>;
-    weatherRules: any[]; setWeatherRules: React.Dispatch<React.SetStateAction<any[]>>;
-    safetyTemplates: any[]; setSafetyTemplates: React.Dispatch<React.SetStateAction<any[]>>;
-    safetyChecklists: any[]; setSafetyChecklists: React.Dispatch<React.SetStateAction<any[]>>;
-    workerMap: Map<string, any>;
-    projectMap: Map<string, any>;
+    users: User[]; setUsers: React.Dispatch<React.SetStateAction<User[]>>;
+    projects: Project[]; setProjects: React.Dispatch<React.SetStateAction<Project[]>>;
+    workers: Worker[]; setWorkers: React.Dispatch<React.SetStateAction<Worker[]>>;
+    timesheets: Timesheet[]; setTimesheets: React.Dispatch<React.SetStateAction<Timesheet[]>>;
+    invoices: Invoice[]; setInvoices: React.Dispatch<React.SetStateAction<Invoice[]>>;
+    vehicles: Vehicle[]; setVehicles: React.Dispatch<React.SetStateAction<Vehicle[]>>;
+    smjestaj: Smjestaj[]; setSmjestaj: React.Dispatch<React.SetStateAction<Smjestaj[]>>;
+    obaveze: Obaveza[]; setObaveze: React.Dispatch<React.SetStateAction<Obaveza[]>>;
+    otpremnice: Otpremnica[]; setOtpremnice: React.Dispatch<React.SetStateAction<Otpremnica[]>>;
+    production: ProductionEntry[]; setProduction: React.Dispatch<React.SetStateAction<ProductionEntry[]>>;
+    prodAlerts: ProductionAlert[]; setProdAlerts: React.Dispatch<React.SetStateAction<ProductionAlert[]>>;
+    auditLog: AuditEntry[]; setAuditLog: React.Dispatch<React.SetStateAction<AuditEntry[]>>;
+    companyProfile: CompanyProfile | null; setCompanyProfile: (cp: CompanyProfile | null) => void;
+    dailyLogs: DailyLog[]; setDailyLogs: React.Dispatch<React.SetStateAction<DailyLog[]>>;
+    weatherRules: WeatherRule[]; setWeatherRules: React.Dispatch<React.SetStateAction<WeatherRule[]>>;
+    safetyTemplates: SafetyTemplate[]; setSafetyTemplates: React.Dispatch<React.SetStateAction<SafetyTemplate[]>>;
+    safetyChecklists: SafetyChecklist[]; setSafetyChecklists: React.Dispatch<React.SetStateAction<SafetyChecklist[]>>;
+    workerMap: Map<string, Worker>;
+    projectMap: Map<string, Project>;
     getWorkerName: (id: string) => string;
     getProjectName: (id: string) => string;
     isLeader: boolean;
     leaderProjectIds: string[];
     leaderWorkerIds: string[];
     // CRUD
-    add: (collection: string, data: any) => Promise<any>;
-    update: (collection: string, id: string, updates: any) => Promise<void>;
+    add: (collection: string, data: Record<string, unknown>) => Promise<BaseDoc | null>;
+    update: (collection: string, id: string, updates: Record<string, unknown>) => Promise<void>;
     remove: (collection: string, id: string) => Promise<void>;
-    setDoc: (collection: string, docId: string, data: any) => Promise<void>;
+    setDoc: (collection: string, docId: string, data: Record<string, unknown>) => Promise<void>;
     // Lazy loaders
-    addAuditLog: (action: string, details: any) => Promise<void>;
+    addAuditLog: (action: string, details: Record<string, unknown>) => Promise<void>;
     loadAuditLog: () => Promise<void>;
     allTimesheetsLoaded: boolean;
     loadAllTimesheets: () => Promise<void>;
@@ -44,7 +50,7 @@ export interface DataContextValue {
     loadWeatherRules: () => Promise<void>;
     loadSafetyData: () => Promise<void>;
     loadProduction: () => Promise<void>;
-    loadDeletedItems: () => Promise<any[]>;
+    loadDeletedItems: () => Promise<BaseDoc[]>;
     cleanupOldDeleted: () => Promise<number>;
     // Refresh
     refreshInvoices: () => Promise<void>;
