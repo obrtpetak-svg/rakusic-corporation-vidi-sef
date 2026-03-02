@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { genId, hashPin } from '../utils/helpers';
 import { validateOrThrow } from '../utils/validate';
-import { writeAuthMapping, getDb, getAuth, initFirebase, loadFirebaseConfig } from './firebaseCore';
+import { writeAuthMapping, getDb, getAuth, initFirebase, loadFirebaseConfig, type FirebaseConfig } from './firebaseCore';
 import { useAuth } from './AuthContext';
 import {
     collection, doc, setDoc, updateDoc, deleteDoc,
@@ -82,11 +82,11 @@ type SetterFn = (updater: any) => void;
 const _setterMap: Record<string, SetterFn> = {};
 
 // ── Snap to array helper ─────────────────────────────────────────────────
-function snapToArray(snap: QuerySnapshot): BaseDoc[] {
-    const items: BaseDoc[] = [];
+function snapToArray<T extends BaseDoc = BaseDoc>(snap: QuerySnapshot): T[] {
+    const items: T[] = [];
     snap.forEach((docSnap) => {
-        const d = { ...docSnap.data(), id: docSnap.id } as BaseDoc;
-        if (!d.deletedAt) items.push(d);
+        const d = { ...docSnap.data(), id: docSnap.id } as T;
+        if (!(d as BaseDoc).deletedAt) items.push(d);
     });
     return items;
 }
@@ -113,23 +113,23 @@ const TRASH_COLLECTIONS = ['workers', 'projects', 'timesheets', 'invoices', 'veh
 export function DataProvider({ children }: { children: React.ReactNode }) {
     const auth = useAuth();
 
-    const [users, setUsers] = useState<any[]>([]);
-    const [projects, setProjects] = useState<any[]>([]);
-    const [workers, setWorkers] = useState<any[]>([]);
-    const [timesheets, setTimesheets] = useState<any[]>([]);
-    const [invoices, setInvoices] = useState<any[]>([]);
-    const [vehicles, setVehicles] = useState<any[]>([]);
-    const [smjestaj, setSmjestaj] = useState<any[]>([]);
-    const [obaveze, setObaveze] = useState<any[]>([]);
-    const [otpremnice, setOtpremnice] = useState<any[]>([]);
-    const [production, setProduction] = useState<any[]>([]);
-    const [prodAlerts, setProdAlerts] = useState<any[]>([]);
-    const [auditLog, setAuditLog] = useState<any[]>([]);
-    const [companyProfile, setCompanyProfile] = useState<any>(null);
-    const [dailyLogs, setDailyLogs] = useState<any[]>([]);
-    const [weatherRules, setWeatherRules] = useState<any[]>([]);
-    const [safetyTemplates, setSafetyTemplates] = useState<any[]>([]);
-    const [safetyChecklists, setSafetyChecklists] = useState<any[]>([]);
+    const [users, setUsers] = useState<User[]>([]);
+    const [projects, setProjects] = useState<Project[]>([]);
+    const [workers, setWorkers] = useState<Worker[]>([]);
+    const [timesheets, setTimesheets] = useState<Timesheet[]>([]);
+    const [invoices, setInvoices] = useState<Invoice[]>([]);
+    const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+    const [smjestaj, setSmjestaj] = useState<Smjestaj[]>([]);
+    const [obaveze, setObaveze] = useState<Obaveza[]>([]);
+    const [otpremnice, setOtpremnice] = useState<Otpremnica[]>([]);
+    const [production, setProduction] = useState<ProductionEntry[]>([]);
+    const [prodAlerts, setProdAlerts] = useState<ProductionAlert[]>([]);
+    const [auditLog, setAuditLog] = useState<AuditEntry[]>([]);
+    const [companyProfile, setCompanyProfile] = useState<CompanyProfile | null>(null);
+    const [dailyLogs, setDailyLogs] = useState<DailyLog[]>([]);
+    const [weatherRules, setWeatherRules] = useState<WeatherRule[]>([]);
+    const [safetyTemplates, setSafetyTemplates] = useState<SafetyTemplate[]>([]);
+    const [safetyChecklists, setSafetyChecklists] = useState<SafetyChecklist[]>([]);
 
     const [allTimesheetsLoaded, setAllTimesheetsLoaded] = useState(false);
     const [dailyLogsLoaded, setDailyLogsLoaded] = useState(false);
@@ -172,7 +172,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         try {
             validateOrThrow(col, docData);
             await setDoc(doc(db, col, id), docData);
-            if (_setterMap[col]) _setterMap[col]((prev) => [...prev, docData as BaseDoc]);
+            if (_setterMap[col]) _setterMap[col]((prev: BaseDoc[]) => [...prev, docData as BaseDoc]);
             return docData;
         } catch (e) { handleError(e, 'add'); throw e; }
     }, []);
@@ -182,7 +182,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         try {
             const stamped = { ...updates, updatedAt: new Date().toISOString() };
             await updateDoc(doc(db, col, id), stamped);
-            if (_setterMap[col]) _setterMap[col]((prev) => prev.map(d => d.id === id ? { ...d, ...stamped } : d));
+            if (_setterMap[col]) _setterMap[col]((prev: BaseDoc[]) => prev.map((d: BaseDoc) => d.id === id ? { ...d, ...stamped } : d));
         } catch (e) { handleError(e, 'update'); throw e; }
     }, []);
 
@@ -192,7 +192,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         try {
             const deletedAt = new Date().toISOString();
             await updateDoc(doc(db, col, id), { deletedAt });
-            if (_setterMap[col]) _setterMap[col]((prev) => prev.filter(d => d.id !== id));
+            if (_setterMap[col]) _setterMap[col]((prev: BaseDoc[]) => prev.filter((d: BaseDoc) => d.id !== id));
         } catch (e) { handleError(e, 'remove'); throw e; }
     }, []);
 
@@ -212,11 +212,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     // ── Data load function (called from AuthContext via triggerDataLoad) ──
-    const initFirebaseAndLoad = useCallback(async (config: Record<string, string>) => {
+    const initFirebaseAndLoad = useCallback(async (config: Record<string, string> | FirebaseConfig) => {
         auth.setLoadError(null);
         try {
             console.log('[DataContext] Starting data load...');
-            if (!initFirebase(config)) { auth.setLoadError('Firebase init failed — check config'); auth.setStep('appLogin'); return; }
+            if (!initFirebase(config as FirebaseConfig)) { auth.setLoadError('Firebase init failed — check config'); auth.setStep('appLogin'); return; }
 
             const fbAuth = getAuth();
             if (fbAuth && fbAuth.currentUser) {
@@ -249,15 +249,15 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
             // Batch 1: Critical
             const [u, cp] = await Promise.all([loadCol('users'), loadSingleDoc('config', 'companyProfile')]);
-            setUsers(u);
-            setCompanyProfile(cp);
+            setUsers(u as User[]);
+            setCompanyProfile(cp as CompanyProfile | null);
 
             // Batch 2: Resilient
             await Promise.allSettled([
-                loadCol('invoices').then(d => { setInvoices(d); return d; }),
-                loadCol('vehicles').then(d => { setVehicles(d); return d; }),
-                loadCol('smjestaj').then(d => { setSmjestaj(d); return d; }),
-                loadCol('otpremnice').then(d => { setOtpremnice(d); return d; }),
+                loadCol('invoices').then(d => { setInvoices(d as Invoice[]); return d; }),
+                loadCol('vehicles').then(d => { setVehicles(d as Vehicle[]); return d; }),
+                loadCol('smjestaj').then(d => { setSmjestaj(d as Smjestaj[]); return d; }),
+                loadCol('otpremnice').then(d => { setOtpremnice(d as Otpremnica[]); return d; }),
             ]);
 
             // PIN migration
@@ -272,9 +272,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             }
 
             // Realtime listeners (MODULAR)
-            const listenWithLog = (col: string, setter: SetterFn | React.Dispatch<React.SetStateAction<BaseDoc[]>>, q?: ReturnType<typeof query>) => {
+            const listenWithLog = (col: string, setter: SetterFn, q?: ReturnType<typeof query>) => {
                 const src = q || collection(db, col);
-                return onSnapshot(src, (snap: QuerySnapshot) => {
+                return onSnapshot(src as ReturnType<typeof collection>, (snap: QuerySnapshot) => {
                     const items = snapToArray(snap);
                     logReads('listener', col, items.length, 'onSnapshot');
                     setter(items);
@@ -288,11 +288,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
                 limit(200)
             );
 
-            const tsUnsub = onSnapshot(tsQuery, (snap: QuerySnapshot) => {
-                const recentDocs = snapToArray(snap);
+            const tsUnsub = onSnapshot(tsQuery as ReturnType<typeof collection>, (snap: QuerySnapshot) => {
+                const recentDocs = snapToArray<Timesheet>(snap);
                 logReads('listener', 'timesheets', recentDocs.length, 'onSnapshot');
                 setTimesheets(prev => {
-                    const oldDocs = prev.filter((d) => ((d as BaseDoc & { date?: string }).date || '') < cutoff30Str);
+                    const oldDocs = prev.filter((d) => ((d as Timesheet & { date?: string }).date || '') < cutoff30Str);
                     return [...oldDocs, ...recentDocs];
                 });
             });
@@ -300,16 +300,16 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             const syncMode = auth.sessionConfig.syncMode || 0;
             if (syncMode === 0) {
                 auth.unsubsRef.current = [
-                    listenWithLog('users', setUsers),
-                    listenWithLog('projects', setProjects),
-                    listenWithLog('workers', setWorkers),
+                    listenWithLog('users', setUsers as SetterFn),
+                    listenWithLog('projects', setProjects as SetterFn),
+                    listenWithLog('workers', setWorkers as SetterFn),
                     tsUnsub,
-                    listenWithLog('obaveze', setObaveze),
-                    onSnapshot(doc(db, 'config', 'companyProfile'), (snap: DocumentSnapshot) => setCompanyProfile(snap.exists() ? snap.data() : null)),
+                    listenWithLog('obaveze', setObaveze as SetterFn),
+                    onSnapshot(doc(db, 'config', 'companyProfile'), (snap: DocumentSnapshot) => setCompanyProfile(snap.exists() ? snap.data() as CompanyProfile : null)),
                 ];
             } else {
                 auth.unsubsRef.current = [
-                    onSnapshot(doc(db, 'config', 'companyProfile'), (snap: DocumentSnapshot) => setCompanyProfile(snap.exists() ? snap.data() : null)),
+                    onSnapshot(doc(db, 'config', 'companyProfile'), (snap: DocumentSnapshot) => setCompanyProfile(snap.exists() ? snap.data() as CompanyProfile : null)),
                 ];
                 auth.setLastSync(new Date());
             }
@@ -341,10 +341,10 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
                 const elapsed = (Date.now() - new Date(saved.loginAt).getTime()) / 60000;
                 const maxDuration = auth.sessionConfig.sessionDuration || 60;
                 if (elapsed < maxDuration) {
-                    const restoredUser = u.find((usr) => usr.id === saved.userId);
+                    const restoredUser = u.find((usr) => (usr as User).id === saved.userId);
                     if (restoredUser) {
-                        console.log('[Session] Restored:', restoredUser.name, `(${Math.round(elapsed)}min ago)`);
-                        auth.handleUserLogin(restoredUser);
+                        console.log('[Session] Restored:', (restoredUser as User).name, `(${Math.round(elapsed)}min ago)`);
+                        auth.handleUserLogin(restoredUser as User);
                         return;
                     }
                 }
@@ -358,11 +358,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
                 const matchName = email.split('@')[0];
                 const matchedUser = u.find((usr) => (usr as User).username === matchName);
                 if (matchedUser) {
-                    await writeAuthMapping(fbAuth2.currentUser.uid, matchedUser);
-                    auth.handleUserLogin(matchedUser);
+                    await writeAuthMapping(fbAuth2.currentUser.uid, matchedUser as User);
+                    auth.handleUserLogin(matchedUser as User);
                     try {
                         await addDoc(collection(db, 'auditLog'), {
-                            id: genId(), action: 'LOGIN_SUCCESS', user: matchedUser.name || matchName,
+                            id: genId(), action: 'LOGIN_SUCCESS', user: (matchedUser as User).name || matchName,
                             userId: matchedUser.id, email, timestamp: new Date().toISOString(),
                             userAgent: navigator.userAgent.slice(0, 200),
                         });
@@ -416,13 +416,13 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
                     loadCol('obaveze'), loadCol('otpremnice'),
                 ]);
                 const tsSnap = await getDocs(query(collection(db, 'timesheets'), where('date', '>=', cutStr), limit(200)));
-                const ts = snapToArray(tsSnap);
-                setUsers(u); setProjects(p); setWorkers(w);
+                const ts = snapToArray<Timesheet>(tsSnap);
+                setUsers(u as User[]); setProjects(p as Project[]); setWorkers(w as Worker[]);
                 setTimesheets(prev => {
-                    const oldDocs = prev.filter((d) => ((d as BaseDoc & { date?: string }).date || '') < cutStr);
+                    const oldDocs = prev.filter((d) => ((d as Timesheet & { date?: string }).date || '') < cutStr);
                     return [...oldDocs, ...ts];
                 });
-                setInvoices(inv); setVehicles(veh); setSmjestaj(smj); setObaveze(ob); setOtpremnice(otp);
+                setInvoices(inv as Invoice[]); setVehicles(veh as Vehicle[]); setSmjestaj(smj as Smjestaj[]); setObaveze(ob as Obaveza[]); setOtpremnice(otp as Otpremnica[]);
                 auth.setLastSync(new Date());
             } catch (e) { console.error('[Polling] Refresh failed:', e); }
         };
@@ -441,28 +441,28 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     const loadAuditLog = useCallback(async () => {
         if (auditLogLoaded) return;
         const db = getDb(); if (!db) return;
-        try { const snap = await getDocs(collection(db, 'auditLog')); setAuditLog(snapToArray(snap)); setAuditLogLoaded(true); }
+        try { const snap = await getDocs(collection(db, 'auditLog')); setAuditLog(snapToArray<AuditEntry>(snap)); setAuditLogLoaded(true); }
         catch (e) { console.error('Failed to load auditLog:', e); }
     }, [auditLogLoaded]);
 
     const loadAllTimesheets = useCallback(async () => {
         if (allTimesheetsLoaded) return;
         const db = getDb(); if (!db) return;
-        try { const snap = await getDocs(collection(db, 'timesheets')); setTimesheets(snapToArray(snap)); setAllTimesheetsLoaded(true); }
+        try { const snap = await getDocs(collection(db, 'timesheets')); setTimesheets(snapToArray<Timesheet>(snap)); setAllTimesheetsLoaded(true); }
         catch (e) { console.error('Failed to load all timesheets:', e); }
     }, [allTimesheetsLoaded]);
 
     const loadDailyLogs = useCallback(async () => {
         if (dailyLogsLoaded) return;
         const db = getDb(); if (!db) return;
-        try { const snap = await getDocs(collection(db, 'dailyLogs')); setDailyLogs(snapToArray(snap)); setDailyLogsLoaded(true); }
+        try { const snap = await getDocs(collection(db, 'dailyLogs')); setDailyLogs(snapToArray<DailyLog>(snap)); setDailyLogsLoaded(true); }
         catch (e) { console.error('Failed to load dailyLogs:', e); }
     }, [dailyLogsLoaded]);
 
     const loadWeatherRules = useCallback(async () => {
         if (weatherRulesLoaded) return;
         const db = getDb(); if (!db) return;
-        try { const snap = await getDocs(collection(db, 'weatherRules')); setWeatherRules(snapToArray(snap)); setWeatherRulesLoaded(true); }
+        try { const snap = await getDocs(collection(db, 'weatherRules')); setWeatherRules(snapToArray<WeatherRule>(snap)); setWeatherRulesLoaded(true); }
         catch (e) { console.error('Failed to load weatherRules:', e); }
     }, [weatherRulesLoaded]);
 
@@ -471,7 +471,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         const db = getDb(); if (!db) return;
         try {
             const [tSnap, cSnap] = await Promise.all([getDocs(collection(db, 'safetyTemplates')), getDocs(collection(db, 'safetyChecklists'))]);
-            setSafetyTemplates(snapToArray(tSnap)); setSafetyChecklists(snapToArray(cSnap)); setSafetyLoaded(true);
+            setSafetyTemplates(snapToArray<SafetyTemplate>(tSnap)); setSafetyChecklists(snapToArray<SafetyChecklist>(cSnap)); setSafetyLoaded(true);
         } catch (e) { console.error('Failed to load safety data:', e); }
     }, [safetyLoaded]);
 
@@ -480,7 +480,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         const db = getDb(); if (!db) return;
         try {
             const [prodSnap, alertSnap] = await Promise.all([getDocs(collection(db, 'production')), getDocs(collection(db, 'prodAlerts'))]);
-            setProduction(snapToArray(prodSnap)); setProdAlerts(snapToArray(alertSnap)); setProductionLoaded(true);
+            setProduction(snapToArray<ProductionEntry>(prodSnap)); setProdAlerts(snapToArray<ProductionAlert>(alertSnap)); setProductionLoaded(true);
         } catch (e) { console.error('Failed to load production:', e); }
     }, [productionLoaded]);
 
