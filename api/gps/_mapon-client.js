@@ -115,34 +115,61 @@ export async function maponPost(endpoint, body = {}, keyType = 'core') {
     return result;
 }
 
-// ── Vehicle normalization ──
+// ── Vehicle normalization (Mapon FMLC format) ──
+// Mapon FMLC puts lat, lng, direction, speed, state directly on the unit object
 export function normalizeVehicle(unit) {
-    const pos = unit.last_position || unit.position || {};
     const now = Date.now();
-    const lastUpdate = pos.time ? new Date(pos.time).getTime() : 0;
+
+    // FMLC: lat/lng/speed/direction at root level
+    const lat = unit.lat || unit.latitude || 0;
+    const lng = unit.lng || unit.longitude || 0;
+    const speed = unit.speed || 0;
+    const heading = unit.direction || unit.heading || 0;
+
+    // FMLC: last_update at root, or fallback to nested
+    const lastUpdateStr = unit.last_update || unit.lastUpdate
+        || unit.last_position?.time || new Date().toISOString();
+    const lastUpdate = new Date(lastUpdateStr).getTime();
     const ageSec = lastUpdate ? Math.round((now - lastUpdate) / 1000) : 99999;
 
+    // FMLC: state.name = 'driving' | 'standing' | 'stopped' | 'idling' | 'offline'
+    const stateName = unit.state?.name || unit.movement_state?.name || '';
     let status = 'offline';
-    if (ageSec < 300) {
-        if ((pos.speed || 0) > 3) status = 'moving';
-        else if (unit.ignition || pos.ignition) status = 'idle';
+    if (lat === 0 && lng === 0) {
+        status = 'offline';
+    } else if (ageSec < 600) {
+        if (stateName === 'driving' || speed > 3) status = 'moving';
+        else if (stateName === 'idling') status = 'idle';
+        else if (stateName === 'standing' || stateName === 'stopped') status = 'stopped';
         else status = 'stopped';
     }
 
+    // Extract plate from number field (format: "DJ-708-CT Živić Antun" → "DJ-708-CT")
+    const number = unit.number || '';
+    const plateParts = number.match(/^([A-Z]{1,3}-\d{2,4}-[A-Z]{1,3})/);
+    const plate = plateParts ? plateParts[1] : (unit.vehicle_registration || unit.plate || '');
+
+    // Extract driver name from number field (after plate)
+    const driverFromNumber = plateParts ? number.replace(plateParts[1], '').trim() : '';
+
     return {
         id: String(unit.unit_id || unit.id),
-        name: unit.number || unit.name || `Unit ${unit.unit_id}`,
-        plate: unit.vehicle_registration || unit.plate || '',
-        lat: pos.lat || pos.latitude || 0,
-        lng: pos.lng || pos.longitude || 0,
-        speed: Math.round(pos.speed || 0),
-        heading: Math.round(pos.direction || pos.heading || 0),
-        ignition: Boolean(unit.ignition || pos.ignition),
+        name: unit.label || unit.number || unit.name || `Unit ${unit.unit_id}`,
+        plate,
+        lat, lng,
+        speed: Math.round(speed),
+        heading: Math.round(heading),
+        ignition: Boolean(unit.ignition),
         status,
-        address: pos.address || null,
-        driverName: unit.driver_name || unit.driver || null,
-        lastUpdate: pos.time || new Date().toISOString(),
+        address: unit.address || null,
+        driverName: unit.driver_name || driverFromNumber || null,
+        lastUpdate: lastUpdateStr,
         group: unit.group_name || unit.group || null,
+        mileage: unit.mileage ? Math.round(unit.mileage / 1000) : null, // m → km
+        type: unit.type || unit.icon || 'car',
+        vin: unit.vin || null,
+        fuelType: unit.fuel_type || null,
+        engineHoursTotal: unit.ignition_total_time || null,
     };
 }
 

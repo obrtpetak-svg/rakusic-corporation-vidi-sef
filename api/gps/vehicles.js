@@ -16,7 +16,9 @@ export default async function handler(req, res) {
 
         // Call Mapon unit/list
         const data = await maponGet('unit/list.json');
-        const units = data?.data?.units || data?.units || [];
+        // FMLC returns units as an object keyed by unit_id, or sometimes as array
+        const rawUnits = data?.data?.units || data?.units || {};
+        const units = Array.isArray(rawUnits) ? rawUnits : Object.values(rawUnits);
 
         // Normalize all vehicles
         const vehiclesMap = {};
