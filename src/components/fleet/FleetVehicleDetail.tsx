@@ -83,6 +83,40 @@ export default function FleetVehicleDetail({ vehicle, onBack }: {
             .finally(() => setIgnLoading(false));
     }, [vehicle.id]);
 
+    // ── Reverse geocoding for address ──
+    const [resolvedAddress, setResolvedAddress] = useState<string | null>(vehicle.address);
+
+    useEffect(() => {
+        if (vehicle.address) { setResolvedAddress(vehicle.address); return; }
+        if (!vehicle.lat || !vehicle.lng || (vehicle.lat === 0 && vehicle.lng === 0)) {
+            setResolvedAddress(null);
+            return;
+        }
+
+        // Use Nominatim (OpenStreetMap) for reverse geocoding — free, no key needed
+        const controller = new AbortController();
+        fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${vehicle.lat}&lon=${vehicle.lng}&zoom=18&addressdetails=1&accept-language=hr`,
+            { signal: controller.signal, headers: { 'User-Agent': 'RAKUSIC-Fleet/1.0' } }
+        )
+            .then(r => r.json())
+            .then(data => {
+                if (data?.display_name) {
+                    // Shorten: take first 3 parts of the display name
+                    const parts = data.display_name.split(', ');
+                    const short = parts.slice(0, 3).join(', ');
+                    setResolvedAddress(short);
+                } else {
+                    setResolvedAddress(`${vehicle.lat.toFixed(5)}, ${vehicle.lng.toFixed(5)}`);
+                }
+            })
+            .catch(() => {
+                setResolvedAddress(`${vehicle.lat.toFixed(5)}, ${vehicle.lng.toFixed(5)}`);
+            });
+
+        return () => controller.abort();
+    }, [vehicle.id, vehicle.lat, vehicle.lng, vehicle.address]);
+
     const totalEngineHours = ignitions.reduce((sum, i) => sum + i.durationMin, 0);
 
     return (
@@ -112,8 +146,11 @@ export default function FleetVehicleDetail({ vehicle, onBack }: {
                         <InfoRow icon="👷" label="Vozač" value={vehicle.driverName || '—'} />
                         <InfoRow icon="🔑" label="Motor" value={vehicle.ignition ? '✅ Pali' : '❌ Ugašen'} />
                         <div style={{ gridColumn: '1 / -1' }}>
-                            <InfoRow icon="📍" label="Lokacija" value={vehicle.address || 'Nepoznato'} />
+                            <InfoRow icon="📍" label="Lokacija" value={resolvedAddress || (vehicle.lat ? `${vehicle.lat.toFixed(5)}, ${vehicle.lng.toFixed(5)}` : 'Nepoznato')} />
                         </div>
+                        {(vehicle as any).mileage && (
+                            <InfoRow icon="🛣️" label="Kilometri" value={`${((vehicle as any).mileage).toLocaleString()} km`} />
+                        )}
                         <div style={{ gridColumn: '1 / -1' }}>
                             <InfoRow icon="⏱️" label="Zadnje ažuriranje" value={new Date(vehicle.lastUpdate).toLocaleString('hr')} />
                         </div>
