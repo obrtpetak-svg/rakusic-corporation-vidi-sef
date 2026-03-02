@@ -39,6 +39,7 @@ const QrCheckInPage = lazy(() => import('./QrCheckIn').then(m => ({ default: m.Q
 const QrAdminPage = lazy(() => import('./QrCheckIn').then(m => ({ default: m.QrAdminPage })));
 const LeaveTrackerPage = lazy(() => import('./LeaveTracker').then(m => ({ default: m.LeaveTracker })));
 const ProizvodnyaPage = lazy(() => import('./ProizvodnyaPage').then(m => ({ default: m.ProizvodnyaPage })));
+const FleetDashboard = lazy(() => import('./fleet/FleetDashboard'));
 
 
 const SkeletonBlock = ({ w = '100%', h = 16, r = 8, style = {} }) => (
@@ -351,6 +352,7 @@ export function Layout() {
         { id: 'izvjestaji', icon: 'report', label: 'Izvještaji' },
         { id: 'kalendar', icon: 'calendar', label: 'Kalendar' },
         { id: 'gps', icon: 'location', label: 'GPS Nadzor' },
+        { id: 'gps-vozila', icon: 'car', label: 'GPS Vozila' },
         { id: 'vozila', icon: 'car', label: 'Vozila' },
         { id: 'smjestaj', icon: 'home', label: 'Smještaj' },
         { id: 'dnevnik', icon: 'file', label: 'Dnevnik' },
@@ -406,6 +408,7 @@ export function Layout() {
         { id: 'otpremnice', icon: 'file', label: 'Otpremnice' },
         { id: 'obavijesti', icon: 'bell', label: 'Obavijesti', badge: leaderPendingCount },
         { id: 'obaveze', icon: 'check', label: 'Obaveze' },
+        { id: 'gps-vozila', icon: 'car', label: 'GPS Vozila' },
         { id: 'vozila', icon: 'car', label: 'Vozila' },
         { id: 'smjestaj', icon: 'home', label: 'Smještaj' },
         { id: 'dnevnik', icon: 'file', label: 'Dnevnik' },
@@ -447,6 +450,7 @@ export function Layout() {
                 case 'izvjestaji': return <ReportsPage />;
                 case 'kalendar': return <KalendarPage />;
                 case 'gps': return <GpsAdminPanel />;
+                case 'gps-vozila': return <FleetDashboard />;
                 case 'vozila': return <VozilaPage />;
                 case 'smjestaj': return <SmjestajPage />;
                 case 'obaveze': return <ObavezePage />;
@@ -477,6 +481,7 @@ export function Layout() {
                 case 'vozila': return <VozilaPage leaderProjectIds={leaderProjectIds} leaderWorkerIds={leaderWorkerIds} />;
                 case 'smjestaj': return <SmjestajPage leaderProjectIds={leaderProjectIds} leaderWorkerIds={leaderWorkerIds} />;
                 case 'gps': return <GpsAdminPanel leaderProjectIds={leaderProjectIds} />;
+                case 'gps-vozila': return <FleetDashboard />;
                 case 'dnevnik': return <DailyLogPage leaderProjectIds={leaderProjectIds} />;
                 case 'vrijeme': return <WeatherPage leaderProjectIds={leaderProjectIds} />;
                 case 'sigurnost': return <SafetyChecklistPage leaderProjectIds={leaderProjectIds} />;
