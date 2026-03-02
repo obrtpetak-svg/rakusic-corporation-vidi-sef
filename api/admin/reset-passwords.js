@@ -1,24 +1,5 @@
 // ── Admin: Reset All User Passwords (Emergency) ──
 // Uses a secret key since Firebase Auth login may be broken.
-// Matches the exact firebase-admin init pattern from _mapon-client.js
-
-let _admin = null;
-async function getAdmin() {
-    if (_admin) return _admin;
-    try {
-        const { default: admin } = await import('firebase-admin');
-        if (!admin.apps.length) {
-            admin.initializeApp({
-                credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || '{}')),
-            });
-        }
-        _admin = admin;
-        return admin;
-    } catch (e) {
-        console.error('[Admin Reset] Firebase init error:', e.message);
-        return null;
-    }
-}
 
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -34,21 +15,30 @@ export default async function handler(req, res) {
         return res.status(403).json({ error: 'Invalid admin secret' });
     }
 
-    try {
-        const newPassword = req.body?.newPassword;
-        if (!newPassword || newPassword.length < 6) {
-            return res.status(400).json({ error: 'newPassword required (min 6 chars)' });
-        }
+    const newPassword = req.body?.newPassword;
+    if (!newPassword || newPassword.length < 6) {
+        return res.status(400).json({ error: 'newPassword required (min 6 chars)' });
+    }
 
-        const admin = await getAdmin();
-        if (!admin) {
-            return res.status(500).json({ error: 'Firebase Admin SDK failed to initialize' });
+    // Check env var
+    const sa = process.env.FIREBASE_SERVICE_ACCOUNT;
+    if (!sa) {
+        return res.status(500).json({ error: 'FIREBASE_SERVICE_ACCOUNT env var not set', envKeys: Object.keys(process.env).filter(k => k.includes('FIRE')) });
+    }
+
+    try {
+        const { default: admin } = await import('firebase-admin');
+
+        if (!admin.apps.length) {
+            const parsed = JSON.parse(sa);
+            admin.initializeApp({
+                credential: admin.credential.cert(parsed),
+            });
         }
 
         const auth = admin.auth();
         const updated = [];
         const failed = [];
-
         const listResult = await auth.listUsers(1000);
 
         for (const user of listResult.users) {
@@ -68,7 +58,10 @@ export default async function handler(req, res) {
         });
 
     } catch (err) {
-        console.error('[Admin Reset] Error:', err);
-        return res.status(500).json({ error: err.message });
+        return res.status(500).json({
+            error: 'Init/reset failed',
+            detail: err.message,
+            stack: err.stack?.split('\n').slice(0, 5),
+        });
     }
 }
