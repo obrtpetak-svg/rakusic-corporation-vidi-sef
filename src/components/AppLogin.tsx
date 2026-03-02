@@ -28,12 +28,17 @@ export function AppLogin() {
             if (!result) setError('Pogrešno korisničko ime ili lozinka.');
         } catch (err: unknown) {
             const code = (err as { code?: string })?.code || '';
+            const msg = (err as { message?: string })?.message || '';
+            console.error('[Login] Error:', code, msg);
             if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
                 setError('Pogrešno korisničko ime ili lozinka.');
             } else if (code === 'auth/too-many-requests') {
-                setError('Previše pokušaja. Pokušajte za nekoliko minuta.');
+                setError('Previše pokušaja prijave. Pričekajte 5 minuta pa pokušajte ponovno.');
+            } else if (code === 'auth/network-request-failed') {
+                setError('Nema internetske veze. Provjerite mrežu.');
             } else {
-                setError('Greška pri prijavi. Pokušajte ponovno.');
+                // Show actual error for debugging
+                setError(`Firebase greška: ${code || msg || 'Nepoznata greška'}`);
             }
             // 🔒 Audit: failed login attempt
             try {
