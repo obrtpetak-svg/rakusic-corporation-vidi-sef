@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
 import { useApp } from '../context/AppContext';
-import { Icon, SvgBarChart, SvgLineChart, SvgDonutChart, useIsMobile } from './ui/SharedComponents';
+import { SvgLineChart, SvgDonutChart, useIsMobile } from './ui/SharedComponents';
 import { C, styles, fmtDate, diffMins, today } from '../utils/helpers';
 
 const TABS = [

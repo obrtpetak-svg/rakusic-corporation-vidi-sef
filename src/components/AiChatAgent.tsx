@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { C, styles, diffMins, fmtDate, isDarkTheme } from '../utils/helpers';
+import { styles, diffMins } from '../utils/helpers';
 import { useIsMobile } from './ui/SharedComponents';
 
 // Build context from app data for the AI

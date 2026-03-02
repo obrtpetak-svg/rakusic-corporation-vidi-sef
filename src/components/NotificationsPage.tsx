@@ -1,11 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, memo } from 'react';
 import { useConfirm } from './ui/ConfirmModal';
 import { useApp, update as updateDoc, remove as removeDoc } from '../context/AppContext';
 import { Icon, StatusBadge, Pagination, usePagination, useIsMobile } from './ui/SharedComponents';
 import { C, styles, genId, fmtDate, fmtDateTime, diffMins } from '../utils/helpers';
 
 // ── Notification Item Card ───────────────────────────────────────────────
-const NotifItem = React.memo(({ icon, iconColor, iconBg, title, subtitle, detail, attachment, onApprove, onReject, approveLabel = 'Odobri', rejectLabel = 'Odbij', selected, onToggle }) => (
+const NotifItem = memo(({ icon, iconColor, iconBg, title, subtitle, detail, attachment, onApprove, onReject, approveLabel = 'Odobri', rejectLabel = 'Odbij', selected, onToggle }) => (
     <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '14px 0', borderBottom: '1px solid var(--divider)',
@@ -55,7 +55,7 @@ const NotifItem = React.memo(({ icon, iconColor, iconBg, title, subtitle, detail
 ));
 
 // ── Section Header ───────────────────────────────────────────────────────
-const SectionHeader = React.memo(({ icon, iconColor, iconBg, title, count }) => (
+const SectionHeader = memo(({ icon, iconColor, iconBg, title, count }) => (
     <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{
             width: 30, height: 30, borderRadius: 8,

@@ -2,7 +2,7 @@
 // GPS Vozila — Fleet Dashboard (Orchestrator)
 // Enterprise GPS Fleet tracking with Mapon FMLC integration
 // ═══════════════════════════════════════════════════════
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useIsMobile } from '../ui/SharedComponents';
 import { C, styles } from '../../utils/helpers';

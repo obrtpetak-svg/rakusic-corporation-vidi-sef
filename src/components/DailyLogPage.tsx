@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useConfirm } from './ui/ConfirmModal';
 import { useApp, add as addDoc, update as updateDoc } from '../context/AppContext';
-import { Icon, Modal, Field, Input, Textarea, Select, StatusBadge, Pagination, usePagination, useIsMobile, useToast } from './ui/SharedComponents';
+import { Icon, Modal, Field, Input, Textarea, Select, Pagination, usePagination, useIsMobile, useToast } from './ui/SharedComponents';
 import { C, styles, genId, today, fmtDate, compressImage, uploadToStorage } from '../utils/helpers';
 
 // WMO Weather Code → Croatian weather name mapping

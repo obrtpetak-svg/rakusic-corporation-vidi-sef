@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { C, styles, hexToRgb } from '../../utils/helpers';
 
 // ── Icon Paths ───────────────────────────────────────────────────────────
@@ -69,7 +70,7 @@ export const Textarea = (props) => <textarea {...props} rows={props.rows || 3} c
 export const Select = ({ children, ...rest }) => <select {...rest} className={`form-select ${rest.className || ''}`}>{children}</select>;
 
 // ── StatusBadge (dynamic RGB — stays inline) ─────────────────────────────
-export const StatusBadge = React.memo(({ status }) => {
+export const StatusBadge = memo(({ status }) => {
     const map = {
         aktivan: ['34,197,94', 'AKTIVAN'], pausa: ['234,179,8', 'PAUZA'],
         'završen': ['100,116,139', 'ZAVRŠEN'], planiran: ['59,130,246', 'PLANIRAN'],
@@ -85,7 +86,7 @@ export const StatusBadge = React.memo(({ status }) => {
 });
 
 // ── StatCard ─────────────────────────────────────────────────────────────
-export const StatCard = React.memo(({ label, value, icon, color = C.accent, sub }) => (
+export const StatCard = memo(({ label, value, icon, color = C.accent, sub }) => (
     <div className="stat-card">
         <div className="stat-icon" style={{ background: `rgba(${hexToRgb(color)},0.15)`, color }}>
             <Icon name={icon} size={24} />

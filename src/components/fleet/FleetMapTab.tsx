@@ -2,7 +2,7 @@
 // Fleet Map Tab — Live vehicle tracking map
 // Uses Leaflet with OpenStreetMap tiles
 // ═══════════════════════════════════════════════════════
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { C, styles } from '../../utils/helpers';
 import { useIsMobile } from '../ui/SharedComponents';
 import type { FleetVehicle } from './FleetDashboard';

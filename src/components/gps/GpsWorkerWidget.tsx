@@ -2,7 +2,7 @@
 // GPS Worker Widget — Floating GPS status for worker panel
 // Shows distance from site, time on site, GPS status
 // ═══════════════════════════════════════════════════════
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { C, styles } from '../../utils/helpers';
 import { formatDistance, timeAgo } from '../../services/GpsSettingsManager';
 import { haversine } from '../../services/GeofenceEngine';

@@ -2,7 +2,7 @@
 // GPS Playback Tab — Historical route replay on map
 // Select worker + date → animated path with controls
 // ═══════════════════════════════════════════════════════
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { C, styles } from '../../utils/helpers';
 import { formatDistance, timeAgo, EVENT_LABELS } from '../../services/GpsSettingsManager';
 import { haversine } from '../../services/GeofenceEngine';

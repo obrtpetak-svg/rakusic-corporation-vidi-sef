@@ -2,7 +2,7 @@
 // GPS Map Tab — Live map with Leaflet
 // Worker markers + geofence circles + project filter
 // ═══════════════════════════════════════════════════════
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { C, styles } from '../../utils/helpers';
 import { formatDistance, timeAgo } from '../../services/GpsSettingsManager';
 import { Icon } from '../ui/SharedComponents';
