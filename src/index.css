@@ -1770,6 +1770,96 @@ a,
   font-family: var(--font-mono);
 }
 
+/* ═══ UTILITY CLASSES (extracted from inline styles — Faza 6) ═══ */
+
+/* Section label — category/tag text (36× inline) */
+.u-section-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* Section title — card/panel heading (30× inline) */
+.u-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+/* Hint text — small muted annotation (22× inline) */
+.u-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Card section wrapper (22× inline) */
+.u-card-section {
+  background: var(--card);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+}
+
+/* Card header with title + action (11× inline) */
+.u-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* Form actions row — right-aligned buttons (14× inline) */
+.u-form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+/* Responsive 2-col grid (13× inline) */
+.u-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 767px) {
+  .u-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Big stat number (12× inline) */
+.u-stat-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+/* Full-width table (11× inline) */
+.u-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Flex row with spacing between items */
+.u-flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Overflow-x auto for table scroll */
+.u-scroll-x {
+  overflow-x: auto;
+}
+
 /* Smooth theme transition for all elements */
 *,
 *::before,
