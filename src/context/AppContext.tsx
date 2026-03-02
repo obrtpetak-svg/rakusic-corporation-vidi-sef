@@ -432,24 +432,26 @@ export function AppProvider({ children }) {
 
             // Load users first (needed for PIN migration + step flow decisions)
             // The realtime listener will take over right after for live updates.
-            const [u, inv, veh, smj, otp, cp] = await Promise.all([
+
+            // ── Batch 1: CRITICAL — must succeed for app to boot ──
+            const [u, cp] = await Promise.all([
                 loadCol('users'),
-                loadCol('invoices'), loadCol('vehicles'),
-                loadCol('smjestaj'), loadCol('otpremnice'),
                 loadDoc('config', 'companyProfile'),
             ]);
-
-            // Set initial data
             setUsers(u);
-            setInvoices(inv); setVehicles(veh);
-            setSmjestaj(smj); setOtpremnice(otp);
             setCompanyProfile(cp);
 
-            // Load production separately (may not have Firestore rules yet)
-            try { const prod = await loadCol('production'); setProduction(prod); }
-            catch (e) { console.warn('[AppContext] production collection not available:', e); }
-            try { const pa = await loadCol('prodAlerts'); setProdAlerts(pa); }
-            catch (e) { console.warn('[AppContext] prodAlerts collection not available:', e); }
+            // ── Batch 2: RESILIENT — app works even if these fail ──
+            const batch2 = await Promise.allSettled([
+                loadCol('invoices').then(d => { setInvoices(d); return d; }),
+                loadCol('vehicles').then(d => { setVehicles(d); return d; }),
+                loadCol('smjestaj').then(d => { setSmjestaj(d); return d; }),
+                loadCol('otpremnice').then(d => { setOtpremnice(d); return d; }),
+            ]);
+            const batch2Failed = batch2.filter(r => r.status === 'rejected');
+            if (batch2Failed.length > 0) {
+                console.warn(`[Boot] ${batch2Failed.length} secondary collections failed — will retry via listeners`);
+            }
 
             // One-time PIN migration: hash any plain-text PINs to hash('1234')
             const isHashed = (pin) => /^[a-f0-9]{64}$/.test(pin);
@@ -600,27 +602,14 @@ export function AppProvider({ children }) {
 
         let firebaseUser = null;
 
-        // Strategy: Try CREATE first (first-time migration), then SIGN IN
+        // Sign in only — no auto-create (admin creates users)
         try {
-            const cred = await auth.createUserWithEmailAndPassword(email, passwordWrapped);
-            console.log('[Auth] Created new Firebase user:', email);
+            const cred = await auth.signInWithEmailAndPassword(email, passwordWrapped);
+            console.log('[Auth] Sign-in OK:', email);
             firebaseUser = cred.user;
-        } catch (createErr) {
-            // Account already exists → sign in
-            if (createErr.code === 'auth/email-already-in-use') {
-                try {
-                    const cred = await auth.signInWithEmailAndPassword(email, passwordWrapped);
-                    console.log('[Auth] Sign-in OK:', email);
-                    firebaseUser = cred.user;
-                } catch (signInErr) {
-                    console.error('[Auth] Sign-in failed:', signInErr.code);
-                    // Wrong password for existing account
-                    throw signInErr;
-                }
-            } else {
-                console.error('[Auth] Create failed:', createErr.code, createErr.message);
-                throw createErr;
-            }
+        } catch (signInErr: any) {
+            console.error('[Auth] Sign-in failed:', signInErr.code);
+            throw signInErr;
         }
 
         if (!firebaseUser) return null;

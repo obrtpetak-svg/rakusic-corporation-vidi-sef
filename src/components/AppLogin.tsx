@@ -21,6 +21,7 @@ export function AppLogin() {
 
     const submit = async () => {
         if (!username.trim() || !password.trim()) { setError('Unesite korisničko ime i lozinku.'); return; }
+        if (password.trim().length < 6) { setError('Lozinka mora imati najmanje 6 znakova.'); return; }
         setLoading(true); setError('');
         try {
             const result = await handleFirebaseLogin(username.trim(), password.trim());
