@@ -34,6 +34,16 @@ export function AppLogin() {
             } else {
                 setError('Greška pri prijavi. Pokušajte ponovno.');
             }
+            // 🔒 Audit: failed login attempt
+            try {
+                const fb = (window as any).firebase;
+                if (fb?.firestore) {
+                    fb.firestore().collection('auditLog').add({
+                        action: 'LOGIN_FAILED', user: username.trim(), reason: code || 'unknown',
+                        timestamp: new Date().toISOString(), userAgent: navigator.userAgent.slice(0, 200),
+                    });
+                }
+            } catch (e) { /* ignore */ }
         }
         setLoading(false);
     };
