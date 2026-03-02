@@ -217,13 +217,41 @@ function getBuiltInConfig() {
     };
 }
 
-// ── Collection names ─────────────────────────────────────────────────────
 const COL = {
     users: 'users', workers: 'workers', projects: 'projects',
     timesheets: 'timesheets', invoices: 'invoices', vehicles: 'vehicles',
     smjestaj: 'smjestaj', obaveze: 'obaveze', otpremnice: 'otpremnice',
     production: 'production', auditLog: 'auditLog',
 };
+
+// ── Clear stale Firestore/Firebase cache ─────────────────────────────────
+// Called when boot fails due to permission or offline errors
+function clearStaleCache() {
+    try {
+        // Clear session data (but keep Firebase config!)
+        localStorage.removeItem('vidime-app-login');
+        localStorage.removeItem('vidime-session');
+        sessionStorage.clear();
+        // Clear ALL IndexedDB databases (Firestore offline cache + Firebase auth)
+        if (window.indexedDB) {
+            if (typeof indexedDB.databases === 'function') {
+                indexedDB.databases().then(dbs => dbs.forEach(db => {
+                    if (db.name) indexedDB.deleteDatabase(db.name);
+                }));
+            }
+            // Known Firebase database names (fallback)
+            ['firebaseLocalStorageDb', 'firestore/[DEFAULT]/rakusic-corporation-vidi-sef/main',
+                'firebase-heartbeat-database', 'firebase-installations-database'].forEach(name => {
+                    try { indexedDB.deleteDatabase(name); } catch { }
+                });
+        }
+        // Clear service worker caches
+        if ('caches' in window) {
+            caches.keys().then(names => names.forEach(n => caches.delete(n)));
+        }
+        console.log('[ClearCache] Stale cache cleared');
+    } catch (e) { console.warn('[ClearCache] Error:', e); }
+}
 
 // ── AppProvider ──────────────────────────────────────────────────────────
 export function AppProvider({ children }) {
@@ -338,7 +366,15 @@ export function AppProvider({ children }) {
                                 console.log('[Boot] App Check activated (debug mode)');
                             }
                         } catch (e) { console.warn('[Boot] App Check not available:', e); }
-                        await initFirebaseAndLoad(config);
+                        try {
+                            await initFirebaseAndLoad(config);
+                        } catch (bootErr: any) {
+                            console.error('[Boot] Session restore failed:', bootErr.message);
+                            // Stale session or permission error — clear everything and go to login
+                            clearStaleCache();
+                            try { auth.signOut(); } catch { }
+                            setStep('appLogin');
+                        }
                         return;
                     }
                 }
@@ -562,10 +598,16 @@ export function AppProvider({ children }) {
                 clearSession(); // expired or user not found
             }
             setStep('appLogin');
-        } catch (err) {
+        } catch (err: any) {
             console.error('[AppContext] Firebase load error:', err);
+            // On permission-denied or offline errors, clear stale cache and go to login
+            if (err.code === 'permission-denied' || err.message?.includes('permission') || err.message?.includes('offline')) {
+                console.warn('[AppContext] Clearing stale cache due to auth/permission error');
+                clearStaleCache();
+                try { const a = getAuth(); if (a) a.signOut(); } catch { }
+            }
             setLoadError(err.message);
-            setStep('firebaseConfig');
+            setStep('appLogin'); // Go to login, NOT firebaseConfig
         }
     };
 
