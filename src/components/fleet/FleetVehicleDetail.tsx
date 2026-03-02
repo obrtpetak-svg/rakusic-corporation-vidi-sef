@@ -70,17 +70,26 @@ export default function FleetVehicleDetail({ vehicle, onBack }: {
         const from = new Date(Date.now() - 3 * 86400000).toISOString();
         const to = new Date().toISOString();
         setIgnLoading(true);
-        fetch(`/api/gps/ignitions?vehicleId=${vehicle.id}&from=${from}&to=${to}`)
-            .then(r => r.json())
-            .then(data => {
+
+        (async () => {
+            try {
+                const fbAuth = (window as any).firebase?.auth?.();
+                const user = fbAuth?.currentUser;
+                const token = user ? await user.getIdToken() : null;
+                if (!token) return;
+
+                const r = await fetch(`/api/gps/ignitions?vehicleId=${vehicle.id}&from=${from}&to=${to}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                const data = await r.json();
                 if (data.sessions?.length > 0) {
                     setIgnitions(data.sessions.map((s: any) => ({
                         start: s.start, end: s.end, durationMin: s.durationMin,
                     })));
                 }
-            })
-            .catch(() => { /* keep mock data */ })
-            .finally(() => setIgnLoading(false));
+            } catch { /* keep mock data */ }
+            finally { setIgnLoading(false); }
+        })();
     }, [vehicle.id]);
 
     // ── Reverse geocoding for address ──

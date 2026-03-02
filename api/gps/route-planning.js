@@ -2,11 +2,14 @@
 // POST /api/gps/route-planning — Route Planning workflows
 // Orders CRUD, route create/optimize/send
 // ═══════════════════════════════════════════════════════
-import { maponGet, maponPost, corsHeaders } from './_mapon-client.js';
+import { maponGet, maponPost, corsHeaders, verifyAuth } from './_mapon-client.js';
 
 export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).json({});
-    Object.entries(corsHeaders()).forEach(([k, v]) => res.setHeader(k, v));
+    Object.entries(corsHeaders(req)).forEach(([k, v]) => res.setHeader(k, v));
+
+    const authUser = await verifyAuth(req);
+    if (!authUser) return res.status(401).json({ error: 'Unauthorized' });
 
     const { action } = req.query;
 

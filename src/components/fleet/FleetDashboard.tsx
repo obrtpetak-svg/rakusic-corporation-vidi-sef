@@ -73,23 +73,32 @@ export default function FleetDashboard() {
     });
 
     useEffect(() => {
-        // Primary: fetch from API directly (always works)
-        const fetchVehicles = () => {
-            fetch('/api/gps/vehicles')
-                .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
-                .then(data => {
-                    if (data?.vehicles && Object.keys(data.vehicles).length > 0) {
-                        setCacheDoc({
-                            updatedAt: data.updatedAt || new Date().toISOString(),
-                            dataAgeSeconds: data.dataAgeSeconds || 0,
-                            providerStatus: data.providerStatus || 'OK',
-                            dataSource: data.dataSource || 'poll',
-                            vehicleCount: data.vehicleCount || Object.keys(data.vehicles).length,
-                            vehicles: data.vehicles,
-                        });
-                    }
-                })
-                .catch(err => console.warn('[Fleet] API fetch failed:', err.message));
+        // Primary: fetch from API with auth token
+        const fetchVehicles = async () => {
+            try {
+                const fbAuth = (window as any).firebase?.auth?.();
+                const user = fbAuth?.currentUser;
+                const token = user ? await user.getIdToken() : null;
+                if (!token) { console.warn('[Fleet] No auth token available'); return; }
+
+                const r = await fetch('/api/gps/vehicles', {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                const data = await r.json();
+                if (data?.vehicles && Object.keys(data.vehicles).length > 0) {
+                    setCacheDoc({
+                        updatedAt: data.updatedAt || new Date().toISOString(),
+                        dataAgeSeconds: data.dataAgeSeconds || 0,
+                        providerStatus: data.providerStatus || 'OK',
+                        dataSource: data.dataSource || 'poll',
+                        vehicleCount: data.vehicleCount || Object.keys(data.vehicles).length,
+                        vehicles: data.vehicles,
+                    });
+                }
+            } catch (err: any) {
+                console.warn('[Fleet] API fetch failed:', err.message);
+            }
         };
 
         fetchVehicles(); // immediate

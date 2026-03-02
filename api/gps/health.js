@@ -5,7 +5,7 @@ import { corsHeaders } from './_mapon-client.js';
 
 export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).json({});
-    Object.entries(corsHeaders()).forEach(([k, v]) => res.setHeader(k, v));
+    Object.entries(corsHeaders(req)).forEach(([k, v]) => res.setHeader(k, v));
 
     try {
         let cacheStatus = { status: 'unknown', lastSync: null, vehicleCount: 0, providerStatus: 'UNKNOWN' };
@@ -32,29 +32,13 @@ export default async function handler(req, res) {
             }
         } catch (fbErr) {
             cacheStatus.status = 'ERROR';
-            cacheStatus.error = fbErr.message;
         }
-
-        // Environment check
-        const envCheck = {
-            maponApiKey: !!process.env.MAPON_API_KEY,
-            maponDataForwardKey: !!process.env.MAPON_DATA_FORWARD_KEY,
-            maponIngestToken: !!process.env.MAPON_INGEST_TOKEN,
-            firebaseServiceAccount: !!process.env.FIREBASE_SERVICE_ACCOUNT,
-        };
 
         return res.status(200).json({
             service: 'gps-fleet',
+            status: cacheStatus.status,
             timestamp: new Date().toISOString(),
-            cache: cacheStatus,
-            env: envCheck,
-            endpoints: {
-                vehicles: '/api/gps/vehicles',
-                ingest: '/api/gps/ingest',
-                routes: '/api/gps/routes',
-                health: '/api/gps/health',
-                dataForward: '/api/gps/data-forward',
-            },
+            vehicleCount: cacheStatus.vehicleCount,
         });
     } catch (err) {
         return res.status(500).json({ status: 'ERROR', error: err.message });

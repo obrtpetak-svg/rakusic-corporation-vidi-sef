@@ -173,12 +173,60 @@ export function normalizeVehicle(unit) {
     };
 }
 
-// CORS helper
-export function corsHeaders() {
+// ── Auth middleware — verify Firebase ID token ──
+let _authAdmin = null;
+async function getAuthAdmin() {
+    if (_authAdmin) return _authAdmin;
+    try {
+        const { default: admin } = await import('firebase-admin');
+        if (!admin.apps.length) {
+            admin.initializeApp({
+                credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || '{}')),
+            });
+        }
+        _authAdmin = admin;
+        return admin;
+    } catch {
+        return null;
+    }
+}
+
+export async function verifyAuth(req) {
+    const authHeader = req.headers.authorization || '';
+    if (!authHeader.startsWith('Bearer ')) return null;
+    const token = authHeader.slice(7);
+    if (!token) return null;
+
+    try {
+        const admin = await getAuthAdmin();
+        if (!admin) return null;
+        const decoded = await admin.auth().verifyIdToken(token);
+        return decoded; // { uid, email, ... }
+    } catch (err) {
+        console.warn(JSON.stringify({
+            level: 'warn', action: 'auth_verify_failed',
+            error: err.message,
+            ip: req.headers['x-forwarded-for'] || req.socket?.remoteAddress,
+        }));
+        return null;
+    }
+}
+
+// CORS helper — locked to production domain
+const ALLOWED_ORIGINS = [
+    'https://rakusic-corporation.live',
+    'http://localhost:5173', // local dev
+    'http://localhost:3000',
+];
+
+export function corsHeaders(req) {
+    const origin = req?.headers?.origin || '';
+    const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
     return {
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': allowedOrigin,
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Credentials': 'true',
         'Content-Type': 'application/json',
     };
 }

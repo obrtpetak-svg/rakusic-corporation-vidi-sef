@@ -2,11 +2,14 @@
 // POST /api/gps/data-forward — Setup/manage Mapon Data Forwarding
 // Only admin should call this (RBAC enforced by frontend)
 // ═══════════════════════════════════════════════════════
-import { maponGet, maponPost, corsHeaders } from './_mapon-client.js';
+import { maponGet, maponPost, corsHeaders, verifyAuth } from './_mapon-client.js';
 
 export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).json({});
-    Object.entries(corsHeaders()).forEach(([k, v]) => res.setHeader(k, v));
+    Object.entries(corsHeaders(req)).forEach(([k, v]) => res.setHeader(k, v));
+
+    const authUser = await verifyAuth(req);
+    if (!authUser) return res.status(401).json({ error: 'Unauthorized' });
 
     try {
         const { action } = req.query;

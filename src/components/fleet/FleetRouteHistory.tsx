@@ -39,7 +39,14 @@ export default function FleetRouteHistory({ vehicles }: { vehicles: FleetVehicle
         setPlaying(false);
 
         try {
-            const res = await fetch(`/api/gps/routes?vehicleId=${selectedVehicle}&from=${dateFrom}T00:00:00Z&to=${dateTo}T23:59:59Z`);
+            const fbAuth = (window as any).firebase?.auth?.();
+            const user = fbAuth?.currentUser;
+            const token = user ? await user.getIdToken() : null;
+            if (!token) throw new Error('No auth token');
+
+            const res = await fetch(`/api/gps/routes?vehicleId=${selectedVehicle}&from=${dateFrom}T00:00:00Z&to=${dateTo}T23:59:59Z`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
             if (!res.ok) {
                 const err = await res.json();
                 throw new Error(err.error || `HTTP ${res.status}`);
