@@ -1,1086 +1,153 @@
-import React, { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { genId, hashPin } from '../utils/helpers';
-import { validateOrThrow } from '../utils/validate';
-import { firebaseSignIn, firebaseSignOut, writeAuthMapping, clearFirestoreCache } from './firebaseCore';
+/**
+ * AppContext — Backward-compatible wrapper
+ * 
+ * Combines AuthContext + DataContext into a single context that
+ * all 33 existing components can use via useApp() without changes.
+ * 
+ * New components should prefer useAuth() or useData() for better
+ * render performance (only re-renders when relevant state changes).
+ */
+import React, { createContext, useContext, useMemo } from 'react';
+import { AuthProvider, useAuth } from './AuthContext';
+import { DataProvider, useData } from './DataContext';
 
-const AppContext = createContext();
+// Re-export everything from sub-contexts for external use
+export { useAuth } from './AuthContext';
+export { useData } from './DataContext';
+export { getDb, getAuth, initFirebase, loadFirebaseConfig, saveFirebaseConfig } from './AuthContext';
+
+// Also re-export CRUD functions that were previously exported from here
+// Components like ArhivaPage import add/update/remove/setDoc directly
+export { add, update, remove, setDoc, batchSet, clearCollection, restoreItem, permanentDelete, getLastDeleted } from './crud';
+
+// ── Legacy context ──────────────────────────────────────────────────────
+const AppContext = createContext<any>(null);
+
+/**
+ * useApp() — backward-compatible hook.
+ * Returns the combined auth + data context.
+ * Prefer useAuth() or useData() in new code.
+ */
 export const useApp = () => useContext(AppContext);
 
-// ── Domain-specific selector hooks (prevents cascading re-renders) ──────
-// Components should prefer these over useApp() when they only need a subset.
-// useApp() still works identically for backward compatibility.
-
+// ── Domain-specific selector hooks ──────────────────────────────────────
 export function useAuthState() {
-    const ctx = useContext(AppContext);
+    const auth = useAuth();
     return useMemo(() => ({
-        step: ctx.step, setStep: ctx.setStep,
-        currentUser: ctx.currentUser, setCurrentUser: ctx.setCurrentUser,
-        firebaseReady: ctx.firebaseReady, loadError: ctx.loadError,
-        handleAppLogin: ctx.handleAppLogin, handleFirebaseLogin: ctx.handleFirebaseLogin, handleFirebaseConfig: ctx.handleFirebaseConfig,
-        handleCompanySetup: ctx.handleCompanySetup, handleAdminCreate: ctx.handleAdminCreate,
-        handleUserLogin: ctx.handleUserLogin, handleLogout: ctx.handleLogout,
-        handleResetFirebase: ctx.handleResetFirebase,
-    }), [ctx.step, ctx.currentUser, ctx.firebaseReady, ctx.loadError]);
+        step: auth.step, setStep: auth.setStep,
+        currentUser: auth.currentUser, setCurrentUser: auth.setCurrentUser,
+        firebaseReady: auth.firebaseReady, loadError: auth.loadError,
+        handleAppLogin: auth.handleAppLogin, handleFirebaseLogin: auth.handleFirebaseLogin,
+        handleFirebaseConfig: auth.handleFirebaseConfig,
+        handleCompanySetup: auth.handleCompanySetup, handleAdminCreate: auth.handleAdminCreate,
+        handleUserLogin: auth.handleUserLogin, handleLogout: auth.handleLogout,
+        handleResetFirebase: auth.handleResetFirebase,
+    }), [auth.step, auth.currentUser, auth.firebaseReady, auth.loadError]);
 }
 
 export function useDataState() {
-    const ctx = useContext(AppContext);
+    const data = useData();
     return useMemo(() => ({
-        users: ctx.users, projects: ctx.projects, workers: ctx.workers,
-        timesheets: ctx.timesheets, invoices: ctx.invoices,
-        vehicles: ctx.vehicles, smjestaj: ctx.smjestaj,
-        obaveze: ctx.obaveze, otpremnice: ctx.otpremnice,
-        auditLog: ctx.auditLog, dailyLogs: ctx.dailyLogs,
-        companyProfile: ctx.companyProfile,
-        workerMap: ctx.workerMap, projectMap: ctx.projectMap,
-        getWorkerName: ctx.getWorkerName, getProjectName: ctx.getProjectName,
-        isLeader: ctx.isLeader, leaderProjectIds: ctx.leaderProjectIds, leaderWorkerIds: ctx.leaderWorkerIds,
-        add: ctx.add, update: ctx.update, remove: ctx.remove, setDoc: ctx.setDoc,
-        addAuditLog: ctx.addAuditLog, loadAuditLog: ctx.loadAuditLog,
-        allTimesheetsLoaded: ctx.allTimesheetsLoaded, loadAllTimesheets: ctx.loadAllTimesheets,
-        loadDailyLogs: ctx.loadDailyLogs,
-    }), [ctx.users, ctx.projects, ctx.workers, ctx.timesheets, ctx.invoices,
-    ctx.vehicles, ctx.smjestaj, ctx.obaveze, ctx.otpremnice,
-    ctx.auditLog, ctx.dailyLogs, ctx.companyProfile,
-    ctx.workerMap, ctx.projectMap, ctx.isLeader, ctx.leaderProjectIds, ctx.leaderWorkerIds,
-    ctx.allTimesheetsLoaded]);
+        users: data.users, projects: data.projects, workers: data.workers,
+        timesheets: data.timesheets, invoices: data.invoices,
+        vehicles: data.vehicles, smjestaj: data.smjestaj,
+        obaveze: data.obaveze, otpremnice: data.otpremnice,
+        auditLog: data.auditLog, dailyLogs: data.dailyLogs,
+        companyProfile: data.companyProfile,
+        workerMap: data.workerMap, projectMap: data.projectMap,
+        getWorkerName: data.getWorkerName, getProjectName: data.getProjectName,
+        isLeader: data.isLeader, leaderProjectIds: data.leaderProjectIds, leaderWorkerIds: data.leaderWorkerIds,
+        add: data.add, update: data.update, remove: data.remove, setDoc: data.setDoc,
+        addAuditLog: data.addAuditLog, loadAuditLog: data.loadAuditLog,
+        allTimesheetsLoaded: data.allTimesheetsLoaded, loadAllTimesheets: data.loadAllTimesheets,
+        loadDailyLogs: data.loadDailyLogs,
+    }), [data.users, data.projects, data.workers, data.timesheets, data.invoices,
+    data.vehicles, data.smjestaj, data.obaveze, data.otpremnice,
+    data.auditLog, data.dailyLogs, data.companyProfile,
+    data.workerMap, data.projectMap, data.isLeader, data.leaderProjectIds, data.leaderWorkerIds,
+    data.allTimesheetsLoaded]);
 }
 
 export function useConfigState() {
-    const ctx = useContext(AppContext);
+    const auth = useAuth();
+    const data = useData();
     return useMemo(() => ({
-        sessionConfig: ctx.sessionConfig, lastSync: ctx.lastSync,
-        forceLogoutAll: ctx.forceLogoutAll,
-        updateSessionDuration: ctx.updateSessionDuration,
-        updateSyncMode: ctx.updateSyncMode,
-        loadDeletedItems: ctx.loadDeletedItems,
-        cleanupOldDeleted: ctx.cleanupOldDeleted,
-        weatherRules: ctx.weatherRules, loadWeatherRules: ctx.loadWeatherRules,
-        safetyTemplates: ctx.safetyTemplates, safetyChecklists: ctx.safetyChecklists,
-        loadSafetyData: ctx.loadSafetyData,
-    }), [ctx.sessionConfig, ctx.lastSync, ctx.weatherRules,
-    ctx.safetyTemplates, ctx.safetyChecklists]);
+        sessionConfig: auth.sessionConfig, lastSync: auth.lastSync,
+        forceLogoutAll: auth.forceLogoutAll,
+        updateSessionDuration: auth.updateSessionDuration,
+        updateSyncMode: auth.updateSyncMode,
+        loadDeletedItems: data.loadDeletedItems,
+        cleanupOldDeleted: data.cleanupOldDeleted,
+        weatherRules: data.weatherRules, loadWeatherRules: data.loadWeatherRules,
+        safetyTemplates: data.safetyTemplates, safetyChecklists: data.safetyChecklists,
+        loadSafetyData: data.loadSafetyData,
+    }), [auth.sessionConfig, auth.lastSync, data.weatherRules,
+    data.safetyTemplates, data.safetyChecklists]);
 }
 
-// ── Firebase core ────────────────────────────────────────────────────────
-let _db = null;
-let _auth = null;
-function getDb() { return _db; }
-function getAuth() { return _auth; }
+// ── Combined context value (for useApp backward compat) ─────────────────
+function AppContextBridge({ children }: { children: React.ReactNode }) {
+    const auth = useAuth();
+    const data = useData();
 
-export function initFirebase(config) {
-    try {
-        if (!window.firebase || !config) return false;
-        if (window.firebase.apps.length > 0) {
-            _db = window.firebase.firestore();
-            _auth = window.firebase.auth();
-            return true;
-        }
-        window.firebase.initializeApp(config);
-        _db = window.firebase.firestore();
-        _auth = window.firebase.auth();
-        _db.enablePersistence({ synchronizeTabs: true }).catch(() => { });
-        return true;
-    } catch (e) { console.error('Firebase init error:', e); return false; }
-}
+    const combined = useMemo(() => ({
+        // Auth
+        step: auth.step, setStep: auth.setStep,
+        currentUser: auth.currentUser, setCurrentUser: auth.setCurrentUser,
+        firebaseReady: auth.firebaseReady, loadError: auth.loadError,
+        sessionConfig: auth.sessionConfig, lastSync: auth.lastSync,
+        handleAppLogin: auth.handleAppLogin, handleFirebaseLogin: auth.handleFirebaseLogin,
+        handleFirebaseConfig: auth.handleFirebaseConfig,
+        handleCompanySetup: auth.handleCompanySetup, handleAdminCreate: auth.handleAdminCreate,
+        handleUserLogin: auth.handleUserLogin, handleLogout: auth.handleLogout,
+        handleResetFirebase: auth.handleResetFirebase,
+        forceLogoutAll: auth.forceLogoutAll, updateSessionDuration: auth.updateSessionDuration,
+        updateSyncMode: auth.updateSyncMode,
+        changePassword: auth.changePassword, exportUserData: auth.exportUserData,
+        // Data
+        users: data.users, setUsers: data.setUsers,
+        projects: data.projects, setProjects: data.setProjects,
+        workers: data.workers, setWorkers: data.setWorkers,
+        timesheets: data.timesheets, setTimesheets: data.setTimesheets,
+        invoices: data.invoices, setInvoices: data.setInvoices,
+        vehicles: data.vehicles, setVehicles: data.setVehicles,
+        smjestaj: data.smjestaj, setSmjestaj: data.setSmjestaj,
+        obaveze: data.obaveze, setObaveze: data.setObaveze,
+        otpremnice: data.otpremnice, setOtpremnice: data.setOtpremnice,
+        production: data.production, setProduction: data.setProduction,
+        prodAlerts: data.prodAlerts, setProdAlerts: data.setProdAlerts,
+        auditLog: data.auditLog, setAuditLog: data.setAuditLog,
+        companyProfile: data.companyProfile, setCompanyProfile: data.setCompanyProfile,
+        dailyLogs: data.dailyLogs, setDailyLogs: data.setDailyLogs,
+        weatherRules: data.weatherRules, setWeatherRules: data.setWeatherRules,
+        safetyTemplates: data.safetyTemplates, setSafetyTemplates: data.setSafetyTemplates,
+        safetyChecklists: data.safetyChecklists, setSafetyChecklists: data.setSafetyChecklists,
+        workerMap: data.workerMap, projectMap: data.projectMap,
+        getWorkerName: data.getWorkerName, getProjectName: data.getProjectName,
+        isLeader: data.isLeader, leaderProjectIds: data.leaderProjectIds, leaderWorkerIds: data.leaderWorkerIds,
+        add: data.add, update: data.update, remove: data.remove, setDoc: data.setDoc,
+        addAuditLog: data.addAuditLog, loadAuditLog: data.loadAuditLog,
+        allTimesheetsLoaded: data.allTimesheetsLoaded, loadAllTimesheets: data.loadAllTimesheets,
+        loadDailyLogs: data.loadDailyLogs, loadWeatherRules: data.loadWeatherRules,
+        loadSafetyData: data.loadSafetyData, loadProduction: data.loadProduction,
+        loadDeletedItems: data.loadDeletedItems, cleanupOldDeleted: data.cleanupOldDeleted,
+        refreshInvoices: data.refreshInvoices, refreshVehicles: data.refreshVehicles,
+        refreshSmjestaj: data.refreshSmjestaj, refreshOtpremnice: data.refreshOtpremnice,
+        refreshProduction: data.refreshProduction,
+    }), [auth, data]);
 
-// ── Firestore CRUD (proper collections) ──────────────────────────────────
-function handleError(e, op) {
-    if (e.code === 'permission-denied' || (e.message && e.message.includes('permissions'))) {
-        throw new Error('Nemate dozvolu za ovu operaciju. Kontaktirajte administratora.');
-    }
-    console.error(`Firestore ${op} error:`, e);
-}
-
-// Global setter registry for optimistic updates (avoids needing realtime listeners)
-const _setterMap = {};
-export function _registerSetters(map) { Object.assign(_setterMap, map); }
-
-export async function add(collection, data) {
-    const db = getDb(); if (!db) return null;
-    const id = data.id || genId();
-    const doc = { ...data, id };
-    try {
-        validateOrThrow(collection, doc);
-        await db.collection(collection).doc(id).set(doc);
-        // Optimistic local update
-        if (_setterMap[collection]) _setterMap[collection](prev => [...prev, doc]);
-        return doc;
-    }
-    catch (e) { handleError(e, 'add'); throw e; }
-}
-
-export async function update(collection, id, updates) {
-    const db = getDb(); if (!db) return;
-    try {
-        const stamped = { ...updates, updatedAt: new Date().toISOString() };
-        await db.collection(collection).doc(id).update(stamped);
-        // Optimistic local update
-        if (_setterMap[collection]) _setterMap[collection](prev => prev.map(d => d.id === id ? { ...d, ...stamped } : d));
-    }
-    catch (e) { handleError(e, 'update'); throw e; }
-}
-
-export async function remove(collection, id) {
-    // Guard: prevent deleting audit log entries
-    if (collection === 'auditLog') {
-        console.warn('Audit log entries cannot be deleted');
-        return;
-    }
-    const db = getDb(); if (!db) return;
-    try {
-        // Soft delete: mark with deletedAt instead of removing
-        const deletedAt = new Date().toISOString();
-        await db.collection(collection).doc(id).update({ deletedAt });
-        // Optimistic: hide from local state
-        if (_setterMap[collection]) _setterMap[collection](prev => prev.filter(d => d.id !== id));
-        // Store deleted item info for undo
-        _lastDeleted = { collection, id, deletedAt };
-    }
-    catch (e) { handleError(e, 'remove'); throw e; }
-}
-
-// Undo last soft delete
-let _lastDeleted = null;
-export function getLastDeleted() { return _lastDeleted; }
-
-export async function restoreItem(collection, id) {
-    const db = getDb(); if (!db) return;
-    try {
-        const doc = await db.collection(collection).doc(id).get();
-        if (!doc.exists) return;
-        const data = doc.data();
-        delete data.deletedAt;
-        await db.collection(collection).doc(id).set(data);
-        // Optimistic: re-add to local state
-        if (_setterMap[collection]) _setterMap[collection](prev => [...prev, { ...data, id }]);
-        _lastDeleted = null;
-    }
-    catch (e) { handleError(e, 'restore'); throw e; }
-}
-
-export async function permanentDelete(collection, id) {
-    const db = getDb(); if (!db) return;
-    try {
-        await db.collection(collection).doc(id).delete();
-    }
-    catch (e) { handleError(e, 'permanentDelete'); throw e; }
-}
-
-export async function setDoc(collection, docId, data) {
-    const db = getDb(); if (!db) return;
-    try { await db.collection(collection).doc(docId).set(data); }
-    catch (e) { handleError(e, 'setDoc'); throw e; }
-}
-
-// Batch operations for backup/restore
-export async function batchSet(collection, items) {
-    const db = getDb(); if (!db) return;
-    for (let i = 0; i < items.length; i += 450) {
-        const batch = db.batch();
-        items.slice(i, i + 450).forEach(item => {
-            const id = item.id || genId();
-            batch.set(db.collection(collection).doc(id), { ...item, id });
-        });
-        await batch.commit();
-    }
-}
-
-export async function clearCollection(collection) {
-    const db = getDb(); if (!db) return;
-    const snap = await db.collection(collection).get();
-    for (let i = 0; i < snap.docs.length; i += 450) {
-        const batch = db.batch();
-        snap.docs.slice(i, i + 450).forEach(doc => batch.delete(doc.ref));
-        await batch.commit();
-    }
-}
-
-// Config persistence
-export function loadFirebaseConfig() {
-    try { const c = localStorage.getItem('vidime-firebase-config-v9'); return c ? JSON.parse(c) : null; }
-    catch { return null; }
-}
-export function saveFirebaseConfig(config) {
-    localStorage.setItem('vidime-firebase-config-v9', JSON.stringify(config));
-}
-
-// Built-in Firebase config (production)
-function getBuiltInConfig() {
-    return {
-        apiKey: 'AIzaSyDVcFE2dlnOyv8s12rKjp3IvJh1LUGZKOs',
-        authDomain: 'rakusic-corporation-vidi-sef.firebaseapp.com',
-        projectId: 'rakusic-corporation-vidi-sef',
-        storageBucket: 'rakusic-corporation-vidi-sef.firebasestorage.app',
-        messagingSenderId: '862008523269',
-        appId: '1:862008523269:web:32252db876f5faa000ba6c',
-    };
-}
-
-const COL = {
-    users: 'users', workers: 'workers', projects: 'projects',
-    timesheets: 'timesheets', invoices: 'invoices', vehicles: 'vehicles',
-    smjestaj: 'smjestaj', obaveze: 'obaveze', otpremnice: 'otpremnice',
-    production: 'production', auditLog: 'auditLog',
-};
-
-// ── Clear stale Firestore/Firebase cache ─────────────────────────────────
-// Called when boot fails due to permission or offline errors
-function clearStaleCache() {
-    try {
-        // Clear session data (but keep Firebase config!)
-        localStorage.removeItem('vidime-app-login');
-        localStorage.removeItem('vidime-session');
-        sessionStorage.clear();
-        // Clear ALL IndexedDB databases (Firestore offline cache + Firebase auth)
-        if (window.indexedDB) {
-            if (typeof indexedDB.databases === 'function') {
-                indexedDB.databases().then(dbs => dbs.forEach(db => {
-                    // PRESERVE firebaseLocalStorageDb — it stores Firebase Auth tokens!
-                    if (db.name && db.name !== 'firebaseLocalStorageDb') {
-                        indexedDB.deleteDatabase(db.name);
-                    }
-                }));
-            }
-            // Known Firebase database names (fallback)
-            ['firebaseLocalStorageDb', 'firestore/[DEFAULT]/rakusic-corporation-vidi-sef/main',
-                'firebase-heartbeat-database', 'firebase-installations-database'].forEach(name => {
-                    try { indexedDB.deleteDatabase(name); } catch { }
-                });
-        }
-        // Clear service worker caches
-        if ('caches' in window) {
-            caches.keys().then(names => names.forEach(n => caches.delete(n)));
-        }
-        console.log('[ClearCache] Stale cache cleared');
-    } catch (e) { console.warn('[ClearCache] Error:', e); }
+    return <AppContext.Provider value={combined}>{children}</AppContext.Provider>;
 }
 
 // ── AppProvider ──────────────────────────────────────────────────────────
-export function AppProvider({ children }) {
-    const [step, setStep] = useState('loading');
-    const [currentUser, setCurrentUser] = useState(null);
-    const [firebaseReady, setFirebaseReady] = useState(false);
-    const [loadError, setLoadError] = useState(null);
-
-    const [users, setUsers] = useState([]);
-    const [projects, setProjects] = useState([]);
-    const [workers, setWorkers] = useState([]);
-    const [timesheets, setTimesheets] = useState([]);
-    const [invoices, setInvoices] = useState([]);
-    const [vehicles, setVehicles] = useState([]);
-    const [smjestaj, setSmjestaj] = useState([]);
-    const [obaveze, setObaveze] = useState([]);
-    const [otpremnice, setOtpremnice] = useState([]);
-    const [production, setProduction] = useState([]);
-    const [prodAlerts, setProdAlerts] = useState([]);
-    const [auditLog, setAuditLog] = useState([]);
-    const [companyProfile, setCompanyProfile] = useState(null);
-
-    // Register setters for optimistic updates (used by add/update/remove)
-    useEffect(() => {
-        _registerSetters({
-            users: setUsers, projects: setProjects, workers: setWorkers,
-            timesheets: setTimesheets, invoices: setInvoices, vehicles: setVehicles,
-            smjestaj: setSmjestaj, obaveze: setObaveze, otpremnice: setOtpremnice,
-            production: setProduction, prodAlerts: setProdAlerts, auditLog: setAuditLog,
-        });
-    }, []);
-    const [allTimesheetsLoaded, setAllTimesheetsLoaded] = useState(false);
-    const [dailyLogs, setDailyLogs] = useState([]);
-    const [dailyLogsLoaded, setDailyLogsLoaded] = useState(false);
-    const [weatherRules, setWeatherRules] = useState([]);
-    const [weatherRulesLoaded, setWeatherRulesLoaded] = useState(false);
-    const [safetyTemplates, setSafetyTemplates] = useState([]);
-    const [safetyChecklists, setSafetyChecklists] = useState([]);
-    const [safetyLoaded, setSafetyLoaded] = useState(false);
-    const [productionLoaded, setProductionLoaded] = useState(false);
-    const [sessionConfig, setSessionConfig] = useState({ sessionDuration: 60, sessionVersion: null as number | null, syncMode: 0 });
-    const [lastSync, setLastSync] = useState(null);
-
-    const unsubsRef = useRef([]);
-    const sessionCheckRef = useRef(null);
-
-    // ── Session persistence helpers ──
-    const SESSION_KEY = 'vidime-session';
-    const saveSession = (user, version) => {
-        localStorage.setItem(SESSION_KEY, JSON.stringify({
-            userId: user.id, userName: user.name, userRole: user.role,
-            loginAt: new Date().toISOString(), sessionVersion: version || 1,
-        }));
-    };
-    const loadSession = () => {
-        try { const s = localStorage.getItem(SESSION_KEY); return s ? JSON.parse(s) : null; }
-        catch { return null; }
-    };
-    const clearSession = () => localStorage.removeItem(SESSION_KEY);
-
-    // ── Map lookups (O(1) instead of O(n) array.find) ──
-    const workerMap = useMemo(() => {
-        const m = new Map();
-        workers.forEach(w => m.set(w.id, w));
-        return m;
-    }, [workers]);
-
-    const projectMap = useMemo(() => {
-        const m = new Map();
-        projects.forEach(p => m.set(p.id, p));
-        return m;
-    }, [projects]);
-
-    const getWorkerName = useCallback((id) => workerMap.get(id)?.name || '—', [workerMap]);
-    const getProjectName = useCallback((id) => projectMap.get(id)?.name || '—', [projectMap]);
-
-    useEffect(() => {
-        const bootApp = async () => {
-            // Check for built-in config (production build with env vars)
-            const builtIn = getBuiltInConfig();
-            const config = builtIn || loadFirebaseConfig();
-
-            if (config) {
-                saveFirebaseConfig(config);
-                // Init Firebase SDK (but don't load data yet)
-                let tries = 0;
-                while (!window.firebase && tries < 50) { await new Promise(r => setTimeout(r, 100)); tries++; }
-                if (!window.firebase) { setLoadError('Firebase library not loaded'); setStep('appLogin'); return; }
-                if (!initFirebase(config)) { setLoadError('Firebase init failed'); setStep('appLogin'); return; }
-
-                // Check if Firebase Auth user already exists (session restore)
-                // IMPORTANT: auth.currentUser is null on page load — Firebase restores it async
-                // Must use onAuthStateChanged to wait for restore
-                const auth = getAuth();
-                if (auth) {
-                    const firebaseUser = await new Promise((resolve) => {
-                        const unsub = auth.onAuthStateChanged((user) => {
-                            unsub(); // only need first callback
-                            resolve(user);
-                        });
-                        // Timeout: if Firebase doesn't respond in 8s, proceed without user
-                        setTimeout(() => resolve(null), 8000);
-                    });
-
-                    if (firebaseUser && !firebaseUser.isAnonymous) {
-                        console.log('[Boot] Firebase Auth session restored:', firebaseUser.email);
-                        try {
-                            await Promise.race([
-                                initFirebaseAndLoad(config),
-                                new Promise((_, reject) => setTimeout(() => reject(new Error('Boot timeout')), 15000)),
-                            ]);
-                        } catch (bootErr: any) {
-                            console.error('[Boot] Session restore failed:', bootErr.message);
-                            // Don't wipe auth tokens — just clear session and go to login
-                            clearSession();
-                            try { auth.signOut(); } catch { }
-                            setStep('appLogin');
-                        }
-                        return;
-                    }
-
-                    // No Firebase Auth — but check if we have a localStorage session
-                    // If so, try to init Firebase and load data anyway
-                    const savedSession = loadSession();
-                    if (savedSession) {
-                        console.log('[Boot] No Firebase Auth but localStorage session exists, trying to load...');
-                        try {
-                            await Promise.race([
-                                initFirebaseAndLoad(config),
-                                new Promise((_, reject) => setTimeout(() => reject(new Error('Boot timeout')), 10000)),
-                            ]);
-                            return; // If it worked, data is loaded
-                        } catch (e) {
-                            console.warn('[Boot] localStorage session fallback failed:', e);
-                            clearSession();
-                        }
-                    }
-                }
-
-                // No Firebase Auth session — show login screen
-                console.log('[Boot] No Firebase Auth session, showing login...');
-                setStep('appLogin');
-            } else {
-                setStep('appLogin');
-            }
-        };
-        bootApp();
-        return () => { unsubsRef.current.forEach(fn => fn()); if (sessionCheckRef.current) clearInterval(sessionCheckRef.current); };
-    }, []);
-
-    const snapToArray = (snap) => {
-        const items = [];
-        snap.forEach(doc => {
-            const d = { ...doc.data(), id: doc.id };
-            if (!d.deletedAt) items.push(d); // Skip soft-deleted
-        });
-        return items;
-    };
-
-    // ── Reads telemetry (dev only) ──────────────────────────────────────────
-    const logReads = (source, collection, count, type = 'get') => {
-        if (import.meta.env.DEV) {
-            console.log(`[READS] ${type.toUpperCase()} ${collection}: ${count} docs (${source})`);
-        }
-    };
-
-    // ── Refresh functions for non-realtime collections ─────────────────────
-    const refreshCollection = useCallback(async (name, setter) => {
-        const db = getDb(); if (!db) return;
-        const snap = await db.collection(name).get();
-        const items = snapToArray(snap);
-        logReads('refresh', name, items.length);
-        setter(items);
-    }, []);
-
-    const initFirebaseAndLoad = async (config) => {
-        setLoadError(null);
-        try {
-            console.log('[AppContext] Starting Firebase init...');
-            let tries = 0;
-            while (!window.firebase && tries < 50) { await new Promise(r => setTimeout(r, 100)); tries++; }
-            if (!window.firebase) { setLoadError('Firebase library not loaded'); setStep('appLogin'); return; }
-            if (!initFirebase(config)) { setLoadError('Firebase init failed — check config'); setStep('appLogin'); return; }
-            console.log('[AppContext] Firebase initialized. Auth:', !!getAuth());
-
-            // Use existing Firebase Auth user (set by handleFirebaseLogin)
-            const auth = getAuth();
-            if (auth && auth.currentUser) {
-                console.log('[AppContext] Using authenticated user:', auth.currentUser.email || auth.currentUser.uid);
-            } else {
-                console.warn('[AppContext] No authenticated user — redirecting to login');
-                setStep('appLogin');
-                return;
-            }
-
-            setFirebaseReady(true);
-
-            const db = getDb();
-
-            // ── Helper: one-time fetch (NO listener) ──
-            const loadCol = async (name) => {
-                const snap = await db.collection(name).get();
-                const items = snapToArray(snap);
-                logReads('boot', name, items.length);
-                return items;
-            };
-            const loadDoc = async (col, id) => {
-                const d = await db.collection(col).doc(id).get();
-                logReads('boot', `${col}/${id}`, d.exists ? 1 : 0);
-                return d.exists ? d.data() : null;
-            };
-
-            // ── Cutoff dates ──
-            const cutoff30 = new Date();
-            cutoff30.setDate(cutoff30.getDate() - 30);
-            const cutoff30Str = cutoff30.toISOString().slice(0, 10);
-
-            // ══════════════════════════════════════════════════════════════════
-            // BOOT STRATEGY (optimized):
-            //   - Tier 1 (REALTIME): users, projects, workers, timesheets, obaveze
-            //     → NO initial get() — onSnapshot handles both initial + realtime
-            //   - Tier 2 (STATIC): vehicles, smjestaj, otpremnice, invoices
-            //     → One-time get() only, NO listener
-            //   - Tier 4 (ON-DEMAND): auditLog, dailyLogs, safety, weather
-            //     → NOT loaded on boot at all
-            // ══════════════════════════════════════════════════════════════════
-
-            // Load users first (needed for PIN migration + step flow decisions)
-            // The realtime listener will take over right after for live updates.
-
-            // ── Batch 1: CRITICAL — must succeed for app to boot ──
-            const [u, cp] = await Promise.all([
-                loadCol('users'),
-                loadDoc('config', 'companyProfile'),
-            ]);
-            setUsers(u);
-            setCompanyProfile(cp);
-
-            // ── Batch 2: RESILIENT — app works even if these fail ──
-            const batch2 = await Promise.allSettled([
-                loadCol('invoices').then(d => { setInvoices(d); return d; }),
-                loadCol('vehicles').then(d => { setVehicles(d); return d; }),
-                loadCol('smjestaj').then(d => { setSmjestaj(d); return d; }),
-                loadCol('otpremnice').then(d => { setOtpremnice(d); return d; }),
-            ]);
-            const batch2Failed = batch2.filter(r => r.status === 'rejected');
-            if (batch2Failed.length > 0) {
-                console.warn(`[Boot] ${batch2Failed.length} secondary collections failed — will retry via listeners`);
-            }
-
-            // One-time PIN migration: hash any plain-text PINs to hash('1234')
-            const isHashed = (pin) => /^[a-f0-9]{64}$/.test(pin);
-            const usersToMigrate = u.filter(user => user.pin && !isHashed(user.pin));
-            if (usersToMigrate.length > 0) {
-                const defaultHashedPin = await hashPin('1234');
-                for (const user of usersToMigrate) {
-                    await db.collection('users').doc(user.id).update({ pin: defaultHashedPin });
-                }
-                console.log(`Migrated ${usersToMigrate.length} user PINs to hashed default.`);
-            }
-
-            // ── Realtime listeners (Tier 1 — single source of truth) ─────────
-            // These replace BOTH initial load AND ongoing updates.
-            // onSnapshot fires immediately with cached/server data.
-            const listenWithLog = (col, setter, query) => {
-                const src = query || db.collection(col);
-                return src.onSnapshot(snap => {
-                    const items = snapToArray(snap);
-                    logReads('listener', col, items.length, 'onSnapshot');
-                    setter(items);
-                });
-            };
-
-            // Timesheets: last 30 days, limit 200, ordered by date
-            const tsQuery = db.collection('timesheets')
-                .where('date', '>=', cutoff30Str)
-                .orderBy('date', 'desc')
-                .limit(200);
-
-            const tsUnsub = tsQuery.onSnapshot(snap => {
-                const recentDocs = snapToArray(snap);
-                logReads('listener', 'timesheets', recentDocs.length, 'onSnapshot');
-                setTimesheets(prev => {
-                    const oldDocs = prev.filter(d => (d.date || '') < cutoff30Str);
-                    return [...oldDocs, ...recentDocs];
-                });
-            });
-
-            // Determine sync mode (0 = realtime, >0 = polling interval in minutes)
-            const syncMode = sessionConfig.syncMode || 0;
-
-            if (syncMode === 0) {
-                // REALTIME MODE — listeners ONLY for Tier 1 (operational data)
-                unsubsRef.current = [
-                    listenWithLog('users', setUsers),
-                    listenWithLog('projects', setProjects),
-                    listenWithLog('workers', setWorkers),
-                    tsUnsub,
-                    listenWithLog('obaveze', setObaveze),
-                    // Config docs (1 doc each — cheap)
-                    db.collection('config').doc('companyProfile').onSnapshot(doc => setCompanyProfile(doc.exists ? doc.data() : null)),
-                ];
-                // NOTE: invoices, vehicles, smjestaj, otpremnice — NO listeners.
-                // They were loaded via get() above. Use refreshCollection() to update.
-            } else {
-                // POLLING MODE — no realtime listeners, data already loaded above
-                unsubsRef.current = [
-                    db.collection('config').doc('companyProfile').onSnapshot(doc => setCompanyProfile(doc.exists ? doc.data() : null)),
-                ];
-                setLastSync(new Date());
-            }
-
-            if (!cp) { setStep('companySetup'); return; }
-            if (!u.length) { setStep('adminCreate'); return; }
-
-            // ── Session config listener ──
-            unsubsRef.current.push(
-                db.collection('config').doc('session').onSnapshot(doc => {
-                    if (doc.exists) {
-                        const sc = doc.data();
-                        setSessionConfig(prev => {
-                            // Force logout ONLY if version actually changed (not on initial load)
-                            // prev.sessionVersion === null means first load from Firestore, not a real change
-                            if (prev.sessionVersion !== null && sc.sessionVersion && sc.sessionVersion > prev.sessionVersion) {
-                                clearSession();
-                                setCurrentUser(null);
-                                const a = getAuth(); if (a) a.signOut();
-                                setStep('appLogin');
-                            }
-                            return { sessionDuration: sc.sessionDuration || 60, sessionVersion: sc.sessionVersion || 1, syncMode: sc.syncMode || 0 };
-                        });
-                    }
-                })
-            );
-
-            // ── Try to restore session from localStorage ──
-            const saved = loadSession();
-            if (saved) {
-                const elapsed = (Date.now() - new Date(saved.loginAt).getTime()) / 60000;
-                const maxDuration = sessionConfig.sessionDuration || 60;
-                if (elapsed < maxDuration) {
-                    const restoredUser = u.find(usr => usr.id === saved.userId);
-                    if (restoredUser) {
-                        console.log('[Session] Restored:', restoredUser.name, `(${Math.round(elapsed)}min ago)`);
-                        setCurrentUser(restoredUser);
-                        setStep('app');
-                        // Start periodic session check
-                        sessionCheckRef.current = setInterval(() => {
-                            const s = loadSession();
-                            if (!s) return;
-                            const age = (Date.now() - new Date(s.loginAt).getTime()) / 60000;
-                            if (age >= maxDuration) { clearSession(); setCurrentUser(null); const a = getAuth(); if (a) a.signOut(); setStep('appLogin'); }
-                        }, 30000); // check every 30s
-                        return;
-                    }
-                }
-                clearSession(); // expired or user not found
-            }
-            setStep('appLogin');
-        } catch (err: any) {
-            console.error('[AppContext] Firebase load error:', err);
-            // On permission-denied or offline errors, clear stale cache and go to login
-            if (err.code === 'permission-denied' || err.message?.includes('permission') || err.message?.includes('offline')) {
-                console.warn('[AppContext] Clearing stale cache due to auth/permission error');
-                clearStaleCache();
-                try { const a = getAuth(); if (a) a.signOut(); } catch { }
-            }
-            setLoadError(err.message);
-            setStep('appLogin'); // Go to login, NOT firebaseConfig
-        }
-    };
-
-    const handleAppLogin = () => {
-        localStorage.setItem('vidime-app-login', 'true');
-        sessionStorage.setItem('vidime-app-login', 'true');
-        const config = loadFirebaseConfig();
-        if (config) initFirebaseAndLoad(config);
-        else setStep('firebaseConfig');
-    };
-
-    // ── Firebase Auth login (replaces hardcoded credentials) ──
-    const handleFirebaseLogin = async (username, password) => {
-        // Step 1: Init Firebase if not ready
-        let config = loadFirebaseConfig();
-        if (!config) config = getBuiltInConfig();
-        if (config && !firebaseReady) {
-            saveFirebaseConfig(config);
-            let tries = 0;
-            while (!window.firebase && tries < 50) { await new Promise(r => setTimeout(r, 100)); tries++; }
-            if (!window.firebase) throw new Error('Firebase library not loaded');
-            initFirebase(config);
-        }
-
-        // NOTE: Do NOT clear IndexedDB here — it breaks Firebase Auth which uses IndexedDB internally.
-        // Cache clearing is available via the "Obriši cache" button on the login page.
-
-        const auth = getAuth();
-        if (!auth) throw new Error('Auth not available');
-
-        // Convert username to email: admin.josip → admin.josip@rakusic-corporation.live
-        const cleanUser = username.toLowerCase().replace(/\s+/g, '.');
-        const email = cleanUser.includes('@') ? cleanUser : `${cleanUser}@rakusic-corporation.live`;
-        const passwordWrapped = password;
-        console.log('[Auth] Attempting login for:', email);
-
-        let firebaseUser = null;
-
-        // Sign in only — no auto-create (admin creates users)
-        try {
-            const cred = await auth.signInWithEmailAndPassword(email, passwordWrapped);
-            console.log('[Auth] Sign-in OK:', email);
-            firebaseUser = cred.user;
-        } catch (signInErr: any) {
-            console.error('[Auth] Sign-in failed:', signInErr.code);
-            throw signInErr;
-        }
-
-        if (!firebaseUser) return null;
-
-        // Step 3: Now authenticated — load all data from Firestore
-        localStorage.setItem('vidime-app-login', 'true');
-        await initFirebaseAndLoad(config);
-
-        // Step 4: After data loaded, match Firebase user to Firestore user
-        // Strip @domain if user typed full email
-        const matchName = cleanUser.includes('@') ? cleanUser.split('@')[0] : cleanUser;
-        const db = getDb();
-        if (db) {
-            const usersSnap = await db.collection('users').get();
-            const allUsers = [];
-            usersSnap.forEach(doc => { const d = { ...doc.data(), id: doc.id }; if (!d.deletedAt) allUsers.push(d); });
-            const matchedUser = allUsers.find(u => u.username === matchName);
-            if (matchedUser) {
-                await writeAuthMapping(firebaseUser.uid, matchedUser);
-                handleUserLogin(matchedUser);
-                // 🔒 Audit: successful login
-                try {
-                    await db.collection('auditLog').add({
-                        id: genId(), action: 'LOGIN_SUCCESS', user: matchedUser.name || matchName,
-                        userId: matchedUser.id, email, timestamp: new Date().toISOString(),
-                        userAgent: navigator.userAgent.slice(0, 200),
-                    });
-                } catch (e) { console.warn('[Audit] Could not log login:', e); }
-            } else {
-                // 🔒 Audit: no matching user
-                try {
-                    await db.collection('auditLog').add({
-                        id: genId(), action: 'LOGIN_NO_MATCH', user: matchName,
-                        email, timestamp: new Date().toISOString(),
-                    });
-                } catch (e) { /* ignore */ }
-                console.warn('[Auth] No Firestore user matches username:', username);
-                setStep('appLogin');
-            }
-        }
-
-        return firebaseUser;
-    };
-
-    const handleFirebaseConfig = (config) => {
-        saveFirebaseConfig(config);
-        initFirebaseAndLoad(config);
-    };
-
-    const handleCompanySetup = async (profile) => {
-        await setDoc('config', 'companyProfile', profile);
-        const u = snapToArray(await getDb().collection('users').get());
-        if (!u.length) setStep('adminCreate');
-        else setStep('appLogin');
-    };
-
-    const handleAdminCreate = async (admin) => {
-        await add('users', admin);
-        await add('workers', { ...admin, role: 'admin' });
-        setCurrentUser(admin);
-        setStep('app');
-    };
-
-    const handleUserLogin = (user) => {
-        setCurrentUser(user);
-        saveSession(user, sessionConfig.sessionVersion);
-        setStep('app');
-        // Start periodic session check
-        if (sessionCheckRef.current) clearInterval(sessionCheckRef.current);
-        sessionCheckRef.current = setInterval(() => {
-            const s = loadSession();
-            if (!s) return;
-            const age = (Date.now() - new Date(s.loginAt).getTime()) / 60000;
-            if (age >= (sessionConfig.sessionDuration || 60)) { clearSession(); setCurrentUser(null); const a = getAuth(); if (a) a.signOut(); setStep('appLogin'); }
-        }, 30000);
-    };
-    const handleLogout = () => {
-        // 🔒 Audit: logout
-        try {
-            const db = getDb();
-            if (db && currentUser) {
-                db.collection('auditLog').add({
-                    id: genId(), action: 'LOGOUT', user: currentUser.name || 'unknown',
-                    userId: currentUser.id, timestamp: new Date().toISOString(),
-                });
-            }
-        } catch (e) { /* ignore */ }
-        clearSession();
-        if (sessionCheckRef.current) clearInterval(sessionCheckRef.current);
-        setCurrentUser(null);
-        const a = getAuth(); if (a) a.signOut();
-        setStep('appLogin');
-    };
-    const handleResetFirebase = () => {
-        localStorage.removeItem('vidime-firebase-config-v9');
-        localStorage.removeItem('vidime-app-login');
-        sessionStorage.removeItem('vidime-app-login');
-        clearSession();
-        window.location.reload();
-    };
-
-    // 🔐 Password change (Firebase Auth)
-    const changePassword = useCallback(async (currentPassword, newPassword) => {
-        const auth = getAuth();
-        if (!auth || !auth.currentUser) throw new Error('Not authenticated');
-        // Validate new password policy
-        if (newPassword.length < 8) throw new Error('Lozinka mora imati barem 8 znakova');
-        if (!/[A-Z]/.test(newPassword)) throw new Error('Lozinka mora imati barem 1 veliko slovo');
-        if (!/[0-9]/.test(newPassword)) throw new Error('Lozinka mora imati barem 1 broj');
-        // Re-authenticate
-        const email = auth.currentUser.email;
-        const wrappedCurrent = currentPassword;
-        const wrappedNew = newPassword;
-        const fb = window.firebase;
-        const credential = fb.auth.EmailAuthProvider.credential(email, wrappedCurrent);
-        await auth.currentUser.reauthenticateWithCredential(credential);
-        await auth.currentUser.updatePassword(wrappedNew);
-        // Audit log
-        try {
-            const db = getDb();
-            if (db) await db.collection('auditLog').add({
-                id: genId(), action: 'PASSWORD_CHANGED', user: currentUser?.name || 'unknown',
-                userId: currentUser?.id, timestamp: new Date().toISOString(),
-            });
-        } catch (e) { /* ignore */ }
-    }, [currentUser]);
-
-    // 📦 GDPR data export (download all user data as JSON)
-    const exportUserData = useCallback(async () => {
-        if (!currentUser) throw new Error('Not logged in');
-        const db = getDb();
-        if (!db) throw new Error('Database not available');
-        const userId = currentUser.id;
-        const name = currentUser.name;
-        // Collect all user-related data
-        const data = {
-            exportDate: new Date().toISOString(),
-            user: currentUser,
-            timesheets: timesheets.filter(t => t.workerId === userId || t.userId === userId),
-            dailyLogs: dailyLogs.filter(l => l.userId === userId || l.createdBy === name),
-            leaveRequests: [], // lazy loaded if needed
-        };
-        // Try to load leave requests
-        try {
-            const snap = await db.collection('leaveRequests').where('workerId', '==', userId).get();
-            snap.forEach(doc => data.leaveRequests.push({ ...doc.data(), id: doc.id }));
-        } catch (e) { /* ignore */ }
-        // Download as JSON
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `vidisef-export-${userId}-${new Date().toISOString().slice(0, 10)}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        // Audit
-        try {
-            await db.collection('auditLog').add({
-                id: genId(), action: 'DATA_EXPORT', user: name,
-                userId, timestamp: new Date().toISOString(),
-            });
-        } catch (e) { /* ignore */ }
-    }, [currentUser, timesheets, dailyLogs]);
-
-    // Admin: force logout all users by incrementing sessionVersion
-    const forceLogoutAll = useCallback(async () => {
-        const db = getDb();
-        if (!db) return;
-        const newVersion = (sessionConfig.sessionVersion || 1) + 1;
-        await db.collection('config').doc('session').set({ ...sessionConfig, sessionVersion: newVersion }, { merge: true });
-        setSessionConfig(prev => ({ ...prev, sessionVersion: newVersion }));
-    }, [sessionConfig]);
-
-    // Admin: update session duration
-    const updateSessionDuration = useCallback(async (minutes) => {
-        const db = getDb();
-        if (!db) return;
-        await db.collection('config').doc('session').set({ ...sessionConfig, sessionDuration: minutes }, { merge: true });
-        setSessionConfig(prev => ({ ...prev, sessionDuration: minutes }));
-    }, [sessionConfig]);
-
-    // Admin: update sync mode (0 = realtime, 5/30/60 = polling minutes)
-    const updateSyncMode = useCallback(async (mode) => {
-        const db = getDb();
-        if (!db) return;
-        await db.collection('config').doc('session').set({ ...sessionConfig, syncMode: mode }, { merge: true });
-        setSessionConfig(prev => ({ ...prev, syncMode: mode }));
-        // No reload — useEffect reacts to syncMode change automatically
-    }, [sessionConfig]);
-
-    // Polling interval effect
-    useEffect(() => {
-        const syncMode = sessionConfig.syncMode || 0;
-        if (syncMode === 0 || step !== 'app') return; // realtime mode or not logged in
-
-        const intervalMs = syncMode * 60 * 1000;
-        const doRefresh = async () => {
-            const db = getDb();
-            if (!db) return;
-            try {
-                const loadCol = async (name) => {
-                    const snap = await db.collection(name).get();
-                    const items = snapToArray(snap);
-                    if (import.meta.env.DEV) console.log(`[READS] POLL ${name}: ${items.length} docs`);
-                    return items;
-                };
-                const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 30);
-                const cutStr = cutoff.toISOString().slice(0, 10);
-                const [u, p, w, inv, veh, smj, ob, otp] = await Promise.all([
-                    loadCol('users'), loadCol('projects'), loadCol('workers'),
-                    loadCol('invoices'), loadCol('vehicles'), loadCol('smjestaj'),
-                    loadCol('obaveze'), loadCol('otpremnice'),
-                ]);
-                const tsSnap = await db.collection('timesheets').where('date', '>=', cutStr).limit(200).get();
-                const ts = snapToArray(tsSnap);
-                if (import.meta.env.DEV) console.log(`[READS] POLL timesheets: ${ts.length} docs (30-day)`);
-                setUsers(u); setProjects(p); setWorkers(w);
-                setTimesheets(prev => {
-                    const oldDocs = prev.filter(d => (d.date || '') < cutStr);
-                    return [...oldDocs, ...ts];
-                });
-                setInvoices(inv); setVehicles(veh); setSmjestaj(smj); setObaveze(ob); setOtpremnice(otp);
-                setLastSync(new Date());
-                console.log(`[Polling] Data refreshed at ${new Date().toLocaleTimeString()}`);
-            } catch (e) { console.error('[Polling] Refresh failed:', e); }
-        };
-
-        const timer = setInterval(doRefresh, intervalMs);
-        return () => clearInterval(timer);
-    }, [sessionConfig.syncMode, step]);
-
-    // Audit log helper
-    const addAuditLog = useCallback(async (action, details) => {
-        const entry = { id: genId(), action, user: currentUser?.name || 'System', timestamp: new Date().toISOString(), details };
-        await add('auditLog', entry);
-        setAuditLog(prev => [...prev, entry]);
-    }, [currentUser]);
-
-    // Lazy load auditLog (for SettingsPage)
-    const [auditLogLoaded, setAuditLogLoaded] = useState(false);
-    const loadAuditLog = useCallback(async () => {
-        if (auditLogLoaded) return;
-        const db = getDb();
-        if (!db) return;
-        try {
-            const snap = await db.collection('auditLog').get();
-            setAuditLog(snapToArray(snap));
-            setAuditLogLoaded(true);
-        } catch (e) { console.error('Failed to load auditLog:', e); }
-    }, [auditLogLoaded]);
-
-    // Trash: load soft-deleted items across collections
-    const TRASH_COLLECTIONS = ['workers', 'projects', 'timesheets', 'invoices', 'vehicles', 'smjestaj', 'obaveze', 'otpremnice', 'production'];
-    const loadDeletedItems = useCallback(async () => {
-        const db = getDb(); if (!db) return [];
-        const results = [];
-        for (const col of TRASH_COLLECTIONS) {
-            try {
-                const snap = await db.collection(col).where('deletedAt', '!=', null).get();
-                snap.forEach(doc => results.push({ ...doc.data(), id: doc.id, _collection: col }));
-            } catch { /* collection may not have deletedAt field yet */ }
-        }
-        return results.sort((a, b) => (b.deletedAt || '').localeCompare(a.deletedAt || ''));
-    }, []);
-
-    // Trash: permanently delete items older than 30 days
-    const cleanupOldDeleted = useCallback(async () => {
-        const db = getDb(); if (!db) return 0;
-        const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 30);
-        const cutStr = cutoff.toISOString();
-        let count = 0;
-        for (const col of TRASH_COLLECTIONS) {
-            try {
-                const snap = await db.collection(col).where('deletedAt', '!=', null).get();
-                for (const doc of snap.docs) {
-                    if (doc.data().deletedAt < cutStr) {
-                        await db.collection(col).doc(doc.id).delete();
-                        count++;
-                    }
-                }
-            } catch { /* skip */ }
-        }
-        return count;
-    }, []);
-
-    // Lazy load ALL timesheets (for archive/reports)
-    const loadAllTimesheets = useCallback(async () => {
-        if (allTimesheetsLoaded) return;
-        const db = getDb();
-        if (!db) return;
-        try {
-            const snap = await db.collection('timesheets').get();
-            setTimesheets(snapToArray(snap));
-            setAllTimesheetsLoaded(true);
-        } catch (e) { console.error('Failed to load all timesheets:', e); }
-    }, [allTimesheetsLoaded]);
-
-    // Lazy load dailyLogs
-    const loadDailyLogs = useCallback(async () => {
-        if (dailyLogsLoaded) return;
-        const db = getDb();
-        if (!db) return;
-        try {
-            const snap = await db.collection('dailyLogs').get();
-            setDailyLogs(snapToArray(snap));
-            setDailyLogsLoaded(true);
-        } catch (e) { console.error('Failed to load dailyLogs:', e); }
-    }, [dailyLogsLoaded]);
-
-    // Lazy load weatherRules
-    const loadWeatherRules = useCallback(async () => {
-        if (weatherRulesLoaded) return;
-        const db = getDb();
-        if (!db) return;
-        try {
-            const snap = await db.collection('weatherRules').get();
-            setWeatherRules(snapToArray(snap));
-            setWeatherRulesLoaded(true);
-        } catch (e) { console.error('Failed to load weatherRules:', e); }
-    }, [weatherRulesLoaded]);
-
-    // Lazy load safety data
-    const loadSafetyData = useCallback(async () => {
-        if (safetyLoaded) return;
-        const db = getDb();
-        if (!db) return;
-        try {
-            const [tSnap, cSnap] = await Promise.all([
-                db.collection('safetyTemplates').get(),
-                db.collection('safetyChecklists').get(),
-            ]);
-            setSafetyTemplates(snapToArray(tSnap));
-            setSafetyChecklists(snapToArray(cSnap));
-            setSafetyLoaded(true);
-        } catch (e) { console.error('Failed to load safety data:', e); }
-    }, [safetyLoaded]);
-
-    // Lazy load production data
-    const loadProduction = useCallback(async () => {
-        if (productionLoaded) return;
-        const db = getDb();
-        if (!db) return;
-        try {
-            const [prodSnap, alertSnap] = await Promise.all([
-                db.collection('production').get(),
-                db.collection('prodAlerts').get(),
-            ]);
-            setProduction(snapToArray(prodSnap));
-            setProdAlerts(snapToArray(alertSnap));
-            setProductionLoaded(true);
-            console.log(`[Lazy] production: ${prodSnap.size} items loaded`);
-        } catch (e) { console.error('Failed to load production:', e); }
-    }, [productionLoaded]);
-
-    // Leader role support
-    const isLeader = currentUser?.role === 'leader';
-    const leaderProjectIds = useMemo(() => currentUser?.assignedProjects || [], [currentUser]);
-    const leaderWorkerIds = useMemo(() => {
-        if (!isLeader || !leaderProjectIds.length) return [];
-        const ids = new Set();
-        projects.filter(p => leaderProjectIds.includes(p.id)).forEach(p => (p.workers || []).forEach(wId => ids.add(wId)));
-        return [...ids];
-    }, [isLeader, leaderProjectIds, projects]);
-
-    // ── Refresh shortcuts for non-realtime (Tier 2) collections ──
-    const refreshInvoices = useCallback(() => refreshCollection('invoices', setInvoices), [refreshCollection]);
-    const refreshVehicles = useCallback(() => refreshCollection('vehicles', setVehicles), [refreshCollection]);
-    const refreshSmjestaj = useCallback(() => refreshCollection('smjestaj', setSmjestaj), [refreshCollection]);
-    const refreshOtpremnice = useCallback(() => refreshCollection('otpremnice', setOtpremnice), [refreshCollection]);
-    const refreshProduction = useCallback(() => refreshCollection('production', setProduction), [refreshCollection]);
-
-    const value = useMemo(() => ({
-        step, setStep, currentUser, setCurrentUser, firebaseReady, loadError,
-        users, setUsers, projects, setProjects, workers, setWorkers,
-        timesheets, setTimesheets, invoices, setInvoices,
-        vehicles, setVehicles, smjestaj, setSmjestaj,
-        obaveze, setObaveze, otpremnice, setOtpremnice,
-        production, setProduction, prodAlerts, setProdAlerts,
-        auditLog, setAuditLog, companyProfile, setCompanyProfile,
-        dailyLogs, setDailyLogs,
-        weatherRules, setWeatherRules,
-        safetyTemplates, setSafetyTemplates,
-        safetyChecklists, setSafetyChecklists,
-        workerMap, projectMap, getWorkerName, getProjectName,
-        add, update, remove, setDoc,
-        addAuditLog, loadAuditLog, allTimesheetsLoaded, loadAllTimesheets,
-        loadDailyLogs, loadWeatherRules, loadSafetyData, loadProduction,
-        isLeader, leaderProjectIds, leaderWorkerIds,
-        handleAppLogin, handleFirebaseLogin, handleFirebaseConfig, handleCompanySetup,
-        handleAdminCreate, handleUserLogin, handleLogout, handleResetFirebase,
-        sessionConfig, forceLogoutAll, updateSessionDuration, updateSyncMode, lastSync,
-        loadDeletedItems, cleanupOldDeleted,
-        refreshInvoices, refreshVehicles, refreshSmjestaj, refreshOtpremnice, refreshProduction,
-        changePassword, exportUserData,
-    }), [step, currentUser, firebaseReady, loadError,
-        users, projects, workers, timesheets, invoices,
-        vehicles, smjestaj, obaveze, otpremnice, production,
-        auditLog, companyProfile, dailyLogs, weatherRules,
-        safetyTemplates, safetyChecklists,
-        workerMap, projectMap, getWorkerName, getProjectName,
-        allTimesheetsLoaded, isLeader, leaderProjectIds, leaderWorkerIds,
-        sessionConfig, lastSync,
-        addAuditLog, loadAuditLog, loadAllTimesheets, loadDailyLogs,
-        loadWeatherRules, loadSafetyData, loadProduction, forceLogoutAll,
-        updateSessionDuration, updateSyncMode,
-        handleAppLogin, handleFirebaseConfig, handleCompanySetup,
-        handleAdminCreate, handleUserLogin, handleLogout, handleResetFirebase,
-        loadDeletedItems, cleanupOldDeleted,
-        changePassword, exportUserData,
-    ]);
-
-    return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+export function AppProvider({ children }: { children: React.ReactNode }) {
+    return (
+        <AuthProvider>
+            <DataProvider>
+                <AppContextBridge>
+                    {children}
+                </AppContextBridge>
+            </DataProvider>
+        </AuthProvider>
+    );
 }
-
