@@ -68,21 +68,24 @@ export interface DataContextValue {
 }
 
 // ── Error handler ────────────────────────────────────────────────────────
-function handleError(e: any, op: string) {
-    if (e.code === 'permission-denied' || (e.message && e.message.includes('permissions'))) {
+function handleError(e: unknown, op: string) {
+    const err = e as { code?: string; message?: string };
+    if (err.code === 'permission-denied' || (err.message && err.message.includes('permissions'))) {
         throw new Error('Nemate dozvolu za ovu operaciju. Kontaktirajte administratora.');
     }
     console.error(`Firestore ${op} error:`, e);
 }
 
 // ── Global setter registry ───────────────────────────────────────────────
-const _setterMap: Record<string, any> = {};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SetterFn = (updater: any) => void;
+const _setterMap: Record<string, SetterFn> = {};
 
 // ── Snap to array helper ─────────────────────────────────────────────────
-function snapToArray(snap: any): any[] {
-    const items: any[] = [];
-    snap.forEach((doc: any) => {
-        const d = { ...doc.data(), id: doc.id };
+function snapToArray(snap: QuerySnapshot): BaseDoc[] {
+    const items: BaseDoc[] = [];
+    snap.forEach((docSnap) => {
+        const d = { ...docSnap.data(), id: docSnap.id } as BaseDoc;
         if (!d.deletedAt) items.push(d);
     });
     return items;
@@ -90,7 +93,7 @@ function snapToArray(snap: any): any[] {
 
 // ── Reads telemetry ──────────────────────────────────────────────────────
 function logReads(source: string, collection: string, count: number, type = 'get') {
-    if ((import.meta as any).env?.DEV) {
+    if (import.meta.env?.DEV) {
         console.log(`[READS] ${type.toUpperCase()} ${collection}: ${count} docs (${source})`);
     }
 }
@@ -162,24 +165,24 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }, [isLeader, leaderProjectIds, projects]);
 
     // ── CRUD ──
-    const addFn = useCallback(async (col: string, data: any) => {
+    const addFn = useCallback(async (col: string, data: Record<string, unknown> & { id?: string }) => {
         const db = getDb(); if (!db) return null;
         const id = data.id || genId();
         const docData = { ...data, id };
         try {
             validateOrThrow(col, docData);
             await setDoc(doc(db, col, id), docData);
-            if (_setterMap[col]) _setterMap[col]((prev: any[]) => [...prev, docData]);
+            if (_setterMap[col]) _setterMap[col]((prev) => [...prev, docData as BaseDoc]);
             return docData;
         } catch (e) { handleError(e, 'add'); throw e; }
     }, []);
 
-    const updateFn = useCallback(async (col: string, id: string, updates: any) => {
+    const updateFn = useCallback(async (col: string, id: string, updates: Record<string, unknown>) => {
         const db = getDb(); if (!db) return;
         try {
             const stamped = { ...updates, updatedAt: new Date().toISOString() };
             await updateDoc(doc(db, col, id), stamped);
-            if (_setterMap[col]) _setterMap[col]((prev: any[]) => prev.map(d => d.id === id ? { ...d, ...stamped } : d));
+            if (_setterMap[col]) _setterMap[col]((prev) => prev.map(d => d.id === id ? { ...d, ...stamped } : d));
         } catch (e) { handleError(e, 'update'); throw e; }
     }, []);
 
@@ -189,18 +192,18 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         try {
             const deletedAt = new Date().toISOString();
             await updateDoc(doc(db, col, id), { deletedAt });
-            if (_setterMap[col]) _setterMap[col]((prev: any[]) => prev.filter(d => d.id !== id));
+            if (_setterMap[col]) _setterMap[col]((prev) => prev.filter(d => d.id !== id));
         } catch (e) { handleError(e, 'remove'); throw e; }
     }, []);
 
-    const setDocFn = useCallback(async (col: string, docId: string, data: any) => {
+    const setDocFn = useCallback(async (col: string, docId: string, data: Record<string, unknown>) => {
         const db = getDb(); if (!db) return;
         try { await setDoc(doc(db, col, docId), data); }
         catch (e) { handleError(e, 'setDoc'); throw e; }
     }, []);
 
     // ── Refresh helper ──
-    const refreshCollection = useCallback(async (name: string, setter: any) => {
+    const refreshCollection = useCallback(async (name: string, setter: SetterFn | React.Dispatch<React.SetStateAction<BaseDoc[]>>) => {
         const db = getDb(); if (!db) return;
         const snap = await getDocs(collection(db, name));
         const items = snapToArray(snap);
@@ -209,7 +212,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     // ── Data load function (called from AuthContext via triggerDataLoad) ──
-    const initFirebaseAndLoad = useCallback(async (config: any) => {
+    const initFirebaseAndLoad = useCallback(async (config: Record<string, string>) => {
         auth.setLoadError(null);
         try {
             console.log('[DataContext] Starting data load...');
@@ -259,7 +262,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
             // PIN migration
             const isHashed = (pin: string) => /^[a-f0-9]{64}$/.test(pin);
-            const usersToMigrate = u.filter((user: any) => user.pin && !isHashed(user.pin));
+            const usersToMigrate = u.filter((user) => (user as User).pin && !isHashed((user as User).pin));
             if (usersToMigrate.length > 0) {
                 const defaultHashedPin = await hashPin('1234');
                 for (const user of usersToMigrate) {
@@ -269,7 +272,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             }
 
             // Realtime listeners (MODULAR)
-            const listenWithLog = (col: string, setter: any, q?: any) => {
+            const listenWithLog = (col: string, setter: SetterFn | React.Dispatch<React.SetStateAction<BaseDoc[]>>, q?: ReturnType<typeof query>) => {
                 const src = q || collection(db, col);
                 return onSnapshot(src, (snap: QuerySnapshot) => {
                     const items = snapToArray(snap);
@@ -289,7 +292,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
                 const recentDocs = snapToArray(snap);
                 logReads('listener', 'timesheets', recentDocs.length, 'onSnapshot');
                 setTimesheets(prev => {
-                    const oldDocs = prev.filter((d: any) => (d.date || '') < cutoff30Str);
+                    const oldDocs = prev.filter((d) => ((d as BaseDoc & { date?: string }).date || '') < cutoff30Str);
                     return [...oldDocs, ...recentDocs];
                 });
             });
@@ -338,7 +341,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
                 const elapsed = (Date.now() - new Date(saved.loginAt).getTime()) / 60000;
                 const maxDuration = auth.sessionConfig.sessionDuration || 60;
                 if (elapsed < maxDuration) {
-                    const restoredUser = u.find((usr: any) => usr.id === saved.userId);
+                    const restoredUser = u.find((usr) => usr.id === saved.userId);
                     if (restoredUser) {
                         console.log('[Session] Restored:', restoredUser.name, `(${Math.round(elapsed)}min ago)`);
                         auth.handleUserLogin(restoredUser);
@@ -353,7 +356,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             if (fbAuth2 && fbAuth2.currentUser) {
                 const email = fbAuth2.currentUser.email || '';
                 const matchName = email.split('@')[0];
-                const matchedUser = u.find((usr: any) => usr.username === matchName);
+                const matchedUser = u.find((usr) => (usr as User).username === matchName);
                 if (matchedUser) {
                     await writeAuthMapping(fbAuth2.currentUser.uid, matchedUser);
                     auth.handleUserLogin(matchedUser);
@@ -376,13 +379,14 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             } else {
                 auth.setStep('appLogin');
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const e = err as { code?: string; message?: string };
             console.error('[DataContext] Firebase load error:', err);
-            if (err.code === 'permission-denied' || err.message?.includes('permission') || err.message?.includes('offline')) {
+            if (e.code === 'permission-denied' || e.message?.includes('permission') || e.message?.includes('offline')) {
                 auth.clearStaleCache();
                 try { const a = getAuth(); if (a) signOut(a); } catch { }
             }
-            auth.setLoadError(err.message);
+            auth.setLoadError(e.message || 'Unknown error');
             auth.setStep('appLogin');
         }
     }, [auth]);
@@ -415,7 +419,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
                 const ts = snapToArray(tsSnap);
                 setUsers(u); setProjects(p); setWorkers(w);
                 setTimesheets(prev => {
-                    const oldDocs = prev.filter((d: any) => (d.date || '') < cutStr);
+                    const oldDocs = prev.filter((d) => ((d as BaseDoc & { date?: string }).date || '') < cutStr);
                     return [...oldDocs, ...ts];
                 });
                 setInvoices(inv); setVehicles(veh); setSmjestaj(smj); setObaveze(ob); setOtpremnice(otp);
@@ -427,7 +431,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }, [auth.sessionConfig.syncMode, auth.step]);
 
     // ── Audit log helper ──
-    const addAuditLog = useCallback(async (action: string, details: any) => {
+    const addAuditLog = useCallback(async (action: string, details: Record<string, unknown>) => {
         const entry = { id: genId(), action, user: auth.currentUser?.name || 'System', timestamp: new Date().toISOString(), details };
         await addFn('auditLog', entry);
         setAuditLog(prev => [...prev, entry]);
@@ -482,14 +486,14 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
     const loadDeletedItems = useCallback(async () => {
         const db = getDb(); if (!db) return [];
-        const results: any[] = [];
+        const results: (BaseDoc & { _collection: string })[] = [];
         for (const col of TRASH_COLLECTIONS) {
             try {
                 const snap = await getDocs(query(collection(db, col), where('deletedAt', '!=', null)));
                 snap.forEach((d) => results.push({ ...d.data(), id: d.id, _collection: col }));
             } catch { /* skip */ }
         }
-        return results.sort((a: any, b: any) => (b.deletedAt || '').localeCompare(a.deletedAt || ''));
+        return results.sort((a, b) => (b.deletedAt || '').localeCompare(a.deletedAt || ''));
     }, []);
 
     const cleanupOldDeleted = useCallback(async () => {

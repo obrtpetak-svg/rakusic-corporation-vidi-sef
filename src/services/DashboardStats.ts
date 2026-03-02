@@ -1,5 +1,6 @@
 import { getDb } from '../context/firebaseCore';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
+import type { Project, Worker, Timesheet, Invoice, Otpremnica, Obaveza, Vehicle, Smjestaj } from '../types';
 
 /**
  * Dashboard Stats — pre-computed aggregate document
@@ -31,30 +32,30 @@ export interface DashboardStats {
  * @param localState - current app state arrays
  */
 export async function refreshDashboardStats(localState: {
-    projects: any[];
-    workers: any[];
-    timesheets: any[];
-    invoices: any[];
-    otpremnice: any[];
-    obaveze: any[];
-    vehicles: any[];
-    smjestaj: any[];
+    projects: Project[];
+    workers: Worker[];
+    timesheets: Timesheet[];
+    invoices: Invoice[];
+    otpremnice: Otpremnica[];
+    obaveze: Obaveza[];
+    vehicles: Vehicle[];
+    smjestaj: Smjestaj[];
 }): Promise<DashboardStats | null> {
     const db = getDb();
     if (!db) return null;
 
     const stats: DashboardStats = {
-        activeProjects: localState.projects.filter((p: any) => p.status === 'aktivan').length,
+        activeProjects: localState.projects.filter(p => p.status === 'aktivan').length,
         totalProjects: localState.projects.length,
-        activeWorkers: localState.workers.filter((w: any) => w.active !== false).length,
+        activeWorkers: localState.workers.filter(w => (w as Worker & { active?: boolean }).active !== false).length,
         totalWorkers: localState.workers.length,
-        pendingTimesheets: localState.timesheets.filter((t: any) => t.status === 'na čekanju').length,
-        pendingInvoices: localState.invoices.filter((i: any) => i.status === 'na čekanju' && i.source === 'radnik').length,
-        pendingOtpremnice: localState.otpremnice.filter((o: any) => o.status === 'na čekanju').length,
+        pendingTimesheets: localState.timesheets.filter(t => t.status === 'na čekanju').length,
+        pendingInvoices: localState.invoices.filter(i => i.status === 'na čekanju' && i.source === 'radnik').length,
+        pendingOtpremnice: localState.otpremnice.filter(o => o.status === 'na čekanju').length,
         pendingTotal: 0,
         totalVehicles: localState.vehicles.length,
         totalSmjestaj: localState.smjestaj.length,
-        activeObaveze: localState.obaveze.filter((o: any) => o.active !== false).length,
+        activeObaveze: localState.obaveze.filter(o => (o as Obaveza & { active?: boolean }).active !== false).length,
         updatedAt: new Date().toISOString(),
     };
     stats.pendingTotal = stats.pendingTimesheets + stats.pendingInvoices + stats.pendingOtpremnice;
