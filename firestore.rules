@@ -3,7 +3,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // ══════════════════════════════════════════════════════════════
-    // ROLE-BASED SECURITY RULES for Vi-Di-Sef
+    // ROLE-BASED SECURITY RULES for Vi-Di-Sef (Enterprise Edition)
     // Uses authMapping collection: Firebase UID → { role, userId }
     // Roles: admin | leader | radnik (default)
     // ══════════════════════════════════════════════════════════════
@@ -21,8 +21,6 @@ service cloud.firestore {
       return isAuth() && getRole() == 'admin';
     }
 
-    // Fallback: if authMapping doesn't exist, allow auth-only access
-    // This prevents lockout during migration
     function hasMapping() {
       return isAuth() && exists(/databases/$(database)/documents/authMapping/$(request.auth.uid));
     }
@@ -31,65 +29,103 @@ service cloud.firestore {
       return isAuth() && (!hasMapping() || getRole() == 'admin');
     }
 
-    // ── AUTH MAPPING — authenticated read/write (app writes on login) ──
+    // ── Input validation helpers ─────────────────────────────────
+    function isString(field) {
+      return request.resource.data[field] is string;
+    }
+
+    function isNumber(field) {
+      return request.resource.data[field] is number;
+    }
+
+    function maxLen(field, max) {
+      return request.resource.data[field].size() <= max;
+    }
+
+    function hasFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    // ── AUTH MAPPING ─────────────────────────────────────────────
     match /authMapping/{uid} {
       allow read: if isAuth();
-      allow write: if isAuth();
+      allow write: if isAuth()
+        && request.resource.data.keys().hasAll(['role', 'userId'])
+        && request.resource.data.role in ['admin', 'leader', 'radnik']
+        && request.resource.data.userId is string
+        && request.resource.data.userId.size() <= 100;
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // ADMIN-ONLY WRITE collections
-    // Everyone reads, only admin (or unmapped users) can write
+    // ADMIN-ONLY WRITE collections (with input validation)
     // ═══════════════════════════════════════════════════════════════
 
-    // ── Users & Workers — admin manages, all read ──
+    // ── Users ──
     match /users/{userId} {
       allow read: if isAuth();
-      allow write: if adminOrNoMapping();
+      allow create: if adminOrNoMapping()
+        && hasFields(['username', 'name'])
+        && isString('username') && maxLen('username', 50)
+        && isString('name') && maxLen('name', 100);
+      allow update: if adminOrNoMapping();
+      allow delete: if adminOrNoMapping();
     }
 
+    // ── Workers ──
     match /workers/{workerId} {
       allow read: if isAuth();
-      allow write: if adminOrNoMapping();
+      allow create: if adminOrNoMapping()
+        && hasFields(['name'])
+        && isString('name') && maxLen('name', 100);
+      allow update: if adminOrNoMapping();
+      allow delete: if adminOrNoMapping();
     }
 
-    // ── Projects — admin manages, all read ──
+    // ── Projects ──
     match /projects/{projectId} {
       allow read: if isAuth();
-      allow write: if adminOrNoMapping();
+      allow create: if adminOrNoMapping()
+        && hasFields(['name'])
+        && isString('name') && maxLen('name', 200);
+      allow update: if adminOrNoMapping();
+      allow delete: if adminOrNoMapping();
     }
 
-    // ── Config — admin manages, all read ──
+    // ── Config ──
     match /config/{docId} {
       allow read: if isAuth();
       allow write: if adminOrNoMapping();
     }
 
-    // ── Vehicles — admin manages, all read ──
+    // ── Vehicles ──
     match /vehicles/{vehicleId} {
       allow read: if isAuth();
-      allow write: if adminOrNoMapping();
+      allow create: if adminOrNoMapping()
+        && hasFields(['name'])
+        && isString('name') && maxLen('name', 100);
+      allow update: if adminOrNoMapping();
+      allow delete: if adminOrNoMapping();
     }
 
-    // ── Smjestaj — admin manages, all read ──
+    // ── Smjestaj ──
     match /smjestaj/{smjestajId} {
       allow read: if isAuth();
       allow write: if adminOrNoMapping();
     }
 
-    // ── Weather Rules — admin manages, all read ──
+    // ── Weather Rules ──
     match /weatherRules/{docId} {
       allow read: if isAuth();
       allow write: if adminOrNoMapping();
     }
 
-    // ── Safety Templates — admin manages, all read ──
+    // ── Safety Templates ──
     match /safetyTemplates/{docId} {
       allow read: if isAuth();
       allow write: if adminOrNoMapping();
     }
 
-    // ── GPS Settings — admin manages, all read ──
+    // ── GPS Settings ──
     match /gpsSettings/{docId} {
       allow read: if isAuth();
       allow write: if adminOrNoMapping();
@@ -103,72 +139,87 @@ service cloud.firestore {
       allow write: if adminOrNoMapping();
     }
 
-    // ── Audit Log — admin reads, all write (app logs actions) ──
+    // ── Audit Log ──
     match /auditLog/{logId} {
       allow read: if adminOrNoMapping();
-      allow write: if isAuth();
+      allow create: if isAuth()
+        && hasFields(['action', 'timestamp'])
+        && isString('action') && maxLen('action', 200);
+      allow update, delete: if false; // Audit logs are immutable
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // ALL-WRITE collections
-    // Workers need to create/update their own data
+    // ALL-WRITE collections (with input validation)
     // ═══════════════════════════════════════════════════════════════
 
-    // ── Timesheets — workers create entries, admin approves ──
+    // ── Timesheets ──
     match /timesheets/{timesheetId} {
       allow read: if isAuth();
-      allow write: if isAuth();
+      allow create: if isAuth()
+        && hasFields(['date', 'workerId'])
+        && isString('date') && maxLen('date', 10);
+      allow update: if isAuth();
+      allow delete: if adminOrNoMapping();
     }
 
-    // ── Invoices — workers submit, admin approves ──
+    // ── Invoices ──
     match /invoices/{invoiceId} {
       allow read: if isAuth();
-      allow write: if isAuth();
+      allow create: if isAuth()
+        && request.resource.data.keys().hasAny(['date', 'amount', 'number']);
+      allow update: if isAuth();
+      allow delete: if adminOrNoMapping();
     }
 
-    // ── Otpremnice — workers create, admin approves ──
+    // ── Otpremnice ──
     match /otpremnice/{otpremnicaId} {
       allow read: if isAuth();
-      allow write: if isAuth();
+      allow create: if isAuth();
+      allow update: if isAuth();
+      allow delete: if adminOrNoMapping();
     }
 
-    // ── Production — admin/leader manage production orders ──
+    // ── Production ──
     match /production/{productionId} {
       allow read: if isAuth();
-      allow write: if isAuth();
+      allow create: if isAuth()
+        && hasFields(['name'])
+        && isString('name') && maxLen('name', 200);
+      allow update: if isAuth();
+      allow delete: if adminOrNoMapping();
     }
 
-    // ── Obaveze — workers mark complete, admin creates ──
+    // ── Obaveze ──
     match /obaveze/{obavezaId} {
       allow read: if isAuth();
       allow write: if isAuth();
     }
 
-    // ── Safety Checklists — workers fill out ──
+    // ── Safety Checklists ──
     match /safetyChecklists/{docId} {
       allow read: if isAuth();
       allow write: if isAuth();
     }
 
-    // ── Daily Logs — workers/leaders create ──
+    // ── Daily Logs ──
     match /dailyLogs/{docId} {
       allow read: if isAuth();
       allow write: if isAuth();
     }
 
-    // ── Fuel Logs — workers log fuel ──
+    // ── Fuel Logs ──
     match /fuelLogs/{docId} {
       allow read: if isAuth();
       allow write: if isAuth();
     }
 
-    // ── Leave Requests — workers submit, admin approves ──
+    // ── Leave Requests ──
     match /leaveRequests/{docId} {
       allow read: if isAuth();
       allow write: if isAuth();
     }
 
-    // ── GPS Live Data — workers send positions ──
+    // ── GPS Live Data ──
     match /gpsLiveLocations/{docId} {
       allow read: if isAuth();
       allow write: if isAuth();
@@ -182,13 +233,13 @@ service cloud.firestore {
       allow write: if isAuth();
     }
 
-    // ── Production Alerts — workers/leaders create, all read ──
+    // ── Production Alerts ──
     match /prodAlerts/{docId} {
       allow read: if isAuth();
       allow write: if isAuth();
     }
 
-    // ── Production Notifications — system creates, users read ──
+    // ── Production Notifications ──
     match /prodNotifications/{docId} {
       allow read: if isAuth();
       allow write: if isAuth();

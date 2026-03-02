@@ -1,0 +1,19 @@
+[
+    {
+        "origin": [
+            "https://rakusic-corporation.live",
+            "https://rakusic-corporation-vidi-sef.vercel.app"
+        ],
+        "method": [
+            "GET",
+            "PUT",
+            "POST",
+            "DELETE"
+        ],
+        "maxAgeSeconds": 3600,
+        "responseHeader": [
+            "Content-Type",
+            "Authorization"
+        ]
+    }
+]

@@ -82,7 +82,7 @@ export function hexToRgb(hex: string): string {
 
 // ── Image Compression ────────────────────────────────────────────────────
 
-export function compressImage(file: File): Promise<CompressedImage> {
+export function compressImage(file: File, maxSize = 1200, quality = 0.75): Promise<CompressedImage> {
     return new Promise((resolve) => {
         if (file.type === 'application/pdf' || !file.type.startsWith('image/')) {
             const reader = new FileReader();
@@ -95,15 +95,19 @@ export function compressImage(file: File): Promise<CompressedImage> {
             const img = new Image();
             img.onload = () => {
                 let w = img.width, h = img.height;
-                if (w > 900 || h > 900) {
-                    if (w > h) { h = Math.round(h * 900 / w); w = 900; }
-                    else { w = Math.round(w * 900 / h); h = 900; }
+                if (w > maxSize || h > maxSize) {
+                    if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                    else { w = Math.round(w * maxSize / h); h = maxSize; }
                 }
                 const canvas = document.createElement('canvas');
                 canvas.width = w; canvas.height = h;
                 canvas.getContext('2d')!.drawImage(img, 0, 0, w, h);
-                const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
-                resolve({ name: file.name.replace(/\.[^.]+$/, '.jpg'), type: 'image/jpeg', data: dataUrl, size: dataUrl.length });
+                // Use WebP for much better compression (~60% smaller than JPEG)
+                const useWebP = canvas.toDataURL('image/webp', 0.1).startsWith('data:image/webp');
+                const format = useWebP ? 'image/webp' : 'image/jpeg';
+                const ext = useWebP ? '.webp' : '.jpg';
+                const dataUrl = canvas.toDataURL(format, quality);
+                resolve({ name: file.name.replace(/\.[^.]+$/, ext), type: format, data: dataUrl, size: dataUrl.length });
             };
             img.src = (e.target as FileReader).result as string;
         };
