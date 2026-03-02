@@ -628,8 +628,8 @@ export function AppProvider({ children }) {
             initFirebase(config);
         }
 
-        // Step 2: Clear stale Firestore cache BEFORE login to prevent hung queries
-        clearFirestoreCache();
+        // NOTE: Do NOT clear IndexedDB here — it breaks Firebase Auth which uses IndexedDB internally.
+        // Cache clearing is available via the "Obriši cache" button on the login page.
 
         const auth = getAuth();
         if (!auth) throw new Error('Auth not available');
