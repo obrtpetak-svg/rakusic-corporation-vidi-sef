@@ -709,6 +709,69 @@ export function AppProvider({ children }) {
         window.location.reload();
     };
 
+    // 🔐 Password change (Firebase Auth)
+    const changePassword = useCallback(async (currentPassword, newPassword) => {
+        const auth = getAuth();
+        if (!auth || !auth.currentUser) throw new Error('Not authenticated');
+        // Validate new password policy
+        if (newPassword.length < 8) throw new Error('Lozinka mora imati barem 8 znakova');
+        if (!/[A-Z]/.test(newPassword)) throw new Error('Lozinka mora imati barem 1 veliko slovo');
+        if (!/[0-9]/.test(newPassword)) throw new Error('Lozinka mora imati barem 1 broj');
+        // Re-authenticate
+        const email = auth.currentUser.email;
+        const wrappedCurrent = `vds_${currentPassword}_auth`;
+        const wrappedNew = `vds_${newPassword}_auth`;
+        const fb = window.firebase;
+        const credential = fb.auth.EmailAuthProvider.credential(email, wrappedCurrent);
+        await auth.currentUser.reauthenticateWithCredential(credential);
+        await auth.currentUser.updatePassword(wrappedNew);
+        // Audit log
+        try {
+            const db = getDb();
+            if (db) await db.collection('auditLog').add({
+                id: genId(), action: 'PASSWORD_CHANGED', user: currentUser?.name || 'unknown',
+                userId: currentUser?.id, timestamp: new Date().toISOString(),
+            });
+        } catch (e) { /* ignore */ }
+    }, [currentUser]);
+
+    // 📦 GDPR data export (download all user data as JSON)
+    const exportUserData = useCallback(async () => {
+        if (!currentUser) throw new Error('Not logged in');
+        const db = getDb();
+        if (!db) throw new Error('Database not available');
+        const userId = currentUser.id;
+        const name = currentUser.name;
+        // Collect all user-related data
+        const data = {
+            exportDate: new Date().toISOString(),
+            user: currentUser,
+            timesheets: timesheets.filter(t => t.workerId === userId || t.userId === userId),
+            dailyLogs: dailyLogs.filter(l => l.userId === userId || l.createdBy === name),
+            leaveRequests: [], // lazy loaded if needed
+        };
+        // Try to load leave requests
+        try {
+            const snap = await db.collection('leaveRequests').where('workerId', '==', userId).get();
+            snap.forEach(doc => data.leaveRequests.push({ ...doc.data(), id: doc.id }));
+        } catch (e) { /* ignore */ }
+        // Download as JSON
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `vidisef-export-${userId}-${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        // Audit
+        try {
+            await db.collection('auditLog').add({
+                id: genId(), action: 'DATA_EXPORT', user: name,
+                userId, timestamp: new Date().toISOString(),
+            });
+        } catch (e) { /* ignore */ }
+    }, [currentUser, timesheets, dailyLogs]);
+
     // Admin: force logout all users by incrementing sessionVersion
     const forceLogoutAll = useCallback(async () => {
         const db = getDb();
@@ -921,6 +984,7 @@ export function AppProvider({ children }) {
         sessionConfig, forceLogoutAll, updateSessionDuration, updateSyncMode, lastSync,
         loadDeletedItems, cleanupOldDeleted,
         refreshInvoices, refreshVehicles, refreshSmjestaj, refreshOtpremnice, refreshProduction,
+        changePassword, exportUserData,
     }), [step, currentUser, firebaseReady, loadError,
         users, projects, workers, timesheets, invoices,
         vehicles, smjestaj, obaveze, otpremnice, production,
@@ -935,6 +999,7 @@ export function AppProvider({ children }) {
         handleAppLogin, handleFirebaseConfig, handleCompanySetup,
         handleAdminCreate, handleUserLogin, handleLogout, handleResetFirebase,
         loadDeletedItems, cleanupOldDeleted,
+        changePassword, exportUserData,
     ]);
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
