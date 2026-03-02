@@ -16,7 +16,7 @@ const STATUS_META: Record<string, { icon: string; label: string; color: string }
     offline: { icon: '⚫', label: 'Offline', color: '#6B7280' },
 };
 
-// Mock maintenance data
+// Mock maintenance data (Firestore in future)
 const MOCK_MAINTENANCE = [
     { id: 'm1', type: 'Servis', desc: 'Veliki servis — ulje, filteri, kočnice', date: '2026-02-15', km: 125400, cost: 890, status: 'done' },
     { id: 'm2', type: 'Gume', desc: 'Zamjena zimskih guma', date: '2026-03-01', km: 127200, cost: 1200, status: 'done' },
@@ -62,7 +62,28 @@ export default function FleetVehicleDetail({ vehicle, onBack }: {
         }
     }, [vehicle.lat, vehicle.lng]);
 
-    const totalEngineHours = MOCK_IGNITIONS.reduce((sum, i) => sum + i.durationMin, 0);
+    // ── Load ignitions from API ──
+    const [ignitions, setIgnitions] = useState(MOCK_IGNITIONS);
+    const [ignLoading, setIgnLoading] = useState(false);
+
+    useEffect(() => {
+        const from = new Date(Date.now() - 3 * 86400000).toISOString();
+        const to = new Date().toISOString();
+        setIgnLoading(true);
+        fetch(`/api/gps/ignitions?vehicleId=${vehicle.id}&from=${from}&to=${to}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.sessions?.length > 0) {
+                    setIgnitions(data.sessions.map((s: any) => ({
+                        start: s.start, end: s.end, durationMin: s.durationMin,
+                    })));
+                }
+            })
+            .catch(() => { /* keep mock data */ })
+            .finally(() => setIgnLoading(false));
+    }, [vehicle.id]);
+
+    const totalEngineHours = ignitions.reduce((sum, i) => sum + i.durationMin, 0);
 
     return (
         <div>
@@ -138,15 +159,15 @@ export default function FleetVehicleDetail({ vehicle, onBack }: {
                 <div style={{ background: 'var(--card)', border: `1px solid ${C.border}`, borderRadius: 14, padding: 20 }}>
                     <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>📍 Povijest ruta</div>
                     <div style={{ fontSize: 13, color: C.textMuted, marginBottom: 16 }}>
-                        Odaberite period za prikaz rute vozila. Sprint 2: podatci iz Mapon route/list API.
+                        Za detaljnu povijest ruta s replay animacijom, koristite tab <strong>📍 Rute</strong> na glavnom dashboardu.
                     </div>
                     <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
-                        <input type="date" defaultValue="2026-03-01" style={{ padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`, background: 'var(--bg)', color: C.text, fontSize: 13 }} />
-                        <input type="date" defaultValue="2026-03-02" style={{ padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`, background: 'var(--bg)', color: C.text, fontSize: 13 }} />
+                        <input type="date" defaultValue={new Date(Date.now() - 86400000).toISOString().split('T')[0]} style={{ padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`, background: 'var(--bg)', color: C.text, fontSize: 13 }} />
+                        <input type="date" defaultValue={new Date().toISOString().split('T')[0]} style={{ padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`, background: 'var(--bg)', color: C.text, fontSize: 13 }} />
                         <button style={{ ...styles.btn, fontSize: 12, padding: '8px 16px' }}>🔍 Prikaži rutu</button>
                     </div>
-                    <div style={{ background: 'var(--bg)', borderRadius: 10, padding: 40, textAlign: 'center', color: C.textMuted, fontSize: 13 }}>
-                        📍 Ovdje će se prikazati replay rute s animacijom i timeline sliderom
+                    <div style={{ background: 'var(--bg)', borderRadius: 10, padding: 30, textAlign: 'center', color: C.textMuted, fontSize: 13 }}>
+                        📍 Replay rute za {vehicle.name} — dostupno na Rute tabu s animacijom i timeline sliderom
                     </div>
                 </div>
             )}
@@ -158,7 +179,9 @@ export default function FleetVehicleDetail({ vehicle, onBack }: {
                     <div style={{ background: 'var(--card)', border: `1px solid ${C.border}`, borderRadius: 14, padding: 16, marginBottom: 12 }}>
                         <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>🔑 Rad motora (zadnja 3 dana)</div>
                         <div style={{ display: 'grid', gap: 6 }}>
-                            {MOCK_IGNITIONS.map((ig, i) => (
+                            {ignLoading ? (
+                                <div style={{ padding: 20, textAlign: 'center', color: C.textMuted, fontSize: 12 }}>⏳ Učitavam podatke o radu motora...</div>
+                            ) : ignitions.map((ig, i) => (
                                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: 'var(--bg)', borderRadius: 8, fontSize: 12 }}>
                                     <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#10B981' }} />
                                     <span style={{ color: C.text, fontWeight: 600 }}>
