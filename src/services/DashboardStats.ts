@@ -1,4 +1,5 @@
 import { getDb } from '../context/firebaseCore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 /**
  * Dashboard Stats — pre-computed aggregate document
@@ -59,7 +60,7 @@ export async function refreshDashboardStats(localState: {
     stats.pendingTotal = stats.pendingTimesheets + stats.pendingInvoices + stats.pendingOtpremnice;
 
     try {
-        await db.collection('config').doc('dashboardStats').set(stats, { merge: true });
+        await setDoc(doc(db, 'config', 'dashboardStats'), stats, { merge: true });
         if (import.meta.env.DEV) console.log('[READS] dashboardStats written:', stats.pendingTotal, 'pending');
     } catch (e) {
         console.warn('[DashboardStats] Write failed:', (e as Error).message);
@@ -77,10 +78,10 @@ export async function readDashboardStats(): Promise<DashboardStats | null> {
     if (!db) return null;
 
     try {
-        const doc = await db.collection('config').doc('dashboardStats').get();
-        if (doc.exists) {
+        const snap = await getDoc(doc(db, 'config', 'dashboardStats'));
+        if (snap.exists()) {
             if (import.meta.env.DEV) console.log('[READS] dashboardStats read (1 read)');
-            return doc.data() as DashboardStats;
+            return snap.data() as DashboardStats;
         }
     } catch (e) {
         console.warn('[DashboardStats] Read failed:', (e as Error).message);
