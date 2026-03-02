@@ -598,7 +598,7 @@ export function AppProvider({ children }) {
         // If user already typed full email, use it as-is
         const cleanUser = username.toLowerCase().replace(/\s+/g, '.');
         const email = cleanUser.includes('@') ? cleanUser : `${cleanUser}@rakusic-corporation.live`;
-        const passwordWrapped = `vds_${password}_auth`;
+        const passwordWrapped = password;
         console.log('[Auth] Attempting login for:', email);
 
         let firebaseUser = null;
@@ -722,8 +722,8 @@ export function AppProvider({ children }) {
         if (!/[0-9]/.test(newPassword)) throw new Error('Lozinka mora imati barem 1 broj');
         // Re-authenticate
         const email = auth.currentUser.email;
-        const wrappedCurrent = `vds_${currentPassword}_auth`;
-        const wrappedNew = `vds_${newPassword}_auth`;
+        const wrappedCurrent = currentPassword;
+        const wrappedNew = newPassword;
         const fb = window.firebase;
         const credential = fb.auth.EmailAuthProvider.credential(email, wrappedCurrent);
         await auth.currentUser.reauthenticateWithCredential(credential);

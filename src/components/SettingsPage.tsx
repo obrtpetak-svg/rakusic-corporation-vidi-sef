@@ -508,7 +508,7 @@ export function SettingsPage({ workerFilterId }) {
                                     const auth = (window as any).firebase?.auth();
                                     if (auth) {
                                         const email = `${userForm.username.trim()}@rakusic-corporation.live`;
-                                        const wrapped = `vds_${userForm.password}_auth`;
+                                        const wrapped = userForm.password;
                                         try {
                                             await auth.createUserWithEmailAndPassword(email, wrapped);
                                         } catch (authErr: any) {

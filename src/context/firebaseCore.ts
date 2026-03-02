@@ -78,7 +78,7 @@ export async function firebaseSignIn(username: string, pin: string): Promise<unk
     const auth = getAuth();
     if (!auth) return null;
     const email = usernameToEmail(username);
-    const password = `vds_${pin}_auth`;
+    const password = pin;
     const win = window as Record<string, unknown>;
     const fb = win.firebase as { auth: { EmailAuthProvider: { credential: (e: string, p: string) => unknown } } };
     const credential = fb.auth.EmailAuthProvider.credential(email, password);
@@ -152,7 +152,7 @@ export async function migrateUsersToFirebaseAuth(users: AppUser[], rawPin?: stri
     let success = 0, failed = 0;
     const errors: Array<{ username: string; error: string }> = [];
     const defaultPin = rawPin || '1234';
-    const password = `vds_${defaultPin}_auth`;
+    const password = defaultPin;
 
     for (const user of users) {
         if (!user.username) continue;
