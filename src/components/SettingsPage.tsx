@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useConfirm } from './ui/ConfirmModal';
 import { useApp, setDoc, clearCollection, batchSet, update as updateDoc, restoreItem, permanentDelete } from '../context/AppContext';
 import { Icon, Modal, Field, Input, Textarea, useIsMobile } from './ui/SharedComponents';
-import { C, styles, genId, fmtDateTime, hashPin } from '../utils/helpers';
+import { C, styles, genId, fmtDateTime } from '../utils/helpers';
 
 export function SettingsPage({ workerFilterId }) {
     const confirm = useConfirm();
@@ -21,10 +21,6 @@ export function SettingsPage({ workerFilterId }) {
     useEffect(() => { loadAuditLog?.(); }, [loadAuditLog]);
     const isMobile = useIsMobile();
     const isWorker = !!workerFilterId;
-
-    // PIN change state
-    const [pinForm, setPinForm] = useState({ currentPin: '', newPin: '', confirmPin: '' });
-    const [pinMsg, setPinMsg] = useState('');
 
     // Password change state (Firebase Auth)
     const [pwForm, setPwForm] = useState({ currentPw: '', newPw: '', confirmPw: '' });
@@ -202,30 +198,6 @@ export function SettingsPage({ workerFilterId }) {
         e.target.value = '';
     };
 
-    // ── PIN CHANGE ───────────────────────────────────────────────
-    const changePin = async () => {
-        setPinMsg('');
-        if (!pinForm.currentPin) { setPinMsg('❌ Unesite trenutni PIN'); return; }
-        if (!pinForm.newPin || pinForm.newPin.length < 4) { setPinMsg('❌ Novi PIN mora imati najmanje 4 znaka'); return; }
-        if (pinForm.newPin !== pinForm.confirmPin) { setPinMsg('❌ Novi PIN-ovi se ne podudaraju'); return; }
-
-        const userId = currentUser?.id;
-        const userDoc = users.find(u => u.id === userId);
-        if (!userDoc) { setPinMsg('❌ Korisnik nije pronađen'); return; }
-
-        const hashedCurrentPin = await hashPin(pinForm.currentPin);
-        if (userDoc.pin !== hashedCurrentPin) { setPinMsg('❌ Trenutni PIN nije točan'); return; }
-
-        try {
-            const hashedNewPin = await hashPin(pinForm.newPin);
-            await updateDoc('users', userId, { pin: hashedNewPin });
-            setPinForm({ currentPin: '', newPin: '', confirmPin: '' });
-            setPinMsg('✅ PIN uspješno promijenjen!');
-            await addAuditLog('PIN_CHANGED', `${currentUser?.name} promijenio/la PIN`);
-        } catch (e) {
-            setPinMsg('❌ Greška: ' + e.message);
-        }
-    };
 
     // ── WORKER SETTINGS PAGE ─────────────────────────────────────
     if (isWorker) {
@@ -233,18 +205,6 @@ export function SettingsPage({ workerFilterId }) {
             <div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: C.text, marginBottom: 24 }}> Postavke</div>
 
-                {/* PIN change for worker */}
-                <div style={styles.card}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16 }}>🔑 Promjena PIN-a</div>
-                    <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 16 }}>Promijenite PIN za pristup aplikaciji. PIN mora imati najmanje 4 znaka.</div>
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: 12, maxWidth: 600 }}>
-                        <Field label="Trenutni PIN" required><Input type="password" value={pinForm.currentPin} onChange={e => setPinForm(f => ({ ...f, currentPin: e.target.value }))} placeholder="Unesite trenutni PIN" maxLength={10} /></Field>
-                        <Field label="Novi PIN" required><Input type="password" value={pinForm.newPin} onChange={e => setPinForm(f => ({ ...f, newPin: e.target.value }))} placeholder="Novi PIN (min. 4)" maxLength={10} /></Field>
-                        <Field label="Potvrdi novi PIN" required><Input type="password" value={pinForm.confirmPin} onChange={e => setPinForm(f => ({ ...f, confirmPin: e.target.value }))} placeholder="Ponovi novi PIN" maxLength={10} /></Field>
-                    </div>
-                    {pinMsg && <div style={{ fontSize: 13, fontWeight: 600, color: pinMsg.startsWith('✅') ? C.green : C.red, marginTop: 12 }}>{pinMsg}</div>}
-                    <button onClick={changePin} disabled={!pinForm.currentPin || !pinForm.newPin} style={{ ...styles.btn, marginTop: 16, opacity: !pinForm.currentPin || !pinForm.newPin ? 0.5 : 1 }}>🔑 Promijeni PIN</button>
-                </div>
 
                 {/* Password change (Firebase Auth) */}
                 <div style={{ ...styles.card, marginTop: 16 }}>
@@ -479,19 +439,6 @@ export function SettingsPage({ workerFilterId }) {
                 <button onClick={doChangePassword} disabled={pwLoading || !pwForm.currentPw || !pwForm.newPw} style={{ ...styles.btn, marginTop: 16, opacity: pwLoading ? 0.5 : 1 }}>
                     {pwLoading ? '⏳ Mijenjam...' : '🔐 Promijeni lozinku'}
                 </button>
-            </div>
-
-            {/* PIN change for admin */}
-            <div style={{ ...styles.card, marginTop: 16 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16 }}>🔑 Promjena PIN-a</div>
-                <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 16 }}>Promijenite PIN za pristup admin računu.</div>
-                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: 12, maxWidth: 600 }}>
-                    <Field label="Trenutni PIN" required><Input type="password" value={pinForm.currentPin} onChange={e => setPinForm(f => ({ ...f, currentPin: e.target.value }))} placeholder="Unesite trenutni PIN" maxLength={10} /></Field>
-                    <Field label="Novi PIN" required><Input type="password" value={pinForm.newPin} onChange={e => setPinForm(f => ({ ...f, newPin: e.target.value }))} placeholder="Novi PIN (min. 4)" maxLength={10} /></Field>
-                    <Field label="Potvrdi novi PIN" required><Input type="password" value={pinForm.confirmPin} onChange={e => setPinForm(f => ({ ...f, confirmPin: e.target.value }))} placeholder="Ponovi novi PIN" maxLength={10} /></Field>
-                </div>
-                {pinMsg && <div style={{ fontSize: 13, fontWeight: 600, color: pinMsg.startsWith('✅') ? C.green : C.red, marginTop: 12 }}>{pinMsg}</div>}
-                <button onClick={changePin} disabled={!pinForm.currentPin || !pinForm.newPin} style={{ ...styles.btn, marginTop: 16, opacity: !pinForm.currentPin || !pinForm.newPin ? 0.5 : 1 }}> Promijeni PIN</button>
             </div>
 
             {/* Edit modal */}
