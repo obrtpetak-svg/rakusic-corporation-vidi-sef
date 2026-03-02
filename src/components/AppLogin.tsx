@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { C, styles } from '../utils/helpers';
+
+const MODULES = ['Projekti', 'Radnici', 'Evidencija sati', 'Vozila', 'Otpremnice', 'Računi', 'Izvještaji', 'Obavijesti'];
 
 export function AppLogin() {
     const { handleFirebaseLogin } = useApp();
@@ -8,6 +10,14 @@ export function AppLogin() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [bootedCount, setBootedCount] = useState(0);
+
+    // Staggered module boot animation
+    useEffect(() => {
+        if (bootedCount >= MODULES.length) return;
+        const t = setTimeout(() => setBootedCount(c => c + 1), 200 + bootedCount * 120);
+        return () => clearTimeout(t);
+    }, [bootedCount]);
 
     const submit = async () => {
         if (!username.trim() || !password.trim()) { setError('Unesite korisničko ime i lozinku.'); return; }
@@ -31,11 +41,27 @@ export function AppLogin() {
     return (
         <div style={{ ...styles.page, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0F172A', minHeight: '100vh' }}>
             <div style={{ width: '100%', maxWidth: 420, padding: '0 16px' }}>
-                <div style={{ textAlign: 'center', marginBottom: 32 }}>
-                    <img src="/icon-192.png" alt="Rakušić Corporation" style={{ width: 72, height: 72, borderRadius: 20, marginBottom: 16 }} />
+                <div style={{ textAlign: 'center', marginBottom: 24 }}>
                     <div style={{ fontSize: 26, fontWeight: 900, color: '#F1F5F9', letterSpacing: '0.02em' }}>RAKUŠIĆ corporation</div>
+                    <img src="/icon-192.png" alt="Rakušić Corporation" style={{ width: 72, height: 72, borderRadius: 20, marginTop: 16, marginBottom: 8 }} />
                     <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 4 }}>Operativni centar upravljanja</div>
                     <a href="https://vi-di-sef.com" target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: C.accent, fontWeight: 600, textDecoration: 'none', marginTop: 8, display: 'inline-block' }}>powered by Vi-Di-Sef</a>
+                </div>
+
+                {/* Module boot sequence animation */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '6px 10px', marginBottom: 24, minHeight: 28 }}>
+                    {MODULES.map((m, i) => (
+                        <div key={m} style={{
+                            fontSize: 11, fontWeight: 600,
+                            color: i < bootedCount ? C.accent : '#94A3B8',
+                            opacity: i < bootedCount ? 1 : 0.3,
+                            transform: i < bootedCount ? 'translateY(0)' : 'translateY(4px)',
+                            transition: 'all 0.3s ease',
+                            fontFamily: 'var(--font-mono)',
+                        }}>
+                            {i < bootedCount ? '✓' : '○'} {m}
+                        </div>
+                    ))}
                 </div>
 
                 <div style={{ background: '#1E293B', borderRadius: 16, padding: '24px 20px', border: '1px solid #334155' }}>
@@ -46,7 +72,7 @@ export function AppLogin() {
                     </div>
                     <div style={{ marginBottom: 12 }}>
                         <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#94A3B8', marginBottom: 6 }}>Korisničko ime *</label>
-                        <input placeholder="npr. admin" value={username} onChange={e => setUsername(e.target.value)} onKeyDown={e => e.key === 'Enter' && submit()}
+                        <input placeholder="npr. admin.josip" value={username} onChange={e => setUsername(e.target.value)} onKeyDown={e => e.key === 'Enter' && submit()}
                             style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: '1px solid #334155', background: '#0F172A', color: '#F1F5F9', fontSize: 14, outline: 'none', boxSizing: 'border-box' }} />
                     </div>
                     <div style={{ marginBottom: 16 }}>
