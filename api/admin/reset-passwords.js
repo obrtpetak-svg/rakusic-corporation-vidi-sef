@@ -1,5 +1,8 @@
 // ── Admin: Reset All User Passwords (Emergency) ──
-// Uses a secret key since Firebase Auth login may be broken.
+// Uses the SAME Firebase Admin init from _mapon-client.js (which works)
+// Plus a secret key since Firebase Auth login may be broken.
+
+import { getAuthAdmin } from '../gps/_mapon-client.js';
 
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -20,20 +23,10 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'newPassword required (min 6 chars)' });
     }
 
-    // Check env var
-    const sa = process.env.FIREBASE_SERVICE_ACCOUNT;
-    if (!sa) {
-        return res.status(500).json({ error: 'FIREBASE_SERVICE_ACCOUNT env var not set', envKeys: Object.keys(process.env).filter(k => k.includes('FIRE')) });
-    }
-
     try {
-        const { default: admin } = await import('firebase-admin');
-
-        if (!admin.apps.length) {
-            const parsed = JSON.parse(sa);
-            admin.initializeApp({
-                credential: admin.credential.cert(parsed),
-            });
+        const admin = await getAuthAdmin();
+        if (!admin) {
+            return res.status(500).json({ error: 'Firebase Admin not available' });
         }
 
         const auth = admin.auth();
@@ -58,10 +51,6 @@ export default async function handler(req, res) {
         });
 
     } catch (err) {
-        return res.status(500).json({
-            error: 'Init/reset failed',
-            detail: err.message,
-            stack: err.stack?.split('\n').slice(0, 5),
-        });
+        return res.status(500).json({ error: err.message, stack: err.stack?.split('\n').slice(0, 3) });
     }
 }
