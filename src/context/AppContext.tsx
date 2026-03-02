@@ -314,19 +314,32 @@ export function AppProvider({ children }) {
                 if (!initFirebase(config)) { setLoadError('Firebase init failed'); setStep('appLogin'); return; }
 
                 // Check if Firebase Auth user already exists (session restore)
+                // IMPORTANT: auth.currentUser is null on page load — Firebase restores it async
+                // Must use onAuthStateChanged to wait for restore
                 const auth = getAuth();
-                if (auth && auth.currentUser && !auth.currentUser.isAnonymous) {
-                    console.log('[Boot] Firebase Auth session found:', auth.currentUser.email);
-                    // Activate App Check if available
-                    try {
-                        const fb = window.firebase;
-                        if (fb && fb.appCheck) {
-                            fb.appCheck().activate('6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI', true);
-                            console.log('[Boot] App Check activated (debug mode)');
-                        }
-                    } catch (e) { console.warn('[Boot] App Check not available:', e); }
-                    await initFirebaseAndLoad(config);
-                    return;
+                if (auth) {
+                    const firebaseUser = await new Promise((resolve) => {
+                        const unsub = auth.onAuthStateChanged((user) => {
+                            unsub(); // only need first callback
+                            resolve(user);
+                        });
+                        // Timeout: if Firebase doesn't respond in 5s, proceed without user
+                        setTimeout(() => resolve(null), 5000);
+                    });
+
+                    if (firebaseUser && !firebaseUser.isAnonymous) {
+                        console.log('[Boot] Firebase Auth session restored:', firebaseUser.email);
+                        // Activate App Check if available
+                        try {
+                            const fb = window.firebase;
+                            if (fb && fb.appCheck) {
+                                fb.appCheck().activate('6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI', true);
+                                console.log('[Boot] App Check activated (debug mode)');
+                            }
+                        } catch (e) { console.warn('[Boot] App Check not available:', e); }
+                        await initFirebaseAndLoad(config);
+                        return;
+                    }
                 }
 
                 // No Firebase Auth session — show login screen
