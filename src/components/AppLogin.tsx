@@ -40,11 +40,13 @@ export function AppLogin() {
                 // Show actual error for debugging
                 setError(`Firebase greška: ${code || msg || 'Nepoznata greška'}`);
             }
-            // 🔒 Audit: failed login attempt
+            // 🔒 Audit: failed login attempt (modular SDK)
             try {
-                const fb = (window as any).firebase;
-                if (fb?.firestore) {
-                    fb.firestore().collection('auditLog').add({
+                const { getDb } = await import('../context/firebaseCore');
+                const { addDoc: fbAdd, collection: fbCol } = await import('firebase/firestore');
+                const db = getDb();
+                if (db) {
+                    fbAdd(fbCol(db, 'auditLog'), {
                         action: 'LOGIN_FAILED', user: username.trim(), reason: code || 'unknown',
                         timestamp: new Date().toISOString(), userAgent: navigator.userAgent.slice(0, 200),
                     });
