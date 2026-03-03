@@ -3,6 +3,7 @@
 // ═══════════════════════════════════════════════════════
 import React, { useState, useEffect } from 'react';
 import { C, styles } from '../../utils/helpers';
+import { error } from '../../utils/logger';
 import { Field } from '../ui/SharedComponents';
 import {
     GPS_DEFAULTS, GPS_MODE_OPTIONS,
@@ -89,7 +90,7 @@ export default function GpsSettingsTab({
             setSuccess('Postavke spremljene! ✅');
             setTimeout(() => setSuccess(''), 3000);
         } catch (e) {
-            console.error('Save error:', e);
+            error('Save error:', e);
         }
         setSaving(false);
     };

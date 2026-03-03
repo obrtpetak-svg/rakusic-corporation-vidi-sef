@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { restoreItem, getLastDeleted } from '../../context/AppContext';
+import { error } from '../../utils/logger';
 
 const COLLECTION_NAMES = {
     workers: 'Radnik', projects: 'Projekt', timesheets: 'Radni sat',
@@ -51,7 +52,7 @@ export function UndoToast() {
             if (timerRef.current) clearTimeout(timerRef.current);
             if (intervalRef.current) clearInterval(intervalRef.current);
         } catch (e) {
-            console.error('Undo failed:', e);
+            error('Undo failed:', e);
         }
     };
 

@@ -3,6 +3,7 @@ import { useConfirm } from './ui/ConfirmModal';
 import { useApp, setDoc, clearCollection, batchSet, update as updateDoc, restoreItem, permanentDelete, add, remove } from '../context/AppContext';
 import { Icon, Modal, Field, Input, Textarea, useIsMobile } from './ui/SharedComponents';
 import { C, styles, genId, fmtDateTime } from '../utils/helpers';
+import { warn } from '../utils/logger';
 
 export function SettingsPage({ workerFilterId }) {
     const confirm = useConfirm();
@@ -555,7 +556,7 @@ export function SettingsPage({ workerFilterId }) {
                                             });
                                         }
                                     } catch (authErr: any) {
-                                        console.warn('[Settings] Firebase Auth provision error:', authErr);
+                                        warn('[Settings] Firebase Auth provision error:', authErr);
                                     }
                                     const newUser = { id: genId(), name: userForm.name.trim(), username: userForm.username.trim(), role: userForm.role, createdAt: new Date().toISOString(), createdBy: currentUser?.name || 'admin' };
                                     await add('users', newUser);

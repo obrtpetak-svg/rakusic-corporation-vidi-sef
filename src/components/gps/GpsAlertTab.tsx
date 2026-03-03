@@ -5,6 +5,7 @@
 // ═══════════════════════════════════════════════════════
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { C, styles } from '../../utils/helpers';
+import { warn } from '../../utils/logger';
 import { formatDistance, timeAgo, EVENT_LABELS, GPS_COL } from '../../services/GpsSettingsManager';
 import { getDb } from '../../context/firebaseCore';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -40,7 +41,7 @@ export default function GpsAlertTab({
         const db = getDb();
         if (db) {
             setDoc(doc(db, GPS_COL.settings, 'company'), { alertsEnabled: newVal }, { merge: true })
-                .catch(err => console.warn('[GpsAlerts] Toggle save failed:', err));
+                .catch(err => warn('[GpsAlerts] Toggle save failed:', err));
         }
     }, [alertsEnabled]);
 

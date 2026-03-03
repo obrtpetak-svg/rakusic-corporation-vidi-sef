@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useConfirm } from './ui/ConfirmModal';
+import { warn, error } from '../utils/logger';
 import { useApp, add as addDoc, update as updateDoc, remove as removeDoc } from '../context/AppContext';
 import { Icon, Modal, Field, Input, Textarea, Select, StatusBadge, Pagination, usePagination, useIsMobile } from './ui/SharedComponents';
 import { C, styles, genId, fmtDate, diffMins, hashPin } from '../utils/helpers';
@@ -66,10 +67,9 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                         body: JSON.stringify({ action: 'create-user', username, password, displayName }),
                     });
                     const data = await resp.json();
-                    if (!resp.ok) console.warn('[Worker] Firebase Auth provision failed:', data.error);
-                    else console.log(`[Worker] Firebase Auth account ${data.action} for ${username}`);
+                    if (!resp.ok) warn('[Worker] Firebase Auth provision failed:', data.error);
                 } catch (err) {
-                    console.warn('[Worker] Firebase Auth provision error:', err);
+                    warn('[Worker] Firebase Auth provision error:', err);
                 }
             };
 
@@ -97,7 +97,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
             }
             setShowForm(false);
         } catch (e) {
-            console.error('Greška pri spremanju radnika:', e);
+            error('Greška pri spremanju radnika:', e);
             alert('Greška pri spremanju: ' + ((e as Error).message || 'Nepoznata greška'));
         }
     };

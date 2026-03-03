@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useConfirm } from './ui/ConfirmModal';
+import { error } from '../utils/logger';
 import { useApp, add as addDoc, update as updateDoc } from '../context/AppContext';
 import { Icon, Modal, Field, Input, Textarea, Select, Pagination, usePagination, useIsMobile, useToast } from './ui/SharedComponents';
 import { C, styles, genId, today, fmtDate, compressImage, uploadToStorage } from '../utils/helpers';
@@ -78,7 +79,7 @@ export function DailyLogPage({ workerFilterId, leaderProjectIds }) {
                     code,
                 });
             }
-        } catch (e) { console.error('Weather suggest error:', e); setWeatherSuggestion(null); }
+        } catch (e) { error('Weather suggest error:', e); setWeatherSuggestion(null); }
         setWeatherLoading(false);
     }, [projects]);
 
@@ -313,7 +314,7 @@ export function DailyLogPage({ workerFilterId, leaderProjectIds }) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
                 <div>
                     <div style={{ fontSize: 22, fontWeight: 800, color: C.text, display: 'flex', alignItems: 'center', gap: 10 }}>
-                         Dnevnik gradilišta
+                        Dnevnik gradilišta
                     </div>
                     <div style={{ color: C.textMuted, fontSize: 13, marginTop: 2 }}>
                         Dnevni izvještaji, vremenske prilike, foto dokumentacija

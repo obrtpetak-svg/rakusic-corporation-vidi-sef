@@ -4,6 +4,7 @@
 // ═══════════════════════════════════════════════════════
 import { useState, useEffect, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
+import { warn } from '../../utils/logger';
 import { useIsMobile } from '../ui/SharedComponents';
 import { C, styles } from '../../utils/helpers';
 import FleetMapTab from './FleetMapTab';
@@ -80,7 +81,7 @@ export default function FleetDashboard() {
                 const auth = getAuth();
                 const user = auth?.currentUser;
                 const token = user ? await user.getIdToken() : null;
-                if (!token) { console.warn('[Fleet] No auth token available'); return; }
+                if (!token) { warn('[Fleet] No auth token available'); return; }
 
                 const r = await fetch('/api/gps/vehicles', {
                     headers: { Authorization: `Bearer ${token}` },
@@ -98,7 +99,7 @@ export default function FleetDashboard() {
                     });
                 }
             } catch (err: any) {
-                console.warn('[Fleet] API fetch failed:', err.message);
+                warn('[Fleet] API fetch failed:', err.message);
             }
         };
 
@@ -130,7 +131,7 @@ export default function FleetDashboard() {
                     });
                 }
             } catch (e) {
-                console.warn('[Fleet] Firestore listener failed:', e);
+                warn('[Fleet] Firestore listener failed:', e);
             }
         })();
 

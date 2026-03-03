@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Icon } from './SharedComponents';
+import { error } from '../../utils/logger';
 
 /**
  * EditableField — click-to-edit inline field component.
@@ -26,7 +27,7 @@ export function EditableField({ value, onSave, label, type = 'text', placeholder
             await onSave(tempValue);
             setEditing(false);
         } catch (e) {
-            console.error('EditableField save error:', e);
+            error('EditableField save error:', e);
         }
         setSaving(false);
     };

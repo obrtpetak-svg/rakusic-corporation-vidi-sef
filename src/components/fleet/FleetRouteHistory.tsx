@@ -3,6 +3,7 @@
 // ═══════════════════════════════════════════════════════
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { C, styles } from '../../utils/helpers';
+import { warn } from '../../utils/logger';
 import { useIsMobile } from '../ui/SharedComponents';
 import type { FleetVehicle } from './FleetDashboard';
 
@@ -66,7 +67,7 @@ export default function FleetRouteHistory({ vehicles }: { vehicles: FleetVehicle
                 setRouteData(data);
             }
         } catch (err: any) {
-            console.warn('[FleetRouteHistory] API failed, using mock data:', err.message);
+            warn('[FleetRouteHistory] API failed, using mock data:', err.message);
             // Use mock data as fallback
             setRouteData({
                 vehicleId: selectedVehicle,

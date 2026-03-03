@@ -89,7 +89,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
             {(nudgeMessage || prediction) && (
                 <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
                     {nudgeMessage && (
-                        <div onClick={onGoToNotifications} style={{ flex: 1, minWidth: 200, background: 'var(--yellow-light)', borderRadius: 12, padding: '10px 16px', fontSize: 13, fontWeight: 600, color: 'var(--text)', cursor: 'pointer', border: '1px solid rgba(234,179,8,0.2)', display: 'flex', alignItems: 'center', gap: 8, animation: 'cardEntry 0.3s ease' }}>
+                        <div role="button" tabIndex={0} aria-label="Pogledaj obavijesti na čekanju" onClick={onGoToNotifications} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onGoToNotifications?.()} style={{ flex: 1, minWidth: 200, background: 'var(--yellow-light)', borderRadius: 12, padding: '10px 16px', fontSize: 13, fontWeight: 600, color: 'var(--text)', cursor: 'pointer', border: '1px solid rgba(234,179,8,0.2)', display: 'flex', alignItems: 'center', gap: 8, animation: 'cardEntry 0.3s ease' }}>
                             {nudgeMessage}
                         </div>
                     )}

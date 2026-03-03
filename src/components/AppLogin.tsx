@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { C, styles } from '../utils/helpers';
+import { error } from '../utils/logger';
 
 const MODULES = ['Projekti', 'Radnici', 'Evidencija sati', 'Vozila', 'Otpremnice', 'Računi', 'Izvještaji', 'Obavijesti'];
 const MAX_ATTEMPTS = 5;
@@ -64,7 +65,7 @@ export function AppLogin() {
         } catch (err: unknown) {
             const code = (err as { code?: string })?.code || '';
             const msg = (err as { message?: string })?.message || '';
-            console.error('[Login] Error:', code, msg);
+            error('[Login] Error:', code, msg);
 
             // Track attempts for credential errors
             const isCredentialError = code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential';

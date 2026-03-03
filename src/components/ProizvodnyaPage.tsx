@@ -1,35 +1,20 @@
-import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
-import { useConfirm } from './ui/ConfirmModal';
-import { useApp, add as addDoc, update as updateDoc, remove as removeDoc } from '../context/AppContext';
+import { useState, useMemo, useEffect } from 'react';
+import { useApp, update as updateDoc } from '../context/AppContext';
 import { Icon, Modal, Field, Input, Textarea, Select, StatusBadge, WorkerCheckboxList, useIsMobile } from './ui/SharedComponents';
-import { C, styles, genId, today, fmtDate, diffMins, compressImage } from '../utils/helpers';
-
+import { C, styles, genId, today, fmtDate, diffMins } from '../utils/helpers';
 import { STAGES, QC_CHECKLISTS, COST_CATEGORIES, STEEL_GRADES, SPEC_UNITS, PROFILE_WEIGHTS, TEMPLATES, fmtDuration, genOrderNumber } from './proizvodnja/proizvodnja-constants';
-
-
-
+import { useProizvodnyaActions } from './proizvodnja/useProizvodnyaActions';
 
 export function ProizvodnyaPage({ leaderProjectIds }) {
-    const confirm = useConfirm();
-    const { production, workers, projects, currentUser, addAuditLog, loadProduction } = useApp();
-
-    // Lazy load production data on mount
+    const { production, workers, projects, currentUser, loadProduction } = useApp();
     useEffect(() => { loadProduction?.(); }, [loadProduction]);
 
     const [activeTab, setActiveTab] = useState('pipeline');
-    const [showForm, setShowForm] = useState(false);
-    const [editId, setEditId] = useState(null);
     const [detailId, setDetailId] = useState(null);
     const [search, setSearch] = useState('');
     const [filterStage, setFilterStage] = useState('all');
     const [filterPriority, setFilterPriority] = useState('all');
     const [filterDeadline, setFilterDeadline] = useState('all');
-    const [showTemplateChooser, setShowTemplateChooser] = useState(false);
-    const [signOffOrder, setSignOffOrder] = useState(null);
-    const [signOffNote, setSignOffNote] = useState('');
-    const [signOffConfirmed, setSignOffConfirmed] = useState(false);
-    const sigCanvasRef = useRef(null);
-    const sigDrawing = useRef(false);
     const isMobile = useIsMobile();
     const isAdmin = currentUser?.role === 'admin';
     const isLeader = currentUser?.role === 'leader';
@@ -39,6 +24,33 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
     const activeOrders = allOrders.filter(o => o.status !== 'arhiviran');
     const archivedOrders = allOrders.filter(o => o.status === 'arhiviran');
     const activeWorkers = workers.filter(w => w.active !== false && w.role !== 'admin');
+
+    // Extract all actions from custom hook
+    const actions = useProizvodnyaActions(allOrders);
+    const {
+        form, editId, showForm, setShowForm, showTemplateChooser, setShowTemplateChooser, upd,
+        openAdd, openFromTemplate, openEdit, doSave, doDelete: doDeleteRaw,
+        signOffOrder, setSignOffOrder, signOffNote, setSignOffNote, signOffConfirmed, setSignOffConfirmed,
+        requestAdvance, confirmSignOff, initSigCanvas, clearSigCanvas,
+        archiveOrder, unarchiveOrder,
+        showCostForm, setShowCostForm, costForm, setCostForm, addCostItem, removeCostItem,
+        handleFileUpload, removeFile,
+        commentText, setCommentText, addComment, removeComment,
+        handleStagePhoto,
+        exportCSV, exportPDF,
+    } = actions;
+
+    // Wrap doDelete to also clear detailId
+    const doDelete = async (id) => {
+        await doDeleteRaw(id);
+        if (detailId === id) setDetailId(null);
+    };
+
+    // Wrap openEdit to also clear detailId
+    const openEditWrapped = (o) => {
+        openEdit(o);
+        setDetailId(null);
+    };
 
     const filtered = useMemo(() => {
         let list = activeOrders;
@@ -64,9 +76,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
             : activeOrders;
         const totalCost = orders.reduce((s, o) => s + (o.totalCost || 0), 0);
         const thisMonth = new Date().toISOString().slice(0, 7);
-        // Count all orders currently at 'zavrseno' stage (regardless of month)
         const allDone = allOrders.filter(o => o.stage === 'zavrseno');
-        // Count orders that entered 'zavrseno' this month
         const doneThisMonth = allDone.filter(o => {
             const entry = (o.stages || []).find(s => s.stage === 'zavrseno');
             return entry && (entry.enteredAt || '').startsWith(thisMonth);
@@ -80,213 +90,6 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
             totalCost,
         };
     }, [activeOrders, allOrders, leaderProjectIds]);
-
-    // Form
-    const blankForm = () => ({
-        orderNumber: genOrderNumber(), name: '', client: '', description: '',
-        deadline: '', priority: 'normalan', quantity: 1, unit: 'kom',
-        stage: 'narudzba', assignedWorkers: [], projectId: '', notes: '',
-        stages: [{ stage: 'narudzba', enteredAt: new Date().toISOString() }],
-        costItems: [], totalCost: 0, files: [], status: 'aktivan',
-    });
-    const [form, setForm] = useState(blankForm());
-    const upd = (k, v) => setForm(f => ({ ...f, [k]: v }));
-
-    const openAdd = () => { setShowTemplateChooser(true); };
-    const openFromTemplate = (tpl) => {
-        const f = blankForm();
-        if (tpl) {
-            f.name = tpl.id !== 'custom' ? tpl.name.replace(/^[^\s]+\s/, '') : '';
-            if (tpl.defaults) Object.assign(f, tpl.defaults);
-            if (tpl.specDefaults) {
-                f.specifications = { materials: (tpl.specDefaults.materials || []).map(m => ({ id: genId(), ...m, quantity: 0 })), dimensions: (tpl.specDefaults.dimensions || []).map(d => ({ id: genId(), ...d, value: '' })), technicalNotes: '' };
-            }
-        }
-        setForm(f); setEditId(null); setShowTemplateChooser(false); setShowForm(true);
-    };
-    const openEdit = (o) => {
-        setForm({ ...o, assignedWorkers: o.assignedWorkers || [], costItems: o.costItems || [], files: o.files || [], stages: o.stages || [], specifications: o.specifications || { materials: [], dimensions: [], technicalNotes: '' } });
-        setEditId(o.id); setDetailId(null); setShowForm(true);
-    };
-
-    const doSave = async () => {
-        if (!form.name.trim()) return alert('Naziv je obavezan');
-        const data = { ...form, totalCost: (form.costItems || []).reduce((s, c) => s + (c.total || 0), 0) };
-        if (editId) {
-            await updateDoc('production', editId, { ...data, updatedAt: new Date().toISOString() });
-        } else {
-            const newId = genId();
-            await addDoc('production', { id: newId, ...data, createdAt: new Date().toISOString(), createdBy: currentUser?.name });
-            // Notify admin about new order
-            await addDoc('prodAlerts', { id: genId(), type: 'new_order', orderNumber: data.orderNumber, orderName: data.name, createdBy: currentUser?.name, createdAt: new Date().toISOString(), status: 'unread', targetRole: 'admin' });
-        }
-        setShowForm(false);
-    };
-
-    const doDelete = async (id) => {
-        if (!(await confirm('Obrisati ovu narudžbu?'))) return;
-        const order = allOrders.find(o => o.id === id);
-        if (addAuditLog) await addAuditLog('PRODUCTION_DELETED', `🗑️ ${currentUser?.name} obrisao narudžbu: ${order?.orderNumber || ''} "${order?.name || ''}"`);
-        await removeDoc('production', id);
-        if (detailId === id) setDetailId(null);
-    };
-
-    const requestAdvance = (order) => {
-        setSignOffOrder(order);
-        setSignOffNote('');
-        setSignOffConfirmed(false);
-    };
-    const confirmSignOff = async () => {
-        if (!signOffConfirmed) return alert('Morate potvrditi da je faza završena');
-        const order = signOffOrder;
-        if (!order) return;
-        const idx = STAGES.findIndex(s => s.id === order.stage);
-        if (idx >= STAGES.length - 1) return;
-        const nextStage = STAGES[idx + 1].id;
-        const updatedStages = [...(order.stages || [])];
-        const current = updatedStages.find(s => s.stage === order.stage && !s.completedAt);
-        if (current) {
-            current.completedAt = new Date().toISOString();
-            current.completedBy = currentUser?.name;
-            current.signedBy = currentUser?.name;
-            current.signNote = signOffNote || '';
-            current.signedAt = new Date().toISOString();
-            current.signature = getSigData() || null;
-        }
-        updatedStages.push({ stage: nextStage, enteredAt: new Date().toISOString() });
-        await updateDoc('production', order.id, { stage: nextStage, stages: updatedStages });
-        if (addAuditLog) await addAuditLog('PRODUCTION_STAGE_CHANGE', `${currentUser?.name} pomaknuo ${order.orderNumber} "${order.name}" u: ${STAGES[idx + 1]?.label}${signOffNote ? ' | ' + signOffNote : ''}`);
-        // Auto-comment on stage change
-        const autoComment = { id: genId(), text: `⏭️ Faza pomaknuta u: ${STAGES[idx + 1]?.label}${signOffNote ? ' — ' + signOffNote : ''}`, author: currentUser?.name || 'Sustav', createdAt: new Date().toISOString(), isSystem: true };
-        const existingComments = order.comments || [];
-        await updateDoc('production', order.id, { comments: [...existingComments, autoComment] });
-        // Notify admin + creator about stage change
-        const alertBase = { type: 'stage_change', orderNumber: order.orderNumber, orderName: order.name, fromStage: STAGES[idx]?.label, toStage: STAGES[idx + 1]?.label, changedBy: currentUser?.name, createdAt: new Date().toISOString(), status: 'unread' };
-        await addDoc('prodAlerts', { id: genId(), ...alertBase, targetRole: 'admin' });
-        if (order.createdBy && order.createdBy !== currentUser?.name) {
-            await addDoc('prodAlerts', { id: genId(), ...alertBase, targetUser: order.createdBy });
-        }
-        setSignOffOrder(null);
-    };
-
-    // Canvas signature helpers
-    const initSigCanvas = useCallback((canvas) => {
-        if (!canvas) return;
-        sigCanvasRef.current = canvas;
-        const ctx = canvas.getContext('2d');
-        ctx.lineWidth = 2;
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = '#1a1a1a';
-        const getPos = (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const t = e.touches ? e.touches[0] : e;
-            return { x: t.clientX - rect.left, y: t.clientY - rect.top };
-        };
-        const start = (e) => { e.preventDefault(); sigDrawing.current = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); };
-        const move = (e) => { if (!sigDrawing.current) return; e.preventDefault(); const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); };
-        const end = () => { sigDrawing.current = false; };
-        canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', move); canvas.addEventListener('mouseup', end); canvas.addEventListener('mouseleave', end);
-        canvas.addEventListener('touchstart', start, { passive: false }); canvas.addEventListener('touchmove', move, { passive: false }); canvas.addEventListener('touchend', end);
-    }, []);
-    const clearSigCanvas = () => { const c = sigCanvasRef.current; if (c) { const ctx = c.getContext('2d'); ctx.clearRect(0, 0, c.width, c.height); } };
-    const getSigData = () => { const c = sigCanvasRef.current; return c ? c.toDataURL('image/png') : null; };
-
-    const archiveOrder = async (order) => {
-        await updateDoc('production', order.id, { status: 'arhiviran' });
-    };
-    const unarchiveOrder = async (order) => {
-        await updateDoc('production', order.id, { status: 'aktivan' });
-    };
-
-    // Cost management
-    const [showCostForm, setShowCostForm] = useState(false);
-    const [costForm, setCostForm] = useState({ name: '', category: 'materijal', quantity: 1, unitPrice: 0, notes: '' });
-    const addCostItem = async () => {
-        if (!costForm.name.trim()) return;
-        const item = { id: genId(), ...costForm, total: costForm.quantity * costForm.unitPrice };
-        const newItems = [...(detailOrder?.costItems || []), item];
-        const newTotal = newItems.reduce((s, c) => s + (c.total || 0), 0);
-        await updateDoc('production', detailOrder.id, { costItems: newItems, totalCost: newTotal });
-        setShowCostForm(false);
-        setCostForm({ name: '', category: 'materijal', quantity: 1, unitPrice: 0, notes: '' });
-    };
-    const removeCostItem = async (itemId) => {
-        const newItems = (detailOrder?.costItems || []).filter(c => c.id !== itemId);
-        const newTotal = newItems.reduce((s, c) => s + (c.total || 0), 0);
-        await updateDoc('production', detailOrder.id, { costItems: newItems, totalCost: newTotal });
-    };
-
-    // File upload
-    const handleFileUpload = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        if (file.size > 10 * 1024 * 1024) return alert('Max 10MB');
-        const compressed = await compressImage(file);
-        const newFiles = [...(detailOrder?.files || []), { id: genId(), ...compressed, uploadedAt: new Date().toISOString(), uploadedBy: currentUser?.name }];
-        await updateDoc('production', detailOrder.id, { files: newFiles });
-    };
-    const removeFile = async (fileId) => {
-        const newFiles = (detailOrder?.files || []).filter(f => f.id !== fileId);
-        await updateDoc('production', detailOrder.id, { files: newFiles });
-    };
-
-    // Comments
-    const [commentText, setCommentText] = useState('');
-    const addComment = async (orderId) => {
-        if (!commentText.trim()) return;
-        const order = allOrders.find(o => o.id === orderId);
-        if (!order) return;
-        const comment = { id: genId(), text: commentText.trim(), author: currentUser?.name || 'Nepoznat', createdAt: new Date().toISOString(), isSystem: false };
-        await updateDoc('production', orderId, { comments: [...(order.comments || []), comment] });
-        setCommentText('');
-    };
-    const removeComment = async (orderId, commentId) => {
-        const order = allOrders.find(o => o.id === orderId);
-        if (!order) return;
-        await updateDoc('production', orderId, { comments: (order.comments || []).filter(c => c.id !== commentId) });
-    };
-
-    // Stage photo upload
-    const handleStagePhoto = async (orderId, stageId) => {
-        const input = document.createElement('input');
-        input.type = 'file'; input.accept = 'image/*'; input.capture = 'environment';
-        input.onchange = async (e) => {
-            const file = (e.target as HTMLInputElement).files?.[0];
-            if (!file) return;
-            const compressed = await compressImage(file);
-            const order = allOrders.find(o => o.id === orderId);
-            if (!order) return;
-            const stages = [...(order.stages || [])];
-            const stage = stages.find(s => s.stage === stageId && !s.completedAt) || stages.findLast(s => s.stage === stageId);
-            if (stage) {
-                stage.photos = [...(stage.photos || []), { id: genId(), ...compressed, uploadedAt: new Date().toISOString(), uploadedBy: currentUser?.name }];
-                await updateDoc('production', orderId, { stages });
-            }
-        };
-        input.click();
-    };
-
-    // Export CSV
-    const exportCSV = () => {
-        const data = (activeTab === 'archive' ? archivedOrders : filtered);
-        const headers = ['Broj', 'Naziv', 'Naručitelj', 'Faza', 'Prioritet', 'Količina', 'Rok', 'Trošak (€)', 'Status'];
-        const rows = data.map(o => [o.orderNumber, o.name, o.client, STAGES.find(s => s.id === o.stage)?.label, o.priority, `${o.quantity} ${o.unit}`, o.deadline, (o.totalCost || 0).toFixed(2), o.status]);
-        const csv = [headers, ...rows].map(r => r.join(';')).join('\n');
-        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = `proizvodnja-${today()}.csv`; a.click();
-    };
-
-    // Export PDF (browser print)
-    const exportPDF = () => {
-        const data = (activeTab === 'archive' ? archivedOrders : filtered);
-        const rows = data.map(o => `<tr><td>${o.orderNumber}</td><td>${o.name}</td><td>${o.client || '—'}</td><td>${STAGES.find(s => s.id === o.stage)?.label || '—'}</td><td>${o.priority}</td><td>${o.quantity} ${o.unit}</td><td>${o.deadline || '—'}</td><td>${(o.totalCost || 0).toFixed(2)}€</td></tr>`).join('');
-        const html = `<!DOCTYPE html><html><head><title>Proizvodnja - ${today()}</title><style>body{font-family:Arial,sans-serif;padding:20px}h1{font-size:18px}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{border:1px solid #ddd;padding:8px 10px;text-align:left;font-size:12px}th{background:#f5f5f5;font-weight:700}tr:nth-child(even){background:#fafafa}.footer{margin-top:20px;font-size:10px;color:#999}</style></head><body><h1>Proizvodnja — Izvještaj</h1><p>Datum: ${fmtDate(new Date().toISOString())} • Ukupno: ${data.length} narudžbi</p><table><thead><tr><th>Broj</th><th>Naziv</th><th>Naručitelj</th><th>Faza</th><th>Prioritet</th><th>Količina</th><th>Rok</th><th>Trošak</th></tr></thead><tbody>${rows}</tbody></table><div class="footer">Generirano iz Vi-Di-Sef • ${new Date().toLocaleString('hr-HR')}</div></body></html>`;
-        const w = window.open('', '_blank');
-        w.document.write(html);
-        w.document.close();
-        setTimeout(() => { w.print(); }, 500);
-    };
 
     // ── Detail View ──
     const detailOrder = detailId ? allOrders.find(o => o.id === detailId) : null;
@@ -367,14 +170,14 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                 <button onClick={() => requestAdvance(detailOrder)} style={{ ...styles.btn, fontSize: 13 }}>
                                     ⏭️ {STAGES[stageIdx + 1] ? `Pomakni u: ${STAGES[stageIdx + 1].label}` : 'Završi'}
                                 </button>
-                                <button onClick={() => openEdit(detailOrder)} style={styles.btnSecondary}><Icon name="edit" size={14} /> Uredi</button>
+                                <button onClick={() => openEditWrapped(detailOrder)} style={styles.btnSecondary}><Icon name="edit" size={14} /> Uredi</button>
                                 <button onClick={() => doDelete(detailOrder.id)} style={{ ...styles.btnDanger, fontSize: 13 }}><Icon name="trash" size={14} /> Obriši</button>
                             </div>
                         )}
                         {canManage && detailOrder.stage === 'zavrseno' && (
                             <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
                                 <button onClick={() => archiveOrder(detailOrder)} style={{ ...styles.btnSecondary, fontSize: 13 }}>📦 Arhiviraj</button>
-                                <button onClick={() => openEdit(detailOrder)} style={styles.btnSecondary}><Icon name="edit" size={14} /> Uredi</button>
+                                <button onClick={() => openEditWrapped(detailOrder)} style={styles.btnSecondary}><Icon name="edit" size={14} /> Uredi</button>
                                 <button onClick={() => doDelete(detailOrder.id)} style={{ ...styles.btnDanger, fontSize: 13 }}><Icon name="trash" size={14} /> Obriši</button>
                             </div>
                         )}
@@ -746,7 +549,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                                     <td style={styles.td}>{c.quantity}</td>
                                                     <td style={styles.td}>{(c.unitPrice || 0).toFixed(2)}€</td>
                                                     <td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{(c.total || 0).toFixed(2)}€</td>
-                                                    {canManage && <td style={styles.td}><button onClick={() => removeCostItem(c.id)} style={{ ...styles.btnDanger, padding: '4px 8px' }}><Icon name="trash" size={10} /></button></td>}
+                                                    {canManage && <td style={styles.td}><button onClick={() => removeCostItem(detailOrder, c.id)} style={{ ...styles.btnDanger, padding: '4px 8px' }}><Icon name="trash" size={10} /></button></td>}
                                                 </tr>
                                             ))}
                                             <tr><td colSpan={4} style={{ ...styles.td, fontWeight: 700, textAlign: 'right' }}>UKUPNO:</td><td style={{ ...styles.td, fontWeight: 800, color: C.accent, fontSize: 16 }}>{(detailOrder.totalCost || 0).toFixed(2)}€</td>{canManage && <td style={styles.td}></td>}</tr>
@@ -767,7 +570,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                     <Field label="Napomena"><Input value={costForm.notes} onChange={e => setCostForm(f => ({ ...f, notes: e.target.value }))} placeholder="Opcionalno..." /></Field>
                                     <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 16 }}>
                                         <button onClick={() => setShowCostForm(false)} style={styles.btnSecondary}>Odustani</button>
-                                        <button onClick={addCostItem} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
+                                        <button onClick={() => addCostItem(detailOrder)} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
                                     </div>
                                 </Modal>
                             )}
@@ -782,7 +585,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                 {canManage && (
                                     <label style={{ ...styles.btnSmall, cursor: 'pointer', display: 'inline-flex' }}>
                                         <Icon name="upload" size={12} /> Upload
-                                        <input type="file" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx" onChange={handleFileUpload} style={{ display: 'none' }} />
+                                        <input type="file" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx" onChange={e => handleFileUpload(e, detailOrder)} style={{ display: 'none' }} />
                                     </label>
                                 )}
                             </div>
@@ -801,7 +604,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                             )}
                                             <div style={{ padding: '8px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                 <div><div style={{ fontSize: 11, fontWeight: 600, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 120 }}>{f.name}</div><div style={{ fontSize: 9, color: C.textMuted }}>{f.uploadedBy}</div></div>
-                                                {canManage && <button onClick={() => removeFile(f.id)} style={{ background: 'none', border: 'none', color: C.red, cursor: 'pointer', fontSize: 12 }}>✕</button>}
+                                                {canManage && <button onClick={() => removeFile(detailOrder, f.id)} style={{ background: 'none', border: 'none', color: C.red, cursor: 'pointer', fontSize: 12 }}>✕</button>}
                                             </div>
                                         </div>
                                     ))}
@@ -885,7 +688,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
     const OrderCard = ({ order }) => {
         const daysLeft = order.deadline ? Math.ceil((new Date(order.deadline).getTime() - Date.now()) / 86400000) : null;
         return (
-            <div onClick={() => setDetailId(order.id)} style={{ padding: '12px 14px', borderRadius: 10, background: C.card, border: `1px solid ${C.border}`, cursor: 'pointer', marginBottom: 8, borderLeft: `4px solid ${stageColor(order.stage)}`, transition: 'all 0.2s' }}
+            <div role="button" tabIndex={0} aria-label={`Narudžba ${order.orderNumber || order.clientName || ''}`} onClick={() => setDetailId(order.id)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setDetailId(order.id)} style={{ padding: '12px 14px', borderRadius: 10, background: C.card, border: `1px solid ${C.border}`, cursor: 'pointer', marginBottom: 8, borderLeft: `4px solid ${stageColor(order.stage)}`, transition: 'all 0.2s' }}
                 onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)'; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}>
                 <div style={{ fontSize: 10, color: C.accent, fontWeight: 700, marginBottom: 4 }}>{order.orderNumber}</div>
@@ -915,8 +718,8 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
                     {canManage && <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> Nova narudžba</button>}
-                    <button onClick={exportCSV} style={styles.btnSecondary}>📊 CSV</button>
-                    <button onClick={exportPDF} style={styles.btnSecondary}>📄 PDF</button>
+                    <button onClick={() => exportCSV(activeTab === 'archive' ? archivedOrders : filtered)} style={styles.btnSecondary}>📊 CSV</button>
+                    <button onClick={() => exportPDF(activeTab === 'archive' ? archivedOrders : filtered)} style={styles.btnSecondary}>📄 PDF</button>
                 </div>
             </div>
 
@@ -1032,7 +835,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                                 {canManage && (
                                                     <td style={styles.td} onClick={e => e.stopPropagation()}>
                                                         <div style={{ display: 'flex', gap: 4 }}>
-                                                            <button onClick={() => openEdit(o)} style={styles.btnSmall}><Icon name="edit" size={10} /></button>
+                                                            <button onClick={() => openEditWrapped(o)} style={styles.btnSmall}><Icon name="edit" size={10} /></button>
                                                             <button onClick={() => doDelete(o.id)} style={styles.btnDanger}><Icon name="trash" size={10} /></button>
                                                         </div>
                                                     </td>

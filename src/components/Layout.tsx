@@ -34,7 +34,7 @@ const ObavezePage = lazy(() => import('./ObavezePage').then(m => ({ default: m.O
 const DailyLogPage = lazy(() => import('./DailyLogPage').then(m => ({ default: m.DailyLogPage })));
 const SmjestajPage = lazy(() => import('./SmjestajPage').then(m => ({ default: m.SmjestajPage })));
 const QrCheckInPage = lazy(() => import('./QrCheckIn').then(m => ({ default: m.QrCheckIn })));
-const QrAdminPage = lazy(() => import('./QrCheckIn').then(m => ({ default: m.QrAdminPage })));
+const QrAdminPage = lazy(() => import('./qr/QrAdminPage').then(m => ({ default: m.QrAdminPage })));
 const LeaveTrackerPage = lazy(() => import('./LeaveTracker').then(m => ({ default: m.LeaveTracker })));
 const ProizvodnyaPage = lazy(() => import('./ProizvodnyaPage').then(m => ({ default: m.ProizvodnyaPage })));
 const FleetDashboard = lazy(() => import('./fleet/FleetDashboard'));
@@ -496,6 +496,8 @@ export function Layout() {
 
     return (
         <div style={styles.page}>
+            {/* Skip Navigation — a11y */}
+            <a href="#main-content" className="skip-nav" style={{ position: 'absolute', left: '-9999px', top: 'auto', width: '1px', height: '1px', overflow: 'hidden', zIndex: 10001 }} onFocus={e => { e.currentTarget.style.cssText = 'position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:10001;background:var(--accent);color:#fff;padding:8px 20px;border-radius:8px;font-size:14px;font-weight:700;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,0.3)'; }} onBlur={e => { e.currentTarget.style.cssText = 'position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden'; }}>Preskoči na glavni sadržaj</a>
             <style>{`
         * { box-sizing: border-box; }
         body { margin: 0; }
@@ -577,7 +579,7 @@ export function Layout() {
             </div>
 
             {/* Main content */}
-            <main role="main" aria-label="Glavni sadržaj" className="main-content" style={{ marginLeft: isMobile ? 0 : 240, padding: isMobile ? '16px 12px' : 24, minHeight: '100vh', transition: 'background 0.4s ease, color 0.4s ease' }}>
+            <main id="main-content" role="main" aria-label="Glavni sadržaj" className="main-content" style={{ marginLeft: isMobile ? 0 : 240, padding: isMobile ? '16px 12px' : 24, minHeight: '100vh', transition: 'background 0.4s ease, color 0.4s ease' }}>
                 {/* Mobile header */}
                 {isMobile && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, position: 'sticky', top: 0, background: 'var(--card-solid)', zIndex: 50, padding: '8px 0', marginTop: -8, borderBottom: '1px solid var(--border)' }}>
@@ -607,12 +609,15 @@ export function Layout() {
                 <Suspense fallback={<LazyFallback type={['timesheets', 'invoices', 'otpremnice', 'reports', 'arhiva', 'dailyLog', 'auditLog'].includes(page) ? 'table' : ['workers', 'projects', 'vehicles', 'smjestaj', 'obaveze'].includes(page) ? 'cards' : 'dashboard'} />}><PageErrorBoundary key={page} onGoHome={() => setPage('dashboard')}><div key={page} style={{ animation: 'fadeIn 0.3s ease, slideUp 0.3s ease' }}>{renderPage()}</div></PageErrorBoundary></Suspense>
             </main>
             {/* Dynamic Island */}
-            {island && (
-                <div className="dynamic-island">
-                    <span style={{ fontSize: 18 }}>{island.icon}</span>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{island.text}</span>
-                </div>
-            )}
+            {/* Dynamic Island — a11y live region */}
+            <div role="status" aria-live="polite" aria-atomic="true">
+                {island && (
+                    <div className="dynamic-island">
+                        <span style={{ fontSize: 18 }}>{island.icon}</span>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{island.text}</span>
+                    </div>
+                )}
+            </div>
             {/* FAB (mobile only) */}
             {isMobile && (
                 <>
@@ -661,7 +666,7 @@ export function Layout() {
                 const step = STEPS[onboardingStep];
                 const TOTAL = STEPS.length;
                 return (
-                    <div style={{ position: 'fixed', inset: 0, zIndex: 10000, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'fadeIn 0.3s ease' }}>
+                    <div role="dialog" aria-modal="true" aria-label="Vodič za korištenje" style={{ position: 'fixed', inset: 0, zIndex: 10000, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'fadeIn 0.3s ease' }}>
                         <div style={{ background: 'var(--card-solid)', borderRadius: 20, padding: 28, maxWidth: 400, width: '92%', boxShadow: 'var(--shadow-xl)', animation: 'cardEntry 0.4s cubic-bezier(0.16,1,0.3,1)' }}>
                             <div style={{ fontSize: 44, textAlign: 'center', marginBottom: 12 }}>{step.icon}</div>
                             <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text)', textAlign: 'center', marginBottom: 8 }}>{step.title}</div>
@@ -739,8 +744,8 @@ export function Layout() {
             {/* More Sheet (mobile) */}
             {showMoreSheet && isMobile && (
                 <>
-                    <div className="more-sheet-overlay" onClick={() => setShowMoreSheet(false)} />
-                    <div className="more-sheet">
+                    <div className="more-sheet-overlay" onClick={() => setShowMoreSheet(false)} aria-hidden="true" />
+                    <div className="more-sheet" role="dialog" aria-modal="true" aria-label="Više opcija">
                         <div className="more-sheet-handle" />
                         {navItems.filter(n => !n.separator && !['dashboard', 'radni-sati', 'projekti', 'obavijesti'].includes(n.id)).map(item => (
                             <button
