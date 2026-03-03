@@ -392,7 +392,7 @@ export function SettingsPage({ workerFilterId }) {
                         </button>
                     </div>
 
-                    {/* Bulk Provision Firebase Auth */}
+                    {/* Bulk Provision Firebase Auth – v2 */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 10, background: 'rgba(16,185,129,0.04)', border: '1px solid rgba(16,185,129,0.12)', marginTop: 12 }}>
                         <div style={{ flex: 1 }}>
                             <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>👥 Aktiviraj prijavu za sve radnike</div>
