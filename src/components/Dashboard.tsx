@@ -5,6 +5,7 @@ import { C, styles, fmtDate, today } from '../utils/helpers';
 import { EmptyState } from './ui/EmptyState';
 import { CountUp, BentoCard, EnhancedStat, QuickAction, StatRow, HeatMap } from './dashboard/DashboardWidgets';
 import { useDashboardData } from './dashboard/useDashboardData';
+import './dashboard.css';
 
 export function Dashboard({ onGoToNotifications, onNavigate }) {
     const { projects, workers, timesheets, invoices, otpremnice, obaveze, vehicles, smjestaj, auditLog, currentUser, companyProfile } = useApp();
@@ -64,10 +65,10 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
             {/* ═══ Hero Header ═══ */}
             <div className="aurora-hero" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
-                    <div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.5px', lineHeight: 1.2 }}>
+                    <div className={`dash__hero-title ${isMobile ? 'dash__hero-title--mobile' : 'dash__hero-title--desktop'}`}>
                         {greeting}, {currentUser?.name?.split(' ')[0]}
                     </div>
-                    <div style={{ color: 'var(--text-muted)', fontSize: 14, marginTop: 6 }}>
+                    <div className="dash__hero-sub">
                         {companyProfile?.companyName || 'Vi-Di-Sef'} · {fmtDate(today())}
                     </div>
                 </div>
@@ -87,9 +88,9 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
 
             {/* ═══ Smart Nudge + Prediction ═══ */}
             {(nudgeMessage || prediction) && (
-                <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
+                <div className="dash__nudge-row">
                     {nudgeMessage && (
-                        <div role="button" tabIndex={0} aria-label="Pogledaj obavijesti na čekanju" onClick={onGoToNotifications} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onGoToNotifications?.()} style={{ flex: 1, minWidth: 200, background: 'var(--yellow-light)', borderRadius: 12, padding: '10px 16px', fontSize: 13, fontWeight: 600, color: 'var(--text)', cursor: 'pointer', border: '1px solid rgba(234,179,8,0.2)', display: 'flex', alignItems: 'center', gap: 8, animation: 'cardEntry 0.3s ease' }}>
+                        <div role="button" tabIndex={0} aria-label="Pogledaj obavijesti na čekanju" onClick={onGoToNotifications} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onGoToNotifications?.()} className="dash__nudge">
                             {nudgeMessage}
                         </div>
                     )}
@@ -107,35 +108,35 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
 
             {/* ═══ Weekly Digest ═══ */}
             {now.getDay() <= 2 && (
-                <div style={{ background: 'linear-gradient(135deg, var(--accent-light), var(--blue-light))', borderRadius: 14, padding: '14px 18px', marginBottom: 16, border: '1px solid var(--border)', animation: 'cardEntry 0.4s ease 0.15s both' }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div className="dash__digest">
+                    <div className="dash__digest-title">
                         Tjedni pregled
                     </div>
-                    <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-                        <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}><strong style={{ fontSize: 16, color: 'var(--text)' }}>{weeklyDigest.hours}h</strong> odrađeno</div>
-                        <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}><strong style={{ fontSize: 16, color: 'var(--text)' }}>{weeklyDigest.workers}</strong> radnika</div>
-                        <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}><strong style={{ fontSize: 16, color: 'var(--text)' }}>{weeklyDigest.projects}</strong> projekata</div>
-                        <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}><strong style={{ fontSize: 16, color: 'var(--text)' }}>{weeklyDigest.entries}</strong> unosa</div>
+                    <div className="dash__digest-row">
+                        <div className="dash__digest-stat"><strong className="dash__digest-value">{weeklyDigest.hours}h</strong> odrađeno</div>
+                        <div className="dash__digest-stat"><strong className="dash__digest-value">{weeklyDigest.workers}</strong> radnika</div>
+                        <div className="dash__digest-stat"><strong className="dash__digest-value">{weeklyDigest.projects}</strong> projekata</div>
+                        <div className="dash__digest-stat"><strong className="dash__digest-value">{weeklyDigest.entries}</strong> unosa</div>
                     </div>
                 </div>
             )}
 
             {/* ═══ Goal Progress + Comparison Toggle ═══ */}
-            <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap', alignItems: 'center' }}>
+            <div className="dash__goal-row">
                 {/* Goal */}
-                <div style={{ flex: 1, minWidth: 200, background: 'var(--card)', borderRadius: 12, padding: '12px 16px', border: '1px solid var(--border)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>Mjesečni cilj</span>
+                <div className="dash__goal-card">
+                    <div className="dash__goal-header">
+                        <span className="dash__goal-label">Mjesečni cilj</span>
                         {editingGoal ? (
                             <input type="number" autoFocus defaultValue={monthlyGoal} onBlur={e => { const v = parseInt(e.target.value) || 2000; setMonthlyGoal(v); localStorage.setItem('vidisef-goal', v); setEditingGoal(false); }} onKeyDown={e => e.key === 'Enter' && e.target.blur()} style={{ width: 60, border: '1px solid var(--border)', borderRadius: 6, padding: '2px 6px', fontSize: 12, background: 'var(--input-bg)', color: 'var(--text)', textAlign: 'right' }} />
                         ) : (
                             <button onClick={() => setEditingGoal(true)} style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontVariantNumeric: 'tabular-nums' }}>{Math.round(totalHoursMonth / 60)}h / {monthlyGoal}h</button>
                         )}
                     </div>
-                    <div style={{ height: 6, borderRadius: 3, background: 'var(--divider)', overflow: 'hidden' }}>
+                    <div className="dash__goal-bar-track">
                         <div style={{ height: '100%', borderRadius: 3, background: (totalHoursMonth / 60) / monthlyGoal > 0.8 ? 'var(--green)' : 'var(--accent)', width: `${Math.min(((totalHoursMonth / 60) / monthlyGoal) * 100, 100)}%`, transition: 'width 0.8s cubic-bezier(0.16,1,0.3,1)' }} />
                     </div>
-                    <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 4 }}>{Math.round(((totalHoursMonth / 60) / monthlyGoal) * 100)}% ostvareno — klikni za promjenu cilja</div>
+                    <div className="dash__goal-note">{Math.round(((totalHoursMonth / 60) / monthlyGoal) * 100)}% ostvareno — klikni za promjenu cilja</div>
                 </div>
                 {/* Comparison toggle */}
                 <button onClick={() => setShowComparison(!showComparison)} style={{ ...styles.btn, background: showComparison ? 'var(--accent)' : 'var(--card)', color: showComparison ? 'var(--text-on-accent)' : 'var(--text)', border: `1px solid ${showComparison ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 10, fontSize: 12, padding: '8px 14px', gap: 6 }}>
@@ -145,7 +146,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
 
             {/* ═══ Comparison Banner ═══ */}
             {showComparison && (
-                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(3, 1fr)', gap: 12, marginBottom: 20, animation: 'cardEntry 0.3s ease' }}>
+                <div className={`dash__compare-grid ${isMobile ? 'dash__compare-grid--mobile' : 'dash__compare-grid--desktop'}`}>
                     {[{
                         label: 'Sati', curr: Math.round(totalHoursMonth / 60), prev: Math.round(prevMonth.hours / 60), suffix: 'h'
                     }, {
@@ -155,13 +156,13 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                     }].map((item, i) => {
                         const diff = item.prev > 0 ? Math.round(((item.curr - item.prev) / item.prev) * 100) : 0;
                         return (
-                            <div key={i} style={{ background: 'var(--card)', borderRadius: 12, padding: '14px 16px', border: '1px solid var(--border)' }}>
-                                <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 4 }}>{item.label}</div>
-                                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                                    <span style={{ fontSize: 22, fontWeight: 900, color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}>{item.curr}{item.suffix || ''}</span>
+                            <div key={i} className="dash__compare-card">
+                                <div className="dash__compare-label">{item.label}</div>
+                                <div className="dash__compare-values">
+                                    <span className="dash__compare-current">{item.curr}{item.suffix || ''}</span>
                                     <span style={{ fontSize: 12, fontWeight: 700, color: diff > 0 ? 'var(--green)' : diff < 0 ? 'var(--red)' : 'var(--text-muted)' }}>{diff > 0 ? '↑' : diff < 0 ? '↓' : '→'} {Math.abs(diff)}%</span>
                                 </div>
-                                <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Prošli: {item.prev}{item.suffix || ''}</div>
+                                <div className="dash__compare-prev">Prošli: {item.prev}{item.suffix || ''}</div>
                             </div>
                         );
                     })}
@@ -169,7 +170,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
             )}
 
             {/* ═══ Stat Cards (Bento Row) ═══ */}
-            <div className="swipe-row" style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: isMobile ? 10 : 16, marginBottom: 24 }}>
+            <div className={`swipe-row dash__stat-grid ${isMobile ? 'dash__stat-grid--mobile' : 'dash__stat-grid--desktop'}`}>
                 <EnhancedStat label="Projekti" value={activeProjects} icon="project" color="#2563EB" sub={`od ${projects.length}`} delay={0} sparkData={sparkProjects} onClick={() => onNavigate?.('projekti')} />
                 <EnhancedStat label="Radnici" value={activeWorkers} icon="workers" color="#059669" sub={`od ${workers.length}`} delay={0.06} sparkData={sparkWorkers} onClick={() => onNavigate?.('radnici')} />
                 <EnhancedStat label="Sati" value={Math.round(totalHoursMonth / 60)} icon="clock" color="#D95D08" suffix="h" sub={`${monthTimesheets.length} unosa`} delay={0.12} sparkData={sparkHours} onClick={() => onNavigate?.('radni-sati')} />
@@ -191,7 +192,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                         <div style={{ fontWeight: 700, color: 'var(--red)', fontSize: 14, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
                             <Icon name="alert-circle" size={16} /> Imate stvari na čekanju
                         </div>
-                        <div style={{ color: 'var(--text-secondary)', fontSize: 13 }}>
+                        <div className="dash__pending-detail">
                             {pendingTimesheets > 0 && `${pendingTimesheets} sati · `}{pendingInvoices > 0 && `${pendingInvoices} računa · `}{pendingOtpremnice > 0 && `${pendingOtpremnice} otpremnica`}
                         </div>
                     </div>
@@ -200,31 +201,25 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
             )}
 
             {/* ═══ BENTO GRID ═══ */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr',
-                gridTemplateRows: 'auto auto',
-                gap: 20,
-                marginBottom: 24
-            }}>
+            <div className={`dash__bento-2-1 ${isMobile ? 'dash__bento-2-1--mobile' : 'dash__bento-2-1--desktop'}`} style={{ gridTemplateRows: 'auto auto' }}>
                 {/* ── Activity (2×1 — first, most prominent) ── */}
                 <BentoCard style={{ animationDelay: '0.1s' }}>
                     <div className="u-bento-header">
-                        <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--green-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--green)' }}>
+                        <div className="dash__icon-badge" style={{ background: 'var(--green-light)', color: 'var(--green)' }}>
                             <Icon name="history" size={14} />
                         </div>
                         Nedavna aktivnost
                     </div>
                     {recentActivity.length === 0
-                        ? <div style={{ color: 'var(--text-muted)', fontSize: 13, padding: 24, textAlign: 'center' }}>Nema aktivnosti</div>
+                        ? <div className="dash__empty" style={{ padding: 24 }}>Nema aktivnosti</div>
                         : recentActivity.map((item, i) => (
-                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < recentActivity.length - 1 ? '1px solid var(--divider)' : 'none' }}>
-                                <div style={{ width: 32, height: 32, borderRadius: 10, background: item.type === 'timesheet' ? 'var(--accent-light)' : 'var(--blue-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: item.type === 'timesheet' ? 'var(--accent)' : 'var(--blue)' }}>
+                            <div key={i} className="dash__activity-item" style={{ borderBottom: i < recentActivity.length - 1 ? '1px solid var(--divider)' : 'none' }}>
+                                <div className="dash__activity-icon" style={{ background: item.type === 'timesheet' ? 'var(--accent-light)' : 'var(--blue-light)', color: item.type === 'timesheet' ? 'var(--accent)' : 'var(--blue)' }}>
                                     <Icon name={item.type === 'timesheet' ? 'clock' : 'invoice'} size={14} />
                                 </div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.text}</div>
-                                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{fmtDate(item.date)}</div>
+                                <div className="dash__activity-text">
+                                    <div className="dash__activity-title">{item.text}</div>
+                                    <div className="dash__activity-date">{fmtDate(item.date)}</div>
                                 </div>
                                 {item.status && <span style={styles.badge(item.status === 'odobren' || item.status === 'prihvaćen' ? '34,197,94' : item.status === 'na čekanju' ? '234,179,8' : '100,116,139')}>{item.status}</span>}
                             </div>
@@ -235,7 +230,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                 {/* ── Bar Chart (2×1) ── */}
                 <BentoCard style={{ animationDelay: '0.15s' }}>
                     <div className="u-bento-header">
-                        <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--blue-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--blue)' }}>
+                        <div className="dash__icon-badge" style={{ background: 'var(--blue-light)', color: 'var(--blue)' }}>
                             <Icon name="report" size={14} />
                         </div>
                         Radni sati · zadnjih 14 dana
@@ -249,7 +244,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                 {/* ── Donut Chart (1×1) ── */}
                 <BentoCard style={{ animationDelay: '0.25s' }}>
                     <div className="u-bento-header" style={{ marginBottom: 12 }}>
-                        <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--purple-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--purple)' }}>
+                        <div className="dash__icon-badge" style={{ background: 'var(--purple-light)', color: 'var(--purple)' }}>
                             <Icon name="project" size={14} />
                         </div>
                         Po projektima
@@ -287,11 +282,11 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
             </div>
 
             {/* ═══ ROW 2: Line Chart + Heat Map ═══ */}
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr', gap: 20, marginBottom: 24 }}>
+            <div className={`dash__bento-2-1 ${isMobile ? 'dash__bento-2-1--mobile' : 'dash__bento-2-1--desktop'}`}>
                 {/* ── Line Chart 30 days ── */}
                 <BentoCard style={{ animationDelay: '0.3s' }}>
                     <div className="u-bento-header">
-                        <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--accent-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)' }}>
+                        <div className="dash__icon-badge" style={{ background: 'var(--accent-light)', color: 'var(--accent)' }}>
                             <Icon name="report" size={14} />
                         </div>
                         Trend sati · 30 dana
@@ -305,13 +300,13 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                 {/* ── Heat Map ── */}
                 <BentoCard style={{ animationDelay: '0.35s' }}>
                     <div className="u-bento-header">
-                        <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--green-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--green)' }}>
+                        <div className="dash__icon-badge" style={{ background: 'var(--green-light)', color: 'var(--green)' }}>
                             <Icon name="calendar" size={14} />
                         </div>
                         Aktivnost
                     </div>
                     <HeatMap data={heatMapData} weeks={5} />
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 12, fontSize: 10, color: 'var(--text-muted)' }}>
+                    <div className="dash__heatmap-legend">
                         <span>Manje</span>
                         {[0.1, 0.3, 0.5, 0.7, 1].map(i => <div key={i} style={{ width: 12, height: 12, borderRadius: 2, background: `rgba(5,150,105,${0.2 + i * 0.8})` }} />)}
                         <span>Više</span>
@@ -324,21 +319,21 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                 {/* ── Top Workers ── */}
                 <BentoCard style={{ animationDelay: '0.4s' }}>
                     <div className="u-bento-header">
-                        <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--blue-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--blue)' }}>
+                        <div className="dash__icon-badge" style={{ background: 'var(--blue-light)', color: 'var(--blue)' }}>
                             <Icon name="workers" size={14} />
                         </div>
                         Top radnici · ovaj mjesec
                     </div>
                     {topWorkers.length > 0 ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <div className="dash__ranking-list">
                             {topWorkers.map((w, i) => {
                                 const maxH = topWorkers[0]?.hours || 1;
                                 return (
-                                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                    <div key={i} className="dash__ranking-row">
                                         <span style={{ fontSize: 11, fontWeight: 700, color: i < 3 ? 'var(--accent)' : 'var(--text-muted)', width: 18, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>#{i + 1}</span>
-                                        <div style={{ flex: 1, position: 'relative', height: 28, borderRadius: 6, overflow: 'hidden', background: 'var(--divider)' }}>
+                                        <div className="dash__ranking-bar-wrap">
                                             <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${(w.hours / maxH) * 100}%`, background: i < 3 ? 'var(--accent-light)' : 'var(--blue-light)', borderRadius: 6, transition: 'width 0.8s cubic-bezier(0.16,1,0.3,1)', animation: `fadeIn 0.5s ease ${0.1 * i}s both` }} />
-                                            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 10px', height: '100%', fontSize: 12 }}>
+                                            <div className="dash__ranking-bar-inner">
                                                 <span style={{ fontWeight: 600, color: 'var(--text)' }}>{w.name}</span>
                                                 <span style={{ fontWeight: 800, color: i < 3 ? 'var(--accent)' : 'var(--blue)', fontVariantNumeric: 'tabular-nums' }}>{w.hours}h</span>
                                             </div>
@@ -353,14 +348,14 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                 {/* ── Currently at Work + Streak ── */}
                 <BentoCard style={{ animationDelay: '0.45s' }}>
                     <div className="u-bento-header">
-                        <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--green-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--green)' }}>
+                        <div className="dash__icon-badge" style={{ background: 'var(--green-light)', color: 'var(--green)' }}>
                             <span style={{ fontSize: 14 }}>📍</span>
                         </div>
                         Danas na poslu
                         <span style={{ marginLeft: 'auto', fontSize: 24, fontWeight: 900, color: 'var(--green)', fontVariantNumeric: 'tabular-nums' }}>{currentlyWorking.length}</span>
                     </div>
                     {currentlyWorking.length > 0 ? (
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
+                        <div className="dash__workers-today">
                             {currentlyWorking.map((w, i) => (
                                 <div key={w.id} title={w.name} style={{
                                     width: 36, height: 36, borderRadius: '50%',
@@ -376,11 +371,11 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                                 </div>
                             ))}
                         </div>
-                    ) : <div style={{ color: 'var(--text-muted)', fontSize: 13, padding: 12, textAlign: 'center', marginBottom: 16 }}>Nitko još nije evidentirao danas</div>}
+                    ) : <div className="dash__empty" style={{ padding: 12, marginBottom: 16 }}>Nitko još nije evidentirao danas</div>}
 
                     {/* Streak */}
-                    <div style={{ background: streak > 5 ? 'var(--green-light)' : streak > 0 ? 'var(--yellow-light)' : 'var(--red-light)', borderRadius: 12, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <span style={{ fontSize: 28 }}>{streak > 5 ? '🔥' : streak > 0 ? '⚡' : '⚠️'}</span>
+                    <div className="dash__streak" style={{ background: streak > 5 ? 'var(--green-light)' : streak > 0 ? 'var(--yellow-light)' : 'var(--red-light)' }}>
+                        <span className="dash__streak-emoji">{streak > 5 ? '🔥' : streak > 0 ? '⚡' : '⚠️'}</span>
                         <div>
                             <div style={{ fontSize: 12, fontWeight: 700, color: streak > 5 ? 'var(--green)' : streak > 0 ? 'var(--yellow)' : 'var(--red)' }}>Streak: {streak} dana</div>
                             <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{streak > 5 ? 'Odlično! Svi redovito unose sate' : 'Konzistentnost unosa radnih sati'}</div>
@@ -393,7 +388,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
             <div className="u-mb-24">
                 <BentoCard style={{ animationDelay: '0.5s' }}>
                     <div className="u-bento-header">
-                        <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--blue-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--blue)' }}>
+                        <div className="dash__icon-badge" style={{ background: 'var(--blue-light)', color: 'var(--blue)' }}>
                             <Icon name="project" size={14} />
                         </div>
                         Aktivni projekti — pregled
@@ -434,23 +429,23 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
             </div>
 
             {/* ═══ ROW 5: Financial + Fleet + Obaveze ═══ */}
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: 20, marginBottom: 24 }}>
+            <div className={`dash__bento-3 ${isMobile ? 'dash__bento-3--mobile' : 'dash__bento-3--desktop'}`}>
                 {/* ── Financial with Donut ── */}
                 <BentoCard style={{ animationDelay: '0.55s' }}>
                     <div className="u-bento-header">
-                        <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--yellow-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--yellow)' }}>
+                        <div className="dash__icon-badge" style={{ background: 'var(--yellow-light)', color: 'var(--yellow)' }}>
                             <Icon name="invoice" size={14} />
                         </div>
                         Financije
                     </div>
-                    <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
-                        <div style={{ flex: 1, textAlign: 'center', padding: '12px 8px', borderRadius: 10, background: 'var(--blue-light)' }}>
-                            <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--blue)', fontVariantNumeric: 'tabular-nums' }}><CountUp end={Math.round(totalInvoiceAmount)} />€</div>
-                            <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600 }}>Ukupno</div>
+                    <div className="dash__fin-row">
+                        <div className="dash__fin-box" style={{ background: 'var(--blue-light)' }}>
+                            <div className="dash__fin-value" style={{ color: 'var(--blue)' }}><CountUp end={Math.round(totalInvoiceAmount)} />€</div>
+                            <div className="dash__fin-label">Ukupno</div>
                         </div>
-                        <div style={{ flex: 1, textAlign: 'center', padding: '12px 8px', borderRadius: 10, background: 'var(--yellow-light)' }}>
-                            <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--yellow)', fontVariantNumeric: 'tabular-nums' }}><CountUp end={Math.round(pendingInvoiceAmount)} />€</div>
-                            <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600 }}>Na čekanju</div>
+                        <div className="dash__fin-box" style={{ background: 'var(--yellow-light)' }}>
+                            <div className="dash__fin-value" style={{ color: 'var(--yellow)' }}><CountUp end={Math.round(pendingInvoiceAmount)} />€</div>
+                            <div className="dash__fin-label">Na čekanju</div>
                         </div>
                     </div>
                     {financialCategories.length > 0 && <SvgDonutChart data={financialCategories} height={120} />}
@@ -470,23 +465,23 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                 {/* ── Fleet Dashboard ── */}
                 <BentoCard style={{ animationDelay: '0.6s' }}>
                     <div className="u-bento-header">
-                        <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--purple-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--purple)' }}>
+                        <div className="dash__icon-badge" style={{ background: 'var(--purple-light)', color: 'var(--purple)' }}>
                             <Icon name="car" size={14} />
                         </div>
                         Flota
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 14 }}>
-                        <div style={{ textAlign: 'center', padding: '10px 6px', borderRadius: 10, background: 'var(--purple-light)' }}>
-                            <div style={{ fontSize: 20, fontWeight: 900, color: 'var(--purple)' }}><CountUp end={vehicles.length} /></div>
-                            <div style={{ fontSize: 9, color: 'var(--text-muted)', fontWeight: 600 }}>Vozila</div>
+                    <div className="dash__fleet-grid">
+                        <div className="dash__fleet-stat" style={{ background: 'var(--purple-light)' }}>
+                            <div className="dash__fleet-value" style={{ color: 'var(--purple)' }}><CountUp end={vehicles.length} /></div>
+                            <div className="dash__fleet-label">Vozila</div>
                         </div>
-                        <div style={{ textAlign: 'center', padding: '10px 6px', borderRadius: 10, background: 'var(--red-light)' }}>
-                            <div style={{ fontSize: 20, fontWeight: 900, color: 'var(--red)' }}><CountUp end={fleetStats.totalCost} />€</div>
-                            <div style={{ fontSize: 9, color: 'var(--text-muted)', fontWeight: 600 }}>Gorivo</div>
+                        <div className="dash__fleet-stat" style={{ background: 'var(--red-light)' }}>
+                            <div className="dash__fleet-value" style={{ color: 'var(--red)' }}><CountUp end={fleetStats.totalCost} />€</div>
+                            <div className="dash__fleet-label">Gorivo</div>
                         </div>
-                        <div style={{ textAlign: 'center', padding: '10px 6px', borderRadius: 10, background: 'var(--blue-light)' }}>
-                            <div style={{ fontSize: 20, fontWeight: 900, color: 'var(--blue)' }}><CountUp end={Math.round(fleetStats.totalKm / 1000)} />k</div>
-                            <div style={{ fontSize: 9, color: 'var(--text-muted)', fontWeight: 600 }}>km</div>
+                        <div className="dash__fleet-stat" style={{ background: 'var(--blue-light)' }}>
+                            <div className="dash__fleet-value" style={{ color: 'var(--blue)' }}><CountUp end={Math.round(fleetStats.totalKm / 1000)} />k</div>
+                            <div className="dash__fleet-label">km</div>
                         </div>
                     </div>
                     {fleetStats.topFuel.length > 0 && (
@@ -511,7 +506,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                 {/* ── Obaveze Timeline ── */}
                 <BentoCard style={{ animationDelay: '0.65s' }}>
                     <div className="u-bento-header">
-                        <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--accent-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)' }}>
+                        <div className="dash__icon-badge" style={{ background: 'var(--accent-light)', color: 'var(--accent)' }}>
                             <span style={{ fontSize: 14 }}>🎯</span>
                         </div>
                         Obaveze
@@ -567,7 +562,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                 {/* ── Weekday Pattern ── */}
                 <BentoCard style={{ animationDelay: '0.75s' }}>
                     <div className="u-bento-header">
-                        <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--accent-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)' }}>
+                        <div className="dash__icon-badge" style={{ background: 'var(--accent-light)', color: 'var(--accent)' }}>
                             <Icon name="calendar" size={14} />
                         </div>
                         Sati po danu u tjednu
@@ -581,7 +576,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                 {/* ── Workers per project ── */}
                 <BentoCard style={{ animationDelay: '0.8s' }}>
                     <div className="u-bento-header">
-                        <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--green-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--green)' }}>
+                        <div className="dash__icon-badge" style={{ background: 'var(--green-light)', color: 'var(--green)' }}>
                             <Icon name="workers" size={14} />
                         </div>
                         Radnici po projektima
@@ -607,7 +602,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                 {/* ── Cost per project ── */}
                 <BentoCard style={{ animationDelay: '0.85s' }}>
                     <div className="u-bento-header">
-                        <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--red-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--red)' }}>
+                        <div className="dash__icon-badge" style={{ background: 'var(--red-light)', color: 'var(--red)' }}>
                             <Icon name="invoice" size={14} />
                         </div>
                         Troškovi po projektu
@@ -636,7 +631,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                 {/* ── Project Status Donut ── */}
                 <BentoCard style={{ animationDelay: '0.9s' }}>
                     <div className="u-bento-header">
-                        <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--blue-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--blue)' }}>
+                        <div className="dash__icon-badge" style={{ background: 'var(--blue-light)', color: 'var(--blue)' }}>
                             <Icon name="project" size={14} />
                         </div>
                         Status projekata
@@ -656,11 +651,11 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                         </div>
                         Neplaćeni računi
                     </div>
-                    <div style={{ textAlign: 'center', padding: '16px 0' }}>
-                        <div style={{ fontSize: 40, fontWeight: 900, color: unpaidInvoices.count > 0 ? 'var(--yellow)' : 'var(--green)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+                    <div className="dash__unpaid-center">
+                        <div className="dash__unpaid-count" style={{ color: unpaidInvoices.count > 0 ? 'var(--yellow)' : 'var(--green)' }}>
                             <CountUp end={unpaidInvoices.count} />
                         </div>
-                        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>računa na čekanju</div>
+                        <div className="dash__unpaid-sub">računa na čekanju</div>
                         {unpaidInvoices.total > 0 && (
                             <div style={{ marginTop: 12, padding: '10px 16px', borderRadius: 10, background: 'var(--yellow-light)', display: 'inline-block' }}>
                                 <span style={{ fontSize: 22, fontWeight: 900, color: 'var(--yellow)', fontVariantNumeric: 'tabular-nums' }}>{unpaidInvoices.total.toLocaleString('hr-HR')}€</span>
@@ -678,7 +673,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
             <div className="u-mb-24">
                 <BentoCard style={{ animationDelay: '0.65s' }}>
                     <div className="u-bento-header">
-                        <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--red-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--red)' }}>
+                        <div className="dash__icon-badge" style={{ background: 'var(--red-light)', color: 'var(--red)' }}>
                             <Icon name="security" size={14} />
                         </div>
                         Audit Log
@@ -687,7 +682,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                         </button>
                     </div>
                     {auditLog.length === 0
-                        ? <div style={{ color: 'var(--text-muted)', fontSize: 13, padding: 16, textAlign: 'center' }}>Nema log zapisa</div>
+                        ? <div className="dash__empty" style={{ padding: 16 }}>Nema log zapisa</div>
                         : auditLog.slice(-5).reverse().map((entry, i) => {
                             const timeAgo = (() => {
                                 if (!entry.timestamp) return '';
@@ -698,13 +693,13 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                                 return `${Math.round(d / 1440)}d`;
                             })();
                             return (
-                                <div key={entry.id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0', borderBottom: i < 4 ? '1px solid var(--divider)' : 'none', animation: `fadeIn 0.3s ease ${i * 0.05}s both` }}>
-                                    <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--divider)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, flexShrink: 0 }}>📝</div>
-                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                        <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.action}</div>
-                                        <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{entry.user} {entry.details ? `· ${entry.details}` : ''}</div>
+                                <div key={entry.id || i} className="dash__audit-item" style={{ borderBottom: i < 4 ? '1px solid var(--divider)' : 'none', animation: `fadeIn 0.3s ease ${i * 0.05}s both` }}>
+                                    <div className="dash__audit-icon">📝</div>
+                                    <div className="dash__audit-text">
+                                        <div className="dash__audit-action">{entry.action}</div>
+                                        <div className="dash__audit-detail">{entry.user} {entry.details ? `· ${entry.details}` : ''}</div>
                                     </div>
-                                    <span style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, flexShrink: 0 }}>{timeAgo}</span>
+                                    <span className="dash__audit-time">{timeAgo}</span>
                                 </div>
                             );
                         })
