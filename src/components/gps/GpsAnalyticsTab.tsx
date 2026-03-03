@@ -193,7 +193,7 @@ export default function GpsAnalyticsTab({
             }}>
                 {/* Donut Chart */}
                 <div style={styles.card}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16 }}>
+                    <div className="u-section-title u-mb-16">
                         🟢 Prisutnost u zoni
                     </div>
                     <DonutChart data={donutData} total={donutTotal} centerLabel={`${kpis.presencePct}%`} />
@@ -209,7 +209,7 @@ export default function GpsAnalyticsTab({
 
                 {/* Trend Chart */}
                 <div style={styles.card}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16 }}>
+                    <div className="u-section-title u-mb-16">
                         📈 Trend prisutnosti (zadnjih {period} dana)
                     </div>
                     {dailyTrend.length === 0 ? (
@@ -250,7 +250,7 @@ export default function GpsAnalyticsTab({
             }}>
                 {/* Worker Distance Bar Chart */}
                 <div style={styles.card}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16 }}>
+                    <div className="u-section-title u-mb-16">
                         📏 Prosječna udaljenost po radniku (top 10)
                     </div>
                     {workerDistances.length === 0 ? (
@@ -284,7 +284,7 @@ export default function GpsAnalyticsTab({
 
                 {/* Event Type Breakdown */}
                 <div style={styles.card}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16 }}>
+                    <div className="u-section-title u-mb-16">
                         📋 Vrste GPS događaja
                     </div>
                     {eventBreakdown.length === 0 ? (
@@ -325,7 +325,7 @@ export default function GpsAnalyticsTab({
                         <span style={{ fontSize: 18 }}>⚠️</span>
                         <div>
                             <div style={{ fontSize: 14, fontWeight: 700, color: '#DC2626' }}>Anomalije — izvan zone (&gt;500m)</div>
-                            <div style={{ fontSize: 12, color: C.textMuted }}>Radnici koji su česti bili daleko od gradilišta</div>
+                            <div className="u-fs-12" style={{ color: C.textMuted }}>Radnici koji su česti bili daleko od gradilišta</div>
                         </div>
                     </div>
                     <div style={{

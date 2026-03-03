@@ -399,7 +399,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                         Aktivni projekti — pregled
                         <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--text-muted)' }}>{projectTableData.length} projekata</span>
                     </div>
-                    <div style={{ overflowX: 'auto' }}>
+                    <div className="u-overflow-x">
                         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 500 }}>
                             <thead>
                                 <tr>

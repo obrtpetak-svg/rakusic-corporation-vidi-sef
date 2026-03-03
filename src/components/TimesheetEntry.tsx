@@ -171,7 +171,7 @@ export function TimesheetEntry() {
 
             {/* My recent entries with EDIT */}
             <div style={{ ...styles.card, marginTop: 20 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>📋 Moji nedavni unosi</div>
+                <div className="u-section-title u-mb-12">📋 Moji nedavni unosi</div>
                 {myTs.slice(0, 15).map(t => {
                     const p = projects.find(x => x.id === t.projectId);
                     const mins = diffMins(t.startTime, t.endTime) - (t.breakMins || 0);

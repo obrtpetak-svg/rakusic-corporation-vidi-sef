@@ -167,8 +167,8 @@ export function OtpremnicePage({ workerFilterId }) {
                         <div key={s.label} style={{ ...styles.card, display: 'flex', alignItems: 'center', gap: 14 }}>
                             <div style={{ background: `${s.color}18`, borderRadius: 12, padding: 12, color: s.color }}><Icon name={s.icon} size={22} /></div>
                             <div>
-                                <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>{s.label}</div>
-                                <div style={{ fontSize: 24, fontWeight: 800, color: C.text }}>{s.value}</div>
+                                <div className="u-stat-label">{s.label}</div>
+                                <div className="u-fs-24 u-fw-800" style={{ color: C.text }}>{s.value}</div>
                             </div>
                         </div>
                     ))}
@@ -177,7 +177,7 @@ export function OtpremnicePage({ workerFilterId }) {
 
             {/* List */}
             <div style={styles.card}>
-                <div style={{ overflowX: 'auto' }}>
+                <div className="u-overflow-x">
                     <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
                         <thead>
                             <tr>

@@ -160,17 +160,17 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
                         <div style={{ width: 56, height: 56, borderRadius: '50%', background: C.accentLight, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.accent, fontWeight: 800, fontSize: 22 }}>{detailWorker.name?.charAt(0)}</div>
                         <div>
-                            <div style={{ fontSize: 22, fontWeight: 800, color: C.text }}>{detailWorker.name}</div>
+                            <div className="u-fs-22 u-fw-800" style={{ color: C.text }}>{detailWorker.name}</div>
                             <div style={{ color: C.textMuted, fontSize: 13 }}>{detailWorker.position || 'Radnik'} • {detailWorker.active !== false ? '🟢 Aktivan' : '🔴 Neaktivan'}</div>
                         </div>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(6, 1fr)', gap: 10, marginBottom: 16 }}>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: C.accentLight }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Projekti</div><div style={{ fontSize: 20, fontWeight: 800, color: C.accent }}>{wProjects.length}</div></div>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(29,78,216,0.08)' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Ukupno sati</div><div style={{ fontSize: 20, fontWeight: 800, color: C.blue }}>{Math.round(totalMins / 60)}h</div></div>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(16,185,129,0.08)' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Ovaj mjesec</div><div style={{ fontSize: 20, fontWeight: 800, color: C.green }}>{Math.round(monthMins / 60)}h</div></div>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(4,120,87,0.08)' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Unosi</div><div style={{ fontSize: 20, fontWeight: 800, color: '#047857' }}>{wTimesheets.length}</div></div>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(245,158,11,0.08)' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Prosjek dolaska</div><div style={{ fontSize: 20, fontWeight: 800, color: '#F59E0B' }}>{avgArrival}</div></div>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(124,58,237,0.08)' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Vozilo</div><div style={{ fontSize: 20, fontWeight: 800, color: '#7C3AED' }}>{wVehicle ? '✔️' : '—'}</div></div>
+                        <div style={{ padding: '12px 16px', borderRadius: 10, background: C.accentLight }}><div className="u-stat-label">Projekti</div><div style={{ fontSize: 20, fontWeight: 800, color: C.accent }}>{wProjects.length}</div></div>
+                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(29,78,216,0.08)' }}><div className="u-stat-label">Ukupno sati</div><div style={{ fontSize: 20, fontWeight: 800, color: C.blue }}>{Math.round(totalMins / 60)}h</div></div>
+                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(16,185,129,0.08)' }}><div className="u-stat-label">Ovaj mjesec</div><div style={{ fontSize: 20, fontWeight: 800, color: C.green }}>{Math.round(monthMins / 60)}h</div></div>
+                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(4,120,87,0.08)' }}><div className="u-stat-label">Unosi</div><div style={{ fontSize: 20, fontWeight: 800, color: '#047857' }}>{wTimesheets.length}</div></div>
+                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(245,158,11,0.08)' }}><div className="u-stat-label">Prosjek dolaska</div><div style={{ fontSize: 20, fontWeight: 800, color: '#F59E0B' }}>{avgArrival}</div></div>
+                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(124,58,237,0.08)' }}><div className="u-stat-label">Vozilo</div><div style={{ fontSize: 20, fontWeight: 800, color: '#7C3AED' }}>{wVehicle ? '✔️' : '—'}</div></div>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 8, fontSize: 13 }}>
                         <EditableField label="📞 Tel" value={detailWorker.phone} onSave={v => updateDoc('workers', detailWorker.id, { phone: v })} type="tel" placeholder="Dodaj telefon" />
@@ -225,7 +225,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
     return (
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
-                <div style={{ fontSize: 22, fontWeight: 800, color: C.text }}>Radnici</div>
+                <div className="u-fs-22 u-fw-800" style={{ color: C.text }}>Radnici</div>
                 <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> Novi radnik</button>
             </div>
             <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
@@ -250,7 +250,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                                 <div style={{ width: 44, height: 44, borderRadius: '50%', background: w.active !== false ? C.accentLight : 'rgba(100,116,139,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 800, color: w.active !== false ? C.accent : C.textMuted, flexShrink: 0 }}>{w.name?.charAt(0)}</div>
                                 <div style={{ flex: 1, minWidth: 0 }}>
                                     <div style={{ fontSize: 14, fontWeight: 700, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{w.name}</div>
-                                    <div style={{ fontSize: 12, color: C.textMuted }}>{w.position || 'Radnik'}{w.phone ? ` • ${w.phone}` : ''}</div>
+                                    <div className="u-fs-12" style={{ color: C.textMuted }}>{w.position || 'Radnik'}{w.phone ? ` • ${w.phone}` : ''}</div>
                                 </div>
                             </div>
                             <div style={{ display: 'flex', gap: 12, fontSize: 12, color: C.textMuted, marginBottom: 12 }}>
@@ -318,7 +318,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                                                 </button>
                                             );
                                         })}
-                                        {projects.length === 0 && <div style={{ fontSize: 12, color: C.textMuted }}>Nema projekata</div>}
+                                        {projects.length === 0 && <div className="u-fs-12" style={{ color: C.textMuted }}>Nema projekata</div>}
                                     </div>
                                 </Field>
                             </div>

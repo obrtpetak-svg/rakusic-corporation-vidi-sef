@@ -115,7 +115,7 @@ export default function GpsAlertTab({
                     <div style={{ fontWeight: 800, fontSize: 18, color: severityConfig.color }}>
                         {severityConfig.text}
                     </div>
-                    <div style={{ fontSize: 13, color: C.textMuted }}>
+                    <div className="u-fs-13" style={{ color: C.textMuted }}>
                         {!alertsEnabled
                             ? 'Sustav alarma je isključen. Uključite ga za praćenje geofence alarma.'
                             : outOfZoneWorkers.length > 0
@@ -290,7 +290,7 @@ export default function GpsAlertTab({
                                                     {meta.label}
                                                     {alert.projectName && ` • ${alert.projectName}`}
                                                 </div>
-                                                <div style={{ fontSize: 12, color: C.textMuted, marginTop: 2 }}>
+                                                <div className="u-fs-12" style={{ color: C.textMuted, marginTop: 2 }}>
                                                     {alert.distanceFromSite != null && `📏 ${formatDistance(alert.distanceFromSite)} • `}
                                                     {alert.accuracy && `🎯 ±${alert.accuracy}m • `}
                                                     {timeAgo(alert.timestamp)}

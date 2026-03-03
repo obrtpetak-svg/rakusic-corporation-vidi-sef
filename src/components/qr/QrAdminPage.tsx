@@ -168,7 +168,7 @@ export function QrAdminPage() {
                                 <div style={{ padding: '14px 16px', borderRadius: 10, background: 'rgba(217,93,8,0.06)', border: '1px solid rgba(217,93,8,0.15)', marginBottom: 16 }}>
                                     <div style={{ fontSize: 16, fontWeight: 700, color: C.text }}>{project.name}</div>
                                     {project.location && <div style={{ fontSize: 12, color: C.textMuted, marginTop: 4 }}>📍 {project.location}</div>}
-                                    {project.client && <div style={{ fontSize: 12, color: C.textMuted, marginTop: 2 }}>🏢 {project.client}</div>}
+                                    {project.client && <div className="u-fs-12" style={{ color: C.textMuted, marginTop: 2 }}>🏢 {project.client}</div>}
                                     <div style={{ fontSize: 11, color: C.accent, marginTop: 6, fontFamily: 'monospace' }}>VIDISEF:{project.id}</div>
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -264,7 +264,7 @@ export function QrAdminPage() {
                     {recentLog.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: 40, color: C.textMuted }}>Nema QR check-in zapisa</div>
                     ) : (
-                        <div style={{ overflowX: 'auto' }}>
+                        <div className="u-overflow-x">
                             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                 <thead><tr>
                                     <th style={styles.th}>Datum</th><th style={styles.th}>Radnik</th><th style={styles.th}>Projekt</th>

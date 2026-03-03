@@ -324,24 +324,24 @@ export function AiInsightsPage({ leaderProjectIds }) {
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                                         <div>
                                             <div style={{ fontWeight: 700, fontSize: 15, color: C.text }}>{p.name}</div>
-                                            <div style={{ fontSize: 12, color: C.textMuted }}>👷 {workerCount} radnika • {daysActive} dana aktivan</div>
+                                            <div className="u-fs-12" style={{ color: C.textMuted }}>👷 {workerCount} radnika • {daysActive} dana aktivan</div>
                                         </div>
                                         <div style={{ textAlign: 'right' }}>
                                             <div style={{ fontSize: 18, fontWeight: 800, color: C.accent }}>{totalH.toFixed(0)}h</div>
-                                            <div style={{ fontSize: 11, color: C.textMuted }}>{dailyRate.toFixed(1)}h/dan</div>
+                                            <div className="u-fs-11" style={{ color: C.textMuted }}>{dailyRate.toFixed(1)}h/dan</div>
                                         </div>
                                     </div>
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
                                         <div style={{ padding: 10, borderRadius: 8, background: 'rgba(59,130,246,0.06)', textAlign: 'center' }}>
-                                            <div style={{ fontSize: 11, color: C.textMuted }}>Ukupni troškovi</div>
+                                            <div className="u-fs-11" style={{ color: C.textMuted }}>Ukupni troškovi</div>
                                             <div style={{ fontSize: 16, fontWeight: 800, color: '#1D4ED8' }}>{totalCost.toFixed(0)}€</div>
                                         </div>
                                         <div style={{ padding: 10, borderRadius: 8, background: 'rgba(249,115,22,0.06)', textAlign: 'center' }}>
-                                            <div style={{ fontSize: 11, color: C.textMuted }}>Dnevni burn</div>
+                                            <div className="u-fs-11" style={{ color: C.textMuted }}>Dnevni burn</div>
                                             <div style={{ fontSize: 16, fontWeight: 800, color: '#EA580C' }}>{dailyCost.toFixed(0)}€/dan</div>
                                         </div>
                                         <div style={{ padding: 10, borderRadius: 8, background: 'rgba(16,185,129,0.06)', textAlign: 'center' }}>
-                                            <div style={{ fontSize: 11, color: C.textMuted }}>€/sat</div>
+                                            <div className="u-fs-11" style={{ color: C.textMuted }}>€/sat</div>
                                             <div style={{ fontSize: 16, fontWeight: 800, color: '#10B981' }}>{totalH > 0 ? (totalCost / totalH).toFixed(1) : '0'}€</div>
                                         </div>
                                     </div>
@@ -384,7 +384,7 @@ export function AiInsightsPage({ leaderProjectIds }) {
                                             <div style={{ fontSize: isFirst ? 40 : 28 }}>{medals[idx]}</div>
                                             <div style={{ fontSize: isFirst ? 15 : 13, fontWeight: 800, color: C.text, marginTop: 4 }}>{s.name}</div>
                                             <div style={{ fontSize: 22, fontWeight: 800, color: C.accent, marginTop: 4 }}>{s.score}</div>
-                                            <div style={{ fontSize: 11, color: C.textMuted }}>{s.totalH}h • {s.daysWorked} dana</div>
+                                            <div className="u-fs-11" style={{ color: C.textMuted }}>{s.totalH}h • {s.daysWorked} dana</div>
                                             <div style={{ marginTop: 8, height: isFirst ? 80 : idx === 1 ? 60 : 40, background: `linear-gradient(to top, ${C.accent}22, ${C.accent}08)`, borderRadius: '8px 8px 0 0', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingBottom: 6 }}>
                                                 <span style={{ fontSize: 18, fontWeight: 800, color: C.accent }}>#{idx + 1}</span>
                                             </div>
@@ -402,7 +402,7 @@ export function AiInsightsPage({ leaderProjectIds }) {
                                 <div style={{ width: 32, textAlign: 'center', fontSize: 14, fontWeight: 800, color: i < 3 ? C.accent : C.textMuted }}>{i < 3 ? medals[i] : `#${i + 1}`}</div>
                                 <div style={{ flex: 1 }}>
                                     <div style={{ fontWeight: 700, fontSize: 14, color: C.text }}>{s.name}</div>
-                                    <div style={{ fontSize: 12, color: C.textMuted }}>{s.totalH}h ukupno • {s.avgH}h/dan • {s.daysWorked} dana</div>
+                                    <div className="u-fs-12" style={{ color: C.textMuted }}>{s.totalH}h ukupno • {s.avgH}h/dan • {s.daysWorked} dana</div>
                                 </div>
                                 {s.streak > 2 && <div style={{ padding: '2px 8px', borderRadius: 8, background: 'rgba(249,115,22,0.1)', fontSize: 11, fontWeight: 700, color: '#EA580C' }}>🔥 {s.streak} dana streak</div>}
                                 <div style={{ width: 80 }}>
@@ -448,7 +448,7 @@ export function AiInsightsPage({ leaderProjectIds }) {
 
                     {/* Risk details table */}
                     <Card title="📋 Detalji rizika po projektu">
-                        <div style={{ overflowX: 'auto' }}>
+                        <div className="u-overflow-x">
                             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                                 <thead>
                                     <tr style={{ borderBottom: `2px solid ${C.border}` }}>

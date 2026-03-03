@@ -51,7 +51,7 @@ export default function WorkerLocationCard({ worker: w, getProjectName }) {
 
                 <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 700, fontSize: 14, color: C.text }}>{w.name}</div>
-                    <div style={{ fontSize: 12, color: C.textMuted }}>{w.position || w.role || 'Radnik'}</div>
+                    <div className="u-fs-12" style={{ color: C.textMuted }}>{w.position || w.role || 'Radnik'}</div>
                 </div>
 
                 <div style={{
@@ -71,15 +71,15 @@ export default function WorkerLocationCard({ worker: w, getProjectName }) {
                 }}>
                     <div>
                         <div style={{ fontSize: 10, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Udaljenost</div>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{formatDistance(loc.distanceFromSite)}</div>
+                        <div className="u-section-title">{formatDistance(loc.distanceFromSite)}</div>
                     </div>
                     <div>
                         <div style={{ fontSize: 10, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Zadnje viđeno</div>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{timeAgo(loc.timestamp)}</div>
+                        <div className="u-section-title">{timeAgo(loc.timestamp)}</div>
                     </div>
                     <div>
                         <div style={{ fontSize: 10, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Preciznost</div>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>±{loc.accuracy}m</div>
+                        <div className="u-section-title">±{loc.accuracy}m</div>
                     </div>
                 </div>
             )}

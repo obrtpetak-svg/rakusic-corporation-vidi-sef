@@ -243,7 +243,7 @@ export function SettingsPage({ workerFilterId }) {
 
                 {/* App info */}
                 <div style={{ ...styles.card, marginTop: 16 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>ℹ️ Aplikacija</div>
+                    <div className="u-section-title u-mb-12">ℹ️ Aplikacija</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                         <div><span style={styles.label}>Verzija</span><div style={{ fontSize: 14, fontWeight: 600, color: C.accent }}>3.0.0</div></div>
                         <div><span style={styles.label}>Korisnik</span><div style={{ fontSize: 14, fontWeight: 600 }}>{currentUser?.name}</div></div>
@@ -263,7 +263,7 @@ export function SettingsPage({ workerFilterId }) {
             {/* Company info */}
             <div style={styles.card}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>🏢 Podaci tvrtke</div>
+                    <div className="u-section-title">🏢 Podaci tvrtke</div>
                     <button onClick={startEdit} style={styles.btnSmall}><Icon name="edit" size={12} /> Uredi</button>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12 }}>
@@ -285,7 +285,7 @@ export function SettingsPage({ workerFilterId }) {
 
             {/* Firebase */}
             <div style={{ ...styles.card, marginTop: 16 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>🔥 Firebase konfiguracija</div>
+                <div className="u-section-title u-mb-12">🔥 Firebase konfiguracija</div>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 8 }}>
                     {(() => {
                         const cfg = JSON.parse(localStorage.getItem('vidime-firebase-config-v9') || '{}');
@@ -299,7 +299,7 @@ export function SettingsPage({ workerFilterId }) {
 
             {/* ── BACKUP / RESTORE ────────────────────────── */}
             <div style={{ ...styles.card, marginTop: 16, borderColor: 'rgba(4,120,87,0.3)' }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16 }}>💾 Backup i Restore</div>
+                <div className="u-section-title u-mb-16">💾 Backup i Restore</div>
 
                 {/* Full Backup */}
                 <div style={{ background: C.bg, borderRadius: 10, padding: 16, marginBottom: 12 }}>
@@ -334,7 +334,7 @@ export function SettingsPage({ workerFilterId }) {
             {/* Audit Log */}
             <div style={{ ...styles.card, marginTop: 16 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>📝 Audit log ({auditLog.length})</div>
+                    <div className="u-section-title">📝 Audit log ({auditLog.length})</div>
                     <div style={{ display: 'flex', gap: 8 }}>
                         <button onClick={() => setShowAudit(!showAudit)} style={styles.btnSmall}>{showAudit ? 'Sakrij' : 'Prikaži'}</button>
                         <button onClick={clearAuditLog} style={styles.btnDanger}><Icon name="trash" size={12} /> Obriši</button>
@@ -358,7 +358,7 @@ export function SettingsPage({ workerFilterId }) {
 
             {/* App info */}
             <div style={{ ...styles.card, marginTop: 16 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}> Aplikacija</div>
+                <div className="u-section-title u-mb-12"> Aplikacija</div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                     <div><span style={styles.label}>Verzija</span><div style={{ fontSize: 14, fontWeight: 600, color: C.accent }}>3.0.0</div></div>
                     <div><span style={styles.label}>Korisnik</span><div style={{ fontSize: 14, fontWeight: 600 }}>{currentUser?.name}</div></div>
@@ -386,7 +386,7 @@ export function SettingsPage({ workerFilterId }) {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 10, background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.12)' }}>
                         <div style={{ flex: 1 }}>
                             <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>🚪 Odjavi sve korisnike</div>
-                            <div style={{ fontSize: 11, color: C.textMuted }}>Svi aktivni korisnici bit će odmah odjavljeni iz aplikacije.</div>
+                            <div className="u-fs-11" style={{ color: C.textMuted }}>Svi aktivni korisnici bit će odmah odjavljeni iz aplikacije.</div>
                         </div>
                         <button onClick={async () => { if (await confirm('Sigurno želite odjaviti SVE korisnike?')) { await forceLogoutAll(); await addAuditLog('FORCE_LOGOUT_ALL', 'Admin je odijavio sve korisnike'); } }} style={{ ...styles.btnSmall, color: C.red, borderColor: 'rgba(239,68,68,0.3)', padding: '8px 14px', fontWeight: 700, whiteSpace: 'nowrap' }}>
                             Odjavi sve
@@ -397,7 +397,7 @@ export function SettingsPage({ workerFilterId }) {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 10, background: 'rgba(16,185,129,0.04)', border: '1px solid rgba(16,185,129,0.12)', marginTop: 12 }}>
                         <div style={{ flex: 1 }}>
                             <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>👥 Aktiviraj prijavu za sve radnike</div>
-                            <div style={{ fontSize: 11, color: C.textMuted }}>Kreira Firebase Auth račune za sve radnike koji ih nemaju (ista lozinka za sve).</div>
+                            <div className="u-fs-11" style={{ color: C.textMuted }}>Kreira Firebase Auth račune za sve radnike koji ih nemaju (ista lozinka za sve).</div>
                         </div>
                         <button onClick={async () => {
                             if (!(await confirm('Kreirati Firebase Auth račune za sve radnike s lozinkom RakusicCorp2026.! ?'))) return;
@@ -474,8 +474,8 @@ export function SettingsPage({ workerFilterId }) {
             <div style={{ ...styles.card, marginTop: 16, borderColor: 'rgba(99,102,241,0.3)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                     <div>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>👥 Korisnici sustava</div>
-                        <div style={{ fontSize: 12, color: C.textMuted, marginTop: 2 }}>Upravljanje korisnicima koji se mogu prijaviti u aplikaciju ({users?.length || 0})</div>
+                        <div className="u-section-title">👥 Korisnici sustava</div>
+                        <div className="u-fs-12" style={{ color: C.textMuted, marginTop: 2 }}>Upravljanje korisnicima koji se mogu prijaviti u aplikaciju ({users?.length || 0})</div>
                     </div>
                     <button onClick={() => { setShowAddUser(true); setUserForm({ name: '', username: '', role: 'radnik', password: '' }); setUserMsg(''); setEditingUser(null); }} style={{ ...styles.btn, fontSize: 12, padding: '8px 16px' }}>+ Dodaj korisnika</button>
                 </div>
@@ -490,7 +490,7 @@ export function SettingsPage({ workerFilterId }) {
                                 </div>
                                 <div>
                                     <div style={{ fontWeight: 600, fontSize: 13, color: C.text }}>{u.name || u.username}</div>
-                                    <div style={{ fontSize: 11, color: C.textMuted }}>{u.username} · <span style={{ fontWeight: 600, color: u.role === 'admin' ? C.red : u.role === 'leader' ? '#F59E0B' : '#6366F1' }}>{u.role || 'radnik'}</span></div>
+                                    <div className="u-fs-11" style={{ color: C.textMuted }}>{u.username} · <span style={{ fontWeight: 600, color: u.role === 'admin' ? C.red : u.role === 'leader' ? '#F59E0B' : '#6366F1' }}>{u.role || 'radnik'}</span></div>
                                 </div>
                             </div>
                             <div style={{ display: 'flex', gap: 6 }}>
@@ -622,7 +622,7 @@ export function SettingsPage({ workerFilterId }) {
                             </button>
                         </div>
                     </div>
-                    {trashItems === null && <div style={{ fontSize: 13, color: C.textMuted }}>Klikni "Učitaj" za prikaz obrisanih stavki</div>}
+                    {trashItems === null && <div className="u-fs-13" style={{ color: C.textMuted }}>Klikni "Učitaj" za prikaz obrisanih stavki</div>}
                     {trashItems && trashItems.length === 0 && <div style={{ fontSize: 13, color: C.green }}>✅ Koš je prazan</div>}
                     {trashItems && trashItems.length > 0 && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 300, overflowY: 'auto' }}>

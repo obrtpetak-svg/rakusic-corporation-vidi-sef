@@ -35,7 +35,7 @@ export default function FleetGeofenceTab({ vehicles }: { vehicles: FleetVehicle[
             {/* ── Geofence List ── */}
             <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>🏗️ Geofence zone ({geofences.length})</div>
+                    <div className="u-section-title">🏗️ Geofence zone ({geofences.length})</div>
                     <button onClick={() => setShowAdd(true)} style={{ ...styles.btn, fontSize: 11, padding: '6px 12px' }}>+ Nova zona</button>
                 </div>
                 <div style={{ display: 'grid', gap: 8 }}>
@@ -51,7 +51,7 @@ export default function FleetGeofenceTab({ vehicles }: { vehicles: FleetVehicle[
                             }}>{g.type === 'circle' ? '⭕' : '🔷'}</div>
                             <div style={{ flex: 1 }}>
                                 <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{g.name}</div>
-                                <div style={{ fontSize: 11, color: C.textMuted }}>
+                                <div className="u-fs-11" style={{ color: C.textMuted }}>
                                     {g.type === 'circle' ? `Krug · ${g.radius}m` : 'Poligon'} · Alert: {g.alertType === 'both' ? 'ulaz+izlaz' : g.alertType === 'enter' ? 'ulaz' : 'izlaz'}
                                 </div>
                             </div>
@@ -92,7 +92,7 @@ export default function FleetGeofenceTab({ vehicles }: { vehicles: FleetVehicle[
 
             {/* ── Event Feed ── */}
             <div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>📋 Události ({MOCK_EVENTS.length})</div>
+                <div className="u-section-title u-mb-12">📋 Události ({MOCK_EVENTS.length})</div>
                 <div style={{ display: 'grid', gap: 6 }}>
                     {MOCK_EVENTS.map(e => (
                         <div key={e.id} style={{ background: 'var(--card)', border: `1px solid ${C.border}`, borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -103,7 +103,7 @@ export default function FleetGeofenceTab({ vehicles }: { vehicles: FleetVehicle[
                                 <div style={{ fontSize: 12, fontWeight: 600, color: C.text }}>
                                     {e.vehicleName} — {e.type === 'GEOFENCE_ENTER' ? 'Ulaz u zonu' : e.type === 'GEOFENCE_EXIT' ? 'Izlaz iz zone' : 'Prekoračenje brzine'}
                                 </div>
-                                <div style={{ fontSize: 11, color: C.textMuted }}>
+                                <div className="u-fs-11" style={{ color: C.textMuted }}>
                                     {e.geofenceName || '—'} · {new Date(e.timestamp).toLocaleString('hr')}
                                 </div>
                             </div>

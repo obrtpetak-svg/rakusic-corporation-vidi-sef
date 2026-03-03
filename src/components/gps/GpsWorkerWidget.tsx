@@ -164,7 +164,7 @@ export default function GpsWorkerWidget({ currentUser, projects, timesheets, isM
                         width: 10, height: 10, borderRadius: '50%', background: statusConfig.color,
                         ...(status === 'inZone' ? { animation: 'pulse-dot 2s infinite' } : {}),
                     }} />
-                    <span style={{ fontSize: 14, fontWeight: 700, color: C.text }}>📍 GPS Status</span>
+                    <span className="u-section-title">📍 GPS Status</span>
                 </div>
                 <button onClick={() => setExpanded(false)} style={{
                     background: 'transparent', border: 'none', cursor: 'pointer',
@@ -184,7 +184,7 @@ export default function GpsWorkerWidget({ currentUser, projects, timesheets, isM
                     <span style={{ fontSize: 24 }}>{statusConfig.icon}</span>
                     <div>
                         <div style={{ fontWeight: 700, fontSize: 14, color: statusConfig.color }}>{statusConfig.text}</div>
-                        {activeProject && <div style={{ fontSize: 11, color: C.textMuted }}>Projekt: {activeProject.name}</div>}
+                        {activeProject && <div className="u-fs-11" style={{ color: C.textMuted }}>Projekt: {activeProject.name}</div>}
                     </div>
                 </div>
 

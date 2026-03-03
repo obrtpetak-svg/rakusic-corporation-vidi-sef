@@ -66,8 +66,8 @@ export default function GpsAdminPanel({ leaderProjectIds }) {
                         fontSize: 22, color: 'white',
                     }}>📡</div>
                     <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 24, fontWeight: 800, color: C.text }}>GPS Nadzor</div>
-                        <div style={{ fontSize: 13, color: C.textMuted }}>
+                        <div className="u-fs-24 u-fw-800" style={{ color: C.text }}>GPS Nadzor</div>
+                        <div className="u-fs-13" style={{ color: C.textMuted }}>
                             {gpsProjects.length} projekt{gpsProjects.length !== 1 ? 'a' : ''} s GPS-om
                             {noGpsProjects.length > 0 && <span style={{ color: '#F59E0B', marginLeft: 6 }}>· {noGpsProjects.length} bez GPS-a</span>}
                         </div>

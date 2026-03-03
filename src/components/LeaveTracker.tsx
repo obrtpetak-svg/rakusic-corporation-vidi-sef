@@ -107,7 +107,7 @@ export function LeaveTracker() {
     return (
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
-                <div style={{ fontSize: 22, fontWeight: 800, color: C.text }}>🏖️ Godišnji odmori & odsutnosti</div>
+                <div className="u-fs-22 u-fw-800" style={{ color: C.text }}>🏖️ Godišnji odmori & odsutnosti</div>
                 <button onClick={() => setShowAdd(true)} style={styles.btn}><Icon name="plus" size={16} /> Novi zahtjev</button>
             </div>
 
@@ -142,7 +142,7 @@ export function LeaveTracker() {
             {/* Worker breakdown (admin) */}
             {isAdmin && (
                 <div style={{ ...styles.card, marginBottom: 20, overflowX: 'auto' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>👷 Po radnicima ({filterYear})</div>
+                    <div className="u-section-title u-mb-12">👷 Po radnicima ({filterYear})</div>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
                         <thead>
                             <tr style={{ borderBottom: `2px solid ${C.border}` }}>
@@ -176,7 +176,7 @@ export function LeaveTracker() {
 
             {/* Recent records */}
             <div style={styles.card}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>📋 Zapisi ({filterYear})</div>
+                <div className="u-section-title u-mb-12">📋 Zapisi ({filterYear})</div>
                 {filteredRecords.length === 0 && <div style={{ color: C.textMuted, fontSize: 13, padding: 12 }}>Nema zapisa za {filterYear}.</div>}
                 {filteredRecords.slice(0, 50).map(r => {
                     const w = workers.find(x => x.id === r.workerId);

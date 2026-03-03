@@ -67,16 +67,16 @@ export function WorkerEvidencija(): React.JSX.Element {
 
             {/* Stats */}
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
-                <div style={{ ...styles.card, textAlign: 'center' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Ukupno sati</div><div style={{ fontSize: 28, fontWeight: 800, color: C.accent }}>{(totalMins / 60).toFixed(1)}h</div></div>
-                <div style={{ ...styles.card, textAlign: 'center' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Odobreno</div><div style={{ fontSize: 28, fontWeight: 800, color: C.green }}>{(approvedMins / 60).toFixed(1)}h</div></div>
-                <div style={{ ...styles.card, textAlign: 'center' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Na čekanju</div><div style={{ fontSize: 28, fontWeight: 800, color: C.yellow }}>{pendingCount}</div></div>
-                <div style={{ ...styles.card, textAlign: 'center' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Odbijeno</div><div style={{ fontSize: 28, fontWeight: 800, color: C.red }}>{rejectedCount}</div></div>
+                <div style={styles.card} className="u-text-center"><div className="u-stat-label">Ukupno sati</div><div style={{ fontSize: 28, fontWeight: 800, color: C.accent }}>{(totalMins / 60).toFixed(1)}h</div></div>
+                <div style={styles.card} className="u-text-center"><div className="u-stat-label">Odobreno</div><div style={{ fontSize: 28, fontWeight: 800, color: C.green }}>{(approvedMins / 60).toFixed(1)}h</div></div>
+                <div style={styles.card} className="u-text-center"><div className="u-stat-label">Na čekanju</div><div style={{ fontSize: 28, fontWeight: 800, color: C.yellow }}>{pendingCount}</div></div>
+                <div style={styles.card} className="u-text-center"><div className="u-stat-label">Odbijeno</div><div style={{ fontSize: 28, fontWeight: 800, color: C.red }}>{rejectedCount}</div></div>
             </div>
 
             {/* Charts */}
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, marginBottom: 24 }}>
-                <div style={styles.card}><div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Zadnjih 7 dana</div><SvgBarChart data={daily} dataKey="hours" label="name" height={160} /></div>
-                <div style={styles.card}><div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Po projektima</div>
+                <div style={styles.card}><div className="u-section-title u-mb-12">Zadnjih 7 dana</div><SvgBarChart data={daily} dataKey="hours" label="name" height={160} /></div>
+                <div style={styles.card}><div className="u-section-title u-mb-12">Po projektima</div>
                     {byProject.length > 0 ? byProject.map(p => (
                         <div key={p.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: `1px solid ${C.border}7A`, fontSize: 13 }}>
                             <span style={{ fontWeight: 600, color: C.textDim }}>{p.name}</span>
@@ -88,8 +88,8 @@ export function WorkerEvidencija(): React.JSX.Element {
 
             {/* History */}
             <div style={styles.card}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Povijest ({myTs.length} unosa)</div>
-                <div style={{ overflowX: 'auto' }}>
+                <div className="u-section-title u-mb-12">Povijest ({myTs.length} unosa)</div>
+                <div className="u-overflow-x">
                     <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 500 }}>
                         <thead><tr><th style={styles.th}>Datum</th><th style={styles.th}>Projekt</th><th style={styles.th}>Od</th><th style={styles.th}>Do</th><th style={styles.th}>Sati</th><th style={styles.th}>Status</th></tr></thead>
                         <tbody>

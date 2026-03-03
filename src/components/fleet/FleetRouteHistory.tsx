@@ -180,7 +180,7 @@ export default function FleetRouteHistory({ vehicles }: { vehicles: FleetVehicle
         <div>
             {/* ── Query Form ── */}
             <div style={{ background: 'var(--card)', border: `1px solid ${C.border}`, borderRadius: 14, padding: 20, marginBottom: 16 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>📍 Povijest ruta — Pretraživanje</div>
+                <div className="u-section-title u-mb-12">📍 Povijest ruta — Pretraživanje</div>
                 <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'end' }}>
                     <div>
                         <label style={{ fontSize: 11, fontWeight: 600, color: C.textMuted, display: 'block', marginBottom: 4 }}>Vozilo</label>
@@ -228,7 +228,7 @@ export default function FleetRouteHistory({ vehicles }: { vehicles: FleetVehicle
                     {/* Replay Map */}
                     <div style={{ background: 'var(--card)', border: `1px solid ${C.border}`, borderRadius: 14, padding: 20 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                            <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>
+                            <div className="u-section-title">
                                 🗺️ Replay rute
                                 {currentPoint && <span style={{ fontSize: 11, color: C.textMuted, marginLeft: 8 }}>
                                     {Math.round(currentPoint.speed || 0)} km/h · {currentPoint.ts ? new Date(currentPoint.ts).toLocaleTimeString('hr') : ''}
@@ -269,7 +269,7 @@ export default function FleetRouteHistory({ vehicles }: { vehicles: FleetVehicle
                 <div style={{ background: 'var(--card)', border: `1px solid ${C.border}`, borderRadius: 14, padding: 60, textAlign: 'center' }}>
                     <div style={{ fontSize: 48, marginBottom: 12 }}>📍</div>
                     <div style={{ fontSize: 16, fontWeight: 700, color: C.text, marginBottom: 6 }}>Odaberite vozilo i period</div>
-                    <div style={{ fontSize: 13, color: C.textMuted }}>Povijest ruta s replay animacijom, brzinom na karti i PDF izvozom</div>
+                    <div className="u-fs-13" style={{ color: C.textMuted }}>Povijest ruta s replay animacijom, brzinom na karti i PDF izvozom</div>
                 </div>
             )}
         </div>

@@ -119,7 +119,7 @@ export function VozilaPage({ workerFilterId }) {
                 <button onClick={() => setDetailId(null)} style={{ ...styles.btnSecondary, marginBottom: 20, display: 'inline-flex' }}><Icon name="back" size={16} /> Natrag</button>
                 <div style={{ ...styles.card, marginBottom: 20 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
-                        <div><div style={{ fontSize: 22, fontWeight: 800, color: C.text }}>{detailVehicle.name || detailVehicle.regNumber}</div><div style={{ color: C.textMuted, fontSize: 13 }}>{detailVehicle.brand} {detailVehicle.model} {detailVehicle.year}</div></div>
+                        <div><div className="u-fs-22 u-fw-800" style={{ color: C.text }}>{detailVehicle.name || detailVehicle.regNumber}</div><div style={{ color: C.textMuted, fontSize: 13 }}>{detailVehicle.brand} {detailVehicle.model} {detailVehicle.year}</div></div>
                         <div style={{ ...styles.badge('249,115,22'), fontSize: 12 }}>{detailVehicle.regNumber}</div>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(5, 1fr)', gap: 12, marginBottom: 16 }}>
@@ -146,11 +146,11 @@ export function VozilaPage({ workerFilterId }) {
                 {detailTab === 'fuel' && (
                     <div style={styles.card}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                            <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>⛽ Evidencija goriva ({fuelLogs.length})</div>
+                            <div className="u-section-title">⛽ Evidencija goriva ({fuelLogs.length})</div>
                             <button onClick={() => setShowFuelForm(detailVehicle.id)} style={styles.btn}><Icon name="plus" size={14} /> Dodaj tankanje</button>
                         </div>
                         {fuelLogs.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, padding: 12 }}>Nema evidencije goriva</div> : (
-                            <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 500 }}>
+                            <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 500 }}>
                                 <thead><tr><th style={styles.th}>Datum</th><th style={styles.th}>Litara</th><th style={styles.th}>€/L</th><th style={styles.th}>Ukupno €</th><th style={styles.th}>km</th><th style={styles.th}>Lokacija</th><th style={styles.th}></th></tr></thead>
                                 <tbody>{fuelLogs.map(f => (
                                     <tr key={f.id}><td style={styles.td}>{fmtDate(f.date)}</td><td style={{ ...styles.td, fontWeight: 600 }}>{f.liters || '—'}</td><td style={styles.td}>{f.pricePerLiter || '—'}</td><td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{f.totalCost ? `${parseFloat(f.totalCost).toFixed(2)}€` : '—'}</td><td style={styles.td}>{f.km ? Number(f.km).toLocaleString() : '—'}</td><td style={styles.td}>{f.location || '—'}</td><td style={styles.td}>{!isWorker && <button onClick={() => deleteFuelLog(detailVehicle.id, f.id)} style={styles.btnDanger}><Icon name="trash" size={12} /></button>}</td></tr>
@@ -164,11 +164,11 @@ export function VozilaPage({ workerFilterId }) {
                 {detailTab === 'km' && (
                     <div style={styles.card}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                            <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>🛣️ Evidencija kilometara ({kmLogs.length})</div>
+                            <div className="u-section-title">🛣️ Evidencija kilometara ({kmLogs.length})</div>
                             <button onClick={() => setShowKmForm(detailVehicle.id)} style={styles.btn}><Icon name="plus" size={14} /> Dodaj km</button>
                         </div>
                         {kmLogs.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, padding: 12 }}>Nema evidencije kilometara</div> : (
-                            <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 400 }}>
+                            <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 400 }}>
                                 <thead><tr><th style={styles.th}>Datum</th><th style={styles.th}>Kilometri</th><th style={styles.th}>Tip</th><th style={styles.th}>Napomena</th><th style={styles.th}>Upisao</th><th style={styles.th}></th></tr></thead>
                                 <tbody>{kmLogs.map(l => (
                                     <tr key={l.id}><td style={styles.td}>{fmtDate(l.date)}</td><td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{Number(l.km).toLocaleString()} km</td><td style={styles.td}><span style={styles.badge(l.type === 'servis' ? '29,78,216' : l.type === 'tehnički' ? '185,28,28' : '4,120,87')}>{l.type}</span></td><td style={styles.td}>{l.notes || '—'}</td><td style={styles.td}>{l.createdBy || '—'}</td><td style={styles.td}>{!isWorker && <button onClick={() => deleteKmLog(detailVehicle.id, l.id)} style={styles.btnDanger}><Icon name="trash" size={12} /></button>}</td></tr>
@@ -182,7 +182,7 @@ export function VozilaPage({ workerFilterId }) {
                 {detailTab === 'diary' && (
                     <div style={styles.card}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                            <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>📋 Dnevnik obavijesti ({diaryEntries.length})</div>
+                            <div className="u-section-title">📋 Dnevnik obavijesti ({diaryEntries.length})</div>
                             <button onClick={() => setShowDiaryForm(detailVehicle.id)} style={styles.btn}><Icon name="plus" size={14} /> Nova obavijest</button>
                         </div>
                         {diaryEntries.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, padding: 12 }}>Nema obavijesti</div> : (
@@ -195,7 +195,7 @@ export function VozilaPage({ workerFilterId }) {
                                                 <span style={{ marginLeft: 8, fontSize: 14, fontWeight: 700, color: C.text }}>{d.title}</span>
                                             </div>
                                             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                                                <span style={{ fontSize: 11, color: C.textMuted }}>{fmtDate(d.date)}</span>
+                                                <span className="u-fs-11" style={{ color: C.textMuted }}>{fmtDate(d.date)}</span>
                                                 {!isWorker && <button onClick={() => deleteDiaryEntry(detailVehicle.id, d.id)} style={styles.btnDanger}><Icon name="trash" size={12} /></button>}
                                             </div>
                                         </div>
@@ -265,7 +265,7 @@ export function VozilaPage({ workerFilterId }) {
     return (
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
-                <div style={{ fontSize: 22, fontWeight: 800, color: C.text }}>{isWorker ? 'Moje vozilo' : 'Vozila'}</div>
+                <div className="u-fs-22 u-fw-800" style={{ color: C.text }}>{isWorker ? 'Moje vozilo' : 'Vozila'}</div>
                 {!isWorker && <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> Novo vozilo</button>}
             </div>
             <div style={{ position: 'relative', marginBottom: 20 }}><Input placeholder="Traži vozilo..." value={search} onChange={e => setSearch(e.target.value)} style={{ paddingLeft: 36 }} /><div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: C.textMuted }}><Icon name="search" size={16} /></div></div>
@@ -277,7 +277,7 @@ export function VozilaPage({ workerFilterId }) {
                     return (
                         <div key={v.id} role="button" tabIndex={0} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && e.currentTarget.click()} style={{ ...styles.card, cursor: 'pointer' }} onClick={() => setDetailId(v.id)}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-                                <div><div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{v.name || v.regNumber}</div><div style={{ fontSize: 12, color: C.textMuted }}>{v.brand} {v.model} {v.year && `(${v.year})`}</div></div>
+                                <div><div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{v.name || v.regNumber}</div><div className="u-fs-12" style={{ color: C.textMuted }}>{v.brand} {v.model} {v.year && `(${v.year})`}</div></div>
                                 <div style={{ ...styles.badge('249,115,22'), fontSize: 12 }}>{v.regNumber || '—'}</div>
                             </div>
                             <div style={{ display: 'flex', gap: 12, fontSize: 12, color: C.textMuted, marginBottom: 12, flexWrap: 'wrap' }}>

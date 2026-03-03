@@ -38,7 +38,7 @@ export default function FleetReportTab({ vehicles }: { vehicles: FleetVehicle[] 
     return (
         <div>
             {/* ── Report Type Selection ── */}
-            <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>📊 Odaberite vrstu izvještaja</div>
+            <div className="u-section-title u-mb-12">📊 Odaberite vrstu izvještaja</div>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
                 {REPORT_TYPES.map(r => (
                     <button key={r.id} onClick={() => setSelectedReport(r.id)} style={{

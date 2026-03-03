@@ -341,8 +341,8 @@ export function ArhivaPage() {
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
                 <div>
-                    <div style={{ fontSize: 24, fontWeight: 800, color: C.text }}>Arhiva podataka</div>
-                    <div style={{ fontSize: 12, color: C.textMuted, marginTop: 2 }}>Pregled, filtriranje i izvoz svih podataka • {projects.length} proj. • {activeWorkers.length} rad. • {timesheets.length} unosa</div>
+                    <div className="u-fs-24 u-fw-800" style={{ color: C.text }}>Arhiva podataka</div>
+                    <div className="u-fs-12" style={{ color: C.textMuted, marginTop: 2 }}>Pregled, filtriranje i izvoz svih podataka • {projects.length} proj. • {activeWorkers.length} rad. • {timesheets.length} unosa</div>
                 </div>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                     <button onClick={() => setShowCharts(c => !c)} style={styles.btnSmall}>{showCharts ? '📊 Sakrij grafove' : '📊 Prikaži grafove'}</button>
@@ -381,8 +381,8 @@ export function ArhivaPage() {
                                 <StatCard label="Prosj. radnika" value={sectionStats.avgWorkers} icon="👥" color="#F59E0B" />
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 2fr', gap: 16, marginBottom: 16 }}>
-                                {sectionStats.statusChart?.length > 0 && <div style={styles.card}><div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>Status projekata</div><SvgDonutChart data={sectionStats.statusChart} height={160} /></div>}
-                                {sectionStats.hoursPerProject?.length > 0 && <div style={styles.card}><div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>Sati po projektu (top 10)</div><SvgBarChart data={sectionStats.hoursPerProject} dataKey="sati" height={180} /></div>}
+                                {sectionStats.statusChart?.length > 0 && <div style={styles.card}><div className="u-section-title" style={{ fontSize: 13, marginBottom: 10 }}>Status projekata</div><SvgDonutChart data={sectionStats.statusChart} height={160} /></div>}
+                                {sectionStats.hoursPerProject?.length > 0 && <div style={styles.card}><div className="u-section-title" style={{ fontSize: 13, marginBottom: 10 }}>Sati po projektu (top 10)</div><SvgBarChart data={sectionStats.hoursPerProject} dataKey="sati" height={180} /></div>}
                             </div>
                         </>
                     )}
@@ -397,8 +397,8 @@ export function ArhivaPage() {
                                 <StatCard label="Prosj. sati" value={`${sectionStats.avgHours}h`} icon="📊" color="#F59E0B" />
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 2fr', gap: 16, marginBottom: 16 }}>
-                                {sectionStats.positionChart?.length > 0 && <div style={styles.card}><div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>Po pozicijama</div><SvgDonutChart data={sectionStats.positionChart} height={160} /></div>}
-                                {sectionStats.topWorkers?.length > 0 && <div style={styles.card}><div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>Top radnici po satima</div><SvgHBarChart data={sectionStats.topWorkers} dataKey="sati" height={220} /></div>}
+                                {sectionStats.positionChart?.length > 0 && <div style={styles.card}><div className="u-section-title" style={{ fontSize: 13, marginBottom: 10 }}>Po pozicijama</div><SvgDonutChart data={sectionStats.positionChart} height={160} /></div>}
+                                {sectionStats.topWorkers?.length > 0 && <div style={styles.card}><div className="u-section-title" style={{ fontSize: 13, marginBottom: 10 }}>Top radnici po satima</div><SvgHBarChart data={sectionStats.topWorkers} dataKey="sati" height={220} /></div>}
                             </div>
                         </>
                     )}
@@ -415,9 +415,9 @@ export function ArhivaPage() {
                                 <StatCard label="Radnika" value={sectionStats.uniqueWorkers} icon="👥" color="#0891B2" />
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 2fr', gap: 16, marginBottom: 16 }}>
-                                {sectionStats.statusChart?.length > 0 && <div style={styles.card}><div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>Status</div><SvgDonutChart data={sectionStats.statusChart} height={140} /></div>}
-                                {sectionStats.typeChart?.length > 0 && <div style={styles.card}><div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>Tip rada</div><SvgDonutChart data={sectionStats.typeChart} height={140} /></div>}
-                                {sectionStats.dailyTrend?.length > 1 && <div style={styles.card}><div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>Dnevni trend (zadnjih 14 dana)</div><SvgLineChart data={sectionStats.dailyTrend} dataKey="sati" height={140} /></div>}
+                                {sectionStats.statusChart?.length > 0 && <div style={styles.card}><div className="u-section-title" style={{ fontSize: 13, marginBottom: 10 }}>Status</div><SvgDonutChart data={sectionStats.statusChart} height={140} /></div>}
+                                {sectionStats.typeChart?.length > 0 && <div style={styles.card}><div className="u-section-title" style={{ fontSize: 13, marginBottom: 10 }}>Tip rada</div><SvgDonutChart data={sectionStats.typeChart} height={140} /></div>}
+                                {sectionStats.dailyTrend?.length > 1 && <div style={styles.card}><div className="u-section-title" style={{ fontSize: 13, marginBottom: 10 }}>Dnevni trend (zadnjih 14 dana)</div><SvgLineChart data={sectionStats.dailyTrend} dataKey="sati" height={140} /></div>}
                             </div>
                         </>
                     )}
@@ -432,8 +432,8 @@ export function ArhivaPage() {
                                 <StatCard label="Prihvaćeno" value={sectionStats.approved} icon="✅" color="#10B981" />
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 2fr', gap: 16, marginBottom: 16 }}>
-                                {sectionStats.categoryChart?.length > 0 && <div style={styles.card}><div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>Po kategorijama</div><SvgDonutChart data={sectionStats.categoryChart} height={160} /></div>}
-                                {sectionStats.topSuppliers?.length > 0 && <div style={styles.card}><div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>Top dobavljači</div><SvgHBarChart data={sectionStats.topSuppliers} dataKey="iznos" height={200} /></div>}
+                                {sectionStats.categoryChart?.length > 0 && <div style={styles.card}><div className="u-section-title" style={{ fontSize: 13, marginBottom: 10 }}>Po kategorijama</div><SvgDonutChart data={sectionStats.categoryChart} height={160} /></div>}
+                                {sectionStats.topSuppliers?.length > 0 && <div style={styles.card}><div className="u-section-title" style={{ fontSize: 13, marginBottom: 10 }}>Top dobavljači</div><SvgHBarChart data={sectionStats.topSuppliers} dataKey="iznos" height={200} /></div>}
                             </div>
                         </>
                     )}
@@ -458,7 +458,7 @@ export function ArhivaPage() {
                                 <StatCard label="Tankanja" value={sectionStats.totalFuelLogs} icon="📊" color="#F59E0B" />
                             </div>
                             {sectionStats.fuelByVehicle?.length > 0 && (
-                                <div style={{ ...styles.card, marginBottom: 16 }}><div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>Troškovi goriva po vozilu</div><SvgHBarChart data={sectionStats.fuelByVehicle} dataKey="trošak" color="#EF4444" height={180} /></div>
+                                <div style={{ ...styles.card, marginBottom: 16 }}><div className="u-section-title" style={{ fontSize: 13, marginBottom: 10 }}>Troškovi goriva po vozilu</div><SvgHBarChart data={sectionStats.fuelByVehicle} dataKey="trošak" color="#EF4444" height={180} /></div>
                             )}
                         </>
                     )}
@@ -483,7 +483,7 @@ export function ArhivaPage() {
                                 <StatCard label="Istekle" value={sectionStats.overdue} icon="⚠️" color="#F59E0B" />
                             </div>
                             {sectionStats.priorityChart?.length > 0 && (
-                                <div style={{ ...styles.card, marginBottom: 16 }}><div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>Po prioritetu</div><SvgDonutChart data={sectionStats.priorityChart} height={140} /></div>
+                                <div style={{ ...styles.card, marginBottom: 16 }}><div className="u-section-title" style={{ fontSize: 13, marginBottom: 10 }}>Po prioritetu</div><SvgDonutChart data={sectionStats.priorityChart} height={140} /></div>
                             )}
                         </>
                     )}

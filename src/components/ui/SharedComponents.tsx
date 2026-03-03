@@ -353,7 +353,7 @@ export const Pagination = ({ currentPage, totalPages, pageSize, setCurrentPage, 
 
     return (
         <nav aria-label="Straničenje" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderTop: `1px solid ${C.border}`, flexWrap: 'wrap', gap: 8 }}>
-            <div style={{ fontSize: 12, color: C.textMuted }}>
+            <div className="u-fs-12" style={{ color: C.textMuted }}>
                 Prikazano <b style={{ color: C.text }}>{showingFrom}–{showingTo}</b> od <b style={{ color: C.text }}>{totalItems}</b> {label}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>

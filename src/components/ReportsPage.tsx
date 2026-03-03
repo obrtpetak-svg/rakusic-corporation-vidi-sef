@@ -208,10 +208,10 @@ const otpStats = useMemo(() => {
 }, [otpremnicePeriod, projects]);
 
 const StatCard = ({ label, value, color, sub }) => (
-    <div style={{ ...styles.card, textAlign: 'center' }}>
-        <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>{label}</div>
+    <div style={styles.card} className="u-text-center">
+        <div className="u-stat-label">{label}</div>
         <div style={{ fontSize: 26, fontWeight: 800, color: color || C.accent }}>{value}</div>
-        {sub && <div style={{ fontSize: 11, color: C.textMuted }}>{sub}</div>}
+        {sub && <div className="u-fs-11" style={{ color: C.textMuted }}>{sub}</div>}
     </div>
 );
 
@@ -219,7 +219,7 @@ return (
     <div>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
-            <div style={{ fontSize: 24, fontWeight: 800, color: C.text }}> Izvještaji</div>
+            <div className="u-fs-24 u-fw-800" style={{ color: C.text }}> Izvještaji</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
                 <button onClick={exportCSV} style={styles.btnSecondary}><Icon name="download" size={14} /> CSV</button>
                 <button onClick={exportPDF} style={styles.btn}><Icon name="file" size={14} /> PDF</button>
@@ -265,19 +265,19 @@ return (
                     <button onClick={exportWorkersPDF} style={styles.btn}><Icon name="file" size={14} /> PDF Radnici</button>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, marginBottom: 20 }}>
-                    <div style={styles.card}><div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Sati po radnicima</div><SvgHBarChart data={hoursByWorker} dataKey="sati" height={Math.max(150, hoursByWorker.length * 36)} /></div>
-                    <div style={styles.card}><div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Dnevni trend</div><SvgLineChart data={dailyTrend} dataKey="sati" height={200} /></div>
+                    <div style={styles.card}><div className="u-section-title u-mb-12">Sati po radnicima</div><SvgHBarChart data={hoursByWorker} dataKey="sati" height={Math.max(150, hoursByWorker.length * 36)} /></div>
+                    <div style={styles.card}><div className="u-section-title u-mb-12">Dnevni trend</div><SvgLineChart data={dailyTrend} dataKey="sati" height={200} /></div>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, marginBottom: 20 }}>
-                    <div style={styles.card}><div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Tip rada raspodjela</div><SvgDonutChart data={typeDistribution} height={160} /></div>
-                    <div style={styles.card}><div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Po danima u tjednu</div><SvgBarChart data={weeklyDist} dataKey="sati" label="name" height={160} color="#047857" /></div>
+                    <div style={styles.card}><div className="u-section-title u-mb-12">Tip rada raspodjela</div><SvgDonutChart data={typeDistribution} height={160} /></div>
+                    <div style={styles.card}><div className="u-section-title u-mb-12">Po danima u tjednu</div><SvgBarChart data={weeklyDist} dataKey="sati" label="name" height={160} color="#047857" /></div>
                 </div>
                 <div style={styles.card}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>Detaljna tablica po radnicima</div>
-                        <div style={{ fontSize: 12, color: C.textMuted }}>{hoursByWorker.length} radnika | {filterWorker !== 'sve' ? workers.find(w => w.id === filterWorker)?.name : 'Svi'}{filterProject !== 'sve' ? ` • ${projects.find(p => p.id === filterProject)?.name}` : ''}</div>
+                        <div className="u-section-title">Detaljna tablica po radnicima</div>
+                        <div className="u-fs-12" style={{ color: C.textMuted }}>{hoursByWorker.length} radnika | {filterWorker !== 'sve' ? workers.find(w => w.id === filterWorker)?.name : 'Svi'}{filterProject !== 'sve' ? ` • ${projects.find(p => p.id === filterProject)?.name}` : ''}</div>
                     </div>
-                    <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}><thead><tr><th style={styles.th}>Radnik</th><th style={styles.th}>Sati</th><th style={styles.th}>Normalan</th><th style={styles.th}>Prekovrm.</th><th style={styles.th}>Noćni</th><th style={styles.th}>Vikend</th><th style={styles.th}>Unosa</th><th style={styles.th}>Prosj/dan</th></tr></thead><tbody>
+                    <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}><thead><tr><th style={styles.th}>Radnik</th><th style={styles.th}>Sati</th><th style={styles.th}>Normalan</th><th style={styles.th}>Prekovrm.</th><th style={styles.th}>Noćni</th><th style={styles.th}>Vikend</th><th style={styles.th}>Unosa</th><th style={styles.th}>Prosj/dan</th></tr></thead><tbody>
                         {hoursByWorker.map(w => <tr key={w.name}><td style={{ ...styles.td, fontWeight: 600 }}>{w.name}</td><td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{w.sati}h</td><td style={styles.td}>{w.normalan}h</td><td style={styles.td}>{w.prekovremeni}h</td><td style={styles.td}>{w.nocni}h</td><td style={styles.td}>{w.vikend}h</td><td style={styles.td}>{w.unosa}</td><td style={styles.td}>{w.unosa > 0 ? (w.sati / w.unosa).toFixed(1) : 0}h</td></tr>)}
                     </tbody></table></div>
                 </div>
@@ -291,15 +291,15 @@ return (
                     <button onClick={exportProjectsPDF} style={{ ...styles.btn, background: '#047857' }}><Icon name="file" size={14} /> PDF Projekti</button>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, marginBottom: 20 }}>
-                    <div style={styles.card}><div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Raspodjela sati</div><SvgDonutChart data={hoursByProject} height={200} /></div>
-                    <div style={styles.card}><div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Usporedba projekata</div><SvgBarChart data={hoursByProject} dataKey="sati" label="name" height={200} /></div>
+                    <div style={styles.card}><div className="u-section-title u-mb-12">Raspodjela sati</div><SvgDonutChart data={hoursByProject} height={200} /></div>
+                    <div style={styles.card}><div className="u-section-title u-mb-12">Usporedba projekata</div><SvgBarChart data={hoursByProject} dataKey="sati" label="name" height={200} /></div>
                 </div>
                 <div style={styles.card}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>Projekti - detalji</div>
-                        <div style={{ fontSize: 12, color: C.textMuted }}>{hoursByProject.length} projekata | {filterProject !== 'sve' ? projects.find(p => p.id === filterProject)?.name : 'Svi'}{filterWorker !== 'sve' ? ` • ${workers.find(w => w.id === filterWorker)?.name}` : ''}</div>
+                        <div className="u-section-title">Projekti - detalji</div>
+                        <div className="u-fs-12" style={{ color: C.textMuted }}>{hoursByProject.length} projekata | {filterProject !== 'sve' ? projects.find(p => p.id === filterProject)?.name : 'Svi'}{filterWorker !== 'sve' ? ` • ${workers.find(w => w.id === filterWorker)?.name}` : ''}</div>
                     </div>
-                    <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}><thead><tr><th style={styles.th}>Projekt</th><th style={styles.th}>Sati</th><th style={styles.th}>Radnika</th><th style={styles.th}>Troškovi</th><th style={styles.th}>Status</th><th style={styles.th}>% vremena</th></tr></thead><tbody>
+                    <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}><thead><tr><th style={styles.th}>Projekt</th><th style={styles.th}>Sati</th><th style={styles.th}>Radnika</th><th style={styles.th}>Troškovi</th><th style={styles.th}>Status</th><th style={styles.th}>% vremena</th></tr></thead><tbody>
                         {hoursByProject.map(p => {
                             const proj = projects.find(x => x.id === p.id);
                             return <tr key={p.name}><td style={{ ...styles.td, fontWeight: 600 }}>{p.fullName || p.name}</td><td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{p.sati}h</td><td style={styles.td}>{p.radnika}</td><td style={styles.td}>{p.trošak.toFixed(0)}€</td><td style={styles.td}><span style={{ padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600, background: proj?.status === 'aktivan' ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)', color: proj?.status === 'aktivan' ? '#10B981' : '#F59E0B' }}>{proj?.status || 'aktivan'}</span></td><td style={styles.td}>{totalHours > 0 ? ((p.sati / (totalHours / 60)) * 100).toFixed(1) : 0}%</td></tr>;
@@ -320,8 +320,8 @@ return (
                     if (workerList.length === 0) return null;
                     return (
                         <div key={p.id} style={{ ...styles.card, marginTop: 12 }}>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 8 }}>🏗️ {p.fullName || p.name} — Radnici ({workerList.length})</div>
-                            <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th style={styles.th}>Radnik</th><th style={styles.th}>Sati</th><th style={styles.th}>Unosa</th><th style={styles.th}>% od projekta</th></tr></thead><tbody>
+                            <div className="u-section-title" style={{ fontSize: 13, marginBottom: 8 }}>🏗️ {p.fullName || p.name} — Radnici ({workerList.length})</div>
+                            <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th style={styles.th}>Radnik</th><th style={styles.th}>Sati</th><th style={styles.th}>Unosa</th><th style={styles.th}>% od projekta</th></tr></thead><tbody>
                                 {workerList.map(([name, d]) => <tr key={name}><td style={{ ...styles.td, fontWeight: 600 }}>{name}</td><td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{d.total.toFixed(1)}h</td><td style={styles.td}>{d.entries}</td><td style={styles.td}>{p.sati > 0 ? ((d.total / p.sati) * 100).toFixed(1) : 0}%</td></tr>)}
                             </tbody></table></div>
                         </div>
@@ -343,17 +343,17 @@ return (
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, marginBottom: 20 }}>
                     <div style={styles.card}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Troškovi po projektima</div>
+                        <div className="u-section-title u-mb-12">Troškovi po projektima</div>
                         {costsByProject.length > 0 ? <SvgBarChart data={costsByProject.map(c => ({ ...c, sati: c.iznos }))} dataKey="sati" label="name" height={220} color="#B91C1C" /> : <div style={{ color: C.textMuted, padding: 20 }}>Nema podataka</div>}
                     </div>
                     <div style={styles.card}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Po kategorijama</div>
+                        <div className="u-section-title u-mb-12">Po kategorijama</div>
                         {costsByCategory.length > 0 ? <SvgHBarChart data={costsByCategory.map(c => ({ name: c.name, sati: c.iznos }))} dataKey="sati" height={Math.max(120, costsByCategory.length * 36)} /> : <div style={{ color: C.textMuted, padding: 20 }}>Nema podataka</div>}
                     </div>
                 </div>
                 <div style={styles.card}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Troškovi po projektima - tablica</div>
-                    <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th style={styles.th}>Projekt</th><th style={styles.th}>Troškovi €</th><th style={styles.th}>% ukupnog</th></tr></thead><tbody>
+                    <div className="u-section-title u-mb-12">Troškovi po projektima - tablica</div>
+                    <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th style={styles.th}>Projekt</th><th style={styles.th}>Troškovi €</th><th style={styles.th}>% ukupnog</th></tr></thead><tbody>
                         {costsByProject.map(c => <tr key={c.name}><td style={{ ...styles.td, fontWeight: 600 }}>{c.fullName || c.name}</td><td style={{ ...styles.td, fontWeight: 700, color: C.red }}>{c.iznos.toFixed(2)}€</td><td style={styles.td}>{totalCosts > 0 ? ((c.iznos / totalCosts) * 100).toFixed(1) : 0}%</td></tr>)}
                         {costsByProject.length === 0 && <tr><td colSpan={3} style={{ ...styles.td, textAlign: 'center', color: C.textMuted }}>Nema podataka</td></tr>}
                     </tbody></table></div>
@@ -365,16 +365,16 @@ return (
         {tab === 'izvjesca' && (
             <div>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, marginBottom: 20 }}>
-                    <div style={styles.card}><div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Dnevni trend (zadnjih 30 dana)</div><SvgLineChart data={dailyTrend} dataKey="sati" height={250} /></div>
-                    <div style={styles.card}><div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Raspodjela po danima</div><SvgBarChart data={weeklyDist} dataKey="sati" label="name" height={250} color="#047857" /></div>
+                    <div style={styles.card}><div className="u-section-title u-mb-12">Dnevni trend (zadnjih 30 dana)</div><SvgLineChart data={dailyTrend} dataKey="sati" height={250} /></div>
+                    <div style={styles.card}><div className="u-section-title u-mb-12">Raspodjela po danima</div><SvgBarChart data={weeklyDist} dataKey="sati" label="name" height={250} color="#047857" /></div>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, marginBottom: 20 }}>
-                    <div style={styles.card}><div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Tip rada</div><SvgDonutChart data={typeDistribution} height={180} /></div>
-                    <div style={styles.card}><div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Troškovi vs Sati</div><SvgBarChart data={hoursByProject.slice(0, 8).map(p => ({ name: p.name, sati: p.trošak }))} dataKey="sati" label="name" height={180} color="#B91C1C" /></div>
+                    <div style={styles.card}><div className="u-section-title u-mb-12">Tip rada</div><SvgDonutChart data={typeDistribution} height={180} /></div>
+                    <div style={styles.card}><div className="u-section-title u-mb-12">Troškovi vs Sati</div><SvgBarChart data={hoursByProject.slice(0, 8).map(p => ({ name: p.name, sati: p.trošak }))} dataKey="sati" label="name" height={180} color="#B91C1C" /></div>
                 </div>
                 <div style={styles.card}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Dnevna tablica</div>
-                    <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th style={styles.th}>Dan</th><th style={styles.th}>Sati</th></tr></thead><tbody>
+                    <div className="u-section-title u-mb-12">Dnevna tablica</div>
+                    <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th style={styles.th}>Dan</th><th style={styles.th}>Sati</th></tr></thead><tbody>
                         {dailyTrend.map(d => <tr key={d.dan}><td style={styles.td}>{d.dan}</td><td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{d.sati}h</td></tr>)}
                     </tbody></table></div>
                 </div>
@@ -398,16 +398,16 @@ return (
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, marginBottom: 20 }}>
                     <div style={styles.card}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Troškovi goriva</div>
+                        <div className="u-section-title u-mb-12">Troškovi goriva</div>
                         {vehicleData.length > 0 ? <SvgBarChart data={vehicleData.map(v => ({ ...v, sati: v.trošak }))} dataKey="sati" label="name" height={200} color="#B91C1C" /> : <div style={{ color: C.textMuted, padding: 12 }}>Nema podataka</div>}
                     </div>
                     <div style={styles.card}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Litara po vozilu</div>
+                        <div className="u-section-title u-mb-12">Litara po vozilu</div>
                         {vehicleData.length > 0 ? <SvgHBarChart data={vehicleData.map(v => ({ name: v.name, sati: v.litara }))} dataKey="sati" height={Math.max(120, vehicleData.length * 36)} /> : <div style={{ color: C.textMuted, padding: 12 }}>Nema podataka</div>}
                     </div>
                 </div>
                 <div style={styles.card}>
-                    <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th style={styles.th}>Vozilo</th><th style={styles.th}>Litara</th><th style={styles.th}>Trošak €</th><th style={styles.th}>Km</th><th style={styles.th}>Unosa</th></tr></thead><tbody>
+                    <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th style={styles.th}>Vozilo</th><th style={styles.th}>Litara</th><th style={styles.th}>Trošak €</th><th style={styles.th}>Km</th><th style={styles.th}>Unosa</th></tr></thead><tbody>
                         {vehicleData.map(v => <tr key={v.name}><td style={{ ...styles.td, fontWeight: 600 }}>{v.name}</td><td style={styles.td}>{v.litara.toFixed(1)}</td><td style={{ ...styles.td, fontWeight: 700, color: C.red }}>{v.trošak.toFixed(2)}€</td><td style={styles.td}>{v.km.toFixed(0)}</td><td style={styles.td}>{v.unosa}</td></tr>)}
                         {vehicleData.length === 0 && <tr><td colSpan={5} style={{ ...styles.td, textAlign: 'center', color: C.textMuted }}>Nema podataka</td></tr>}
                     </tbody></table></div>
@@ -424,8 +424,8 @@ return (
                     <StatCard label="Ukupno prekovremenih" value={`${productivity.reduce((s, p) => s + p.overtime, 0).toFixed(1)}h`} color="#F59E0B" />
                 </div>
                 <div style={styles.card}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16 }}> Produktivnost po radnicima</div>
-                    <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <div className="u-section-title u-mb-16"> Produktivnost po radnicima</div>
+                    <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead><tr><th style={styles.th}>Radnik</th><th style={styles.th}>Ukupno h</th><th style={styles.th}>Radnih dana</th><th style={styles.th}>Prosj./dan</th><th style={styles.th}>Projekata</th><th style={styles.th}>Prekov.</th><th style={styles.th}>Efikasnost</th></tr></thead>
                         <tbody>{productivity.map(w => (
                             <tr key={w.name}><td style={{ ...styles.td, fontWeight: 600 }}>{w.name}</td><td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{w.totalH}h</td><td style={styles.td}>{w.days}</td><td style={styles.td}>{w.avgH}h</td><td style={styles.td}>{w.projects}</td><td style={{ ...styles.td, color: w.overtime > 0 ? '#F59E0B' : C.textMuted }}>{w.overtime}h</td>
@@ -446,8 +446,8 @@ return (
                     <StatCard label="Radnih dana u periodu" value={attendance[0]?.totalDays || 0} color={C.blue} />
                 </div>
                 <div style={styles.card}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16 }}>📋 Prisutnost radnika</div>
-                    <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <div className="u-section-title u-mb-16">📋 Prisutnost radnika</div>
+                    <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead><tr><th style={styles.th}>Radnik</th><th style={styles.th}>Prisutan (dana)</th><th style={styles.th}>Odsutan</th><th style={styles.th}>Kašnjenja</th><th style={styles.th}>Stopa prisutnosti</th></tr></thead>
                         <tbody>{attendance.map(a => (
                             <tr key={a.name}><td style={{ ...styles.td, fontWeight: 600 }}>{a.name}</td><td style={{ ...styles.td, fontWeight: 700, color: C.green }}>{a.present}</td><td style={{ ...styles.td, color: a.absent > 3 ? C.red : C.textMuted }}>{a.absent}</td><td style={{ ...styles.td, color: a.late > 0 ? '#F59E0B' : C.textMuted }}>{a.late}</td>
@@ -472,13 +472,13 @@ return (
                     <StatCard label="Prosj. iznos" value={`${otpStats.avgAmount}€`} color="#6366F1" />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: 16, marginBottom: 20 }}>
-                    {otpStats.statusChart?.length > 0 && <div style={styles.card}><div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>Status otpremnica</div><SvgDonutChart data={otpStats.statusChart} height={160} /></div>}
-                    {otpStats.projectChart?.length > 0 && <div style={styles.card}><div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>Po projektu (iznos)</div><SvgHBarChart data={otpStats.projectChart} dataKey="iznos" height={180} /></div>}
-                    {otpStats.supplierChart?.length > 0 && <div style={styles.card}><div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>Po dobavljaču</div><SvgHBarChart data={otpStats.supplierChart} dataKey="iznos" color="#10B981" height={180} /></div>}
+                    {otpStats.statusChart?.length > 0 && <div style={styles.card}><div className="u-section-title" style={{ fontSize: 13, marginBottom: 10 }}>Status otpremnica</div><SvgDonutChart data={otpStats.statusChart} height={160} /></div>}
+                    {otpStats.projectChart?.length > 0 && <div style={styles.card}><div className="u-section-title" style={{ fontSize: 13, marginBottom: 10 }}>Po projektu (iznos)</div><SvgHBarChart data={otpStats.projectChart} dataKey="iznos" height={180} /></div>}
+                    {otpStats.supplierChart?.length > 0 && <div style={styles.card}><div className="u-section-title" style={{ fontSize: 13, marginBottom: 10 }}>Po dobavljaču</div><SvgHBarChart data={otpStats.supplierChart} dataKey="iznos" color="#10B981" height={180} /></div>}
                 </div>
                 <div style={styles.card}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16 }}>📦 Sve otpremnice u periodu ({otpremnicePeriod.length})</div>
-                    <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}>
+                    <div className="u-section-title u-mb-16">📦 Sve otpremnice u periodu ({otpremnicePeriod.length})</div>
+                    <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}>
                         <thead><tr><th style={styles.th}>Br.</th><th style={styles.th}>Datum</th><th style={styles.th}>Dobavljač</th><th style={styles.th}>Projekt</th><th style={styles.th}>Iznos</th><th style={styles.th}>Status</th><th style={styles.th}>Napomena</th></tr></thead>
                         <tbody>{otpremnicePeriod.sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 100).map(o => {
                             const proj = projects.find(p => p.id === o.projectId);
@@ -501,8 +501,8 @@ return (
         {/* Tab: Sve podatke */}
         {tab === 'sve' && (
             <div style={styles.card}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Svi radni sati ({periodTs.length} unosa)</div>
-                <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}><thead><tr><th style={styles.th}>Datum</th><th style={styles.th}>Radnik</th><th style={styles.th}>Projekt</th><th style={styles.th}>Od</th><th style={styles.th}>Do</th><th style={styles.th}>Sati</th><th style={styles.th}>Tip</th><th style={styles.th}>Status</th></tr></thead><tbody>
+                <div className="u-section-title u-mb-12">Svi radni sati ({periodTs.length} unosa)</div>
+                <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}><thead><tr><th style={styles.th}>Datum</th><th style={styles.th}>Radnik</th><th style={styles.th}>Projekt</th><th style={styles.th}>Od</th><th style={styles.th}>Do</th><th style={styles.th}>Sati</th><th style={styles.th}>Tip</th><th style={styles.th}>Status</th></tr></thead><tbody>
                     {periodTs.sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 200).map(t => {
                         const w = workers.find(x => x.id === t.workerId);
                         const p = projects.find(x => x.id === t.projectId);

@@ -142,8 +142,8 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
                 <div>
-                    <div style={{ fontSize: 24, fontWeight: 800, color: C.text }}>Proizvodnja</div>
-                    <div style={{ fontSize: 12, color: C.textMuted, marginTop: 2 }}>{activeOrders.length} narudžbi • Praćenje proizvodnog procesa</div>
+                    <div className="u-fs-24 u-fw-800" style={{ color: C.text }}>Proizvodnja</div>
+                    <div className="u-fs-12" style={{ color: C.textMuted, marginTop: 2 }}>{activeOrders.length} narudžbi • Praćenje proizvodnog procesa</div>
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
                     {canManage && <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> Nova narudžba</button>}
@@ -154,11 +154,11 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
     
             {/* Stats + Mini Dashboard */}
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(6, 1fr)', gap: 10, marginBottom: 20 }}>
-                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Ukupno</div><div style={{ fontSize: 22, fontWeight: 800, color: C.accent }}>{stats.total}</div></div>
-                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>U tijeku</div><div style={{ fontSize: 22, fontWeight: 800, color: '#3B82F6' }}>{stats.inProgress}</div></div>
-                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Na čekanju</div><div style={{ fontSize: 22, fontWeight: 800, color: '#F59E0B' }}>{stats.waiting}</div></div>
-                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Završeno</div><div style={{ fontSize: 22, fontWeight: 800, color: C.green }}>{stats.doneTotal}</div><div style={{ fontSize: 10, color: C.textMuted }}>{stats.doneMonth > 0 ? `+${stats.doneMonth} ovaj mj.` : ''}</div></div>
-                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Troškovi</div><div style={{ fontSize: 22, fontWeight: 800, color: '#EF4444' }}>{stats.totalCost > 0 ? `${stats.totalCost.toFixed(0)}€` : '0€'}</div></div>
+                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div className="u-stat-label">Ukupno</div><div style={{ fontSize: 22, fontWeight: 800, color: C.accent }}>{stats.total}</div></div>
+                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div className="u-stat-label">U tijeku</div><div style={{ fontSize: 22, fontWeight: 800, color: '#3B82F6' }}>{stats.inProgress}</div></div>
+                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div className="u-stat-label">Na čekanju</div><div style={{ fontSize: 22, fontWeight: 800, color: '#F59E0B' }}>{stats.waiting}</div></div>
+                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div className="u-stat-label">Završeno</div><div style={{ fontSize: 22, fontWeight: 800, color: C.green }}>{stats.doneTotal}</div><div style={{ fontSize: 10, color: C.textMuted }}>{stats.doneMonth > 0 ? `+${stats.doneMonth} ovaj mj.` : ''}</div></div>
+                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div className="u-stat-label">Troškovi</div><div style={{ fontSize: 22, fontWeight: 800, color: '#EF4444' }}>{stats.totalCost > 0 ? `${stats.totalCost.toFixed(0)}€` : '0€'}</div></div>
                 {/* Mini pie chart */}
                 <div style={{ ...styles.card, textAlign: 'center', padding: '10px' }}>
                     <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Faze</div>
@@ -239,7 +239,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
             {activeTab === 'lista' && (
                 <div>
                     {filtered.length === 0 ? <div style={{ ...styles.card, textAlign: 'center', padding: 50, color: C.textMuted }}><div style={{ fontSize: 32, marginBottom: 8 }}>📭</div>Nema narudžbi za odabrane filtre</div> : (
-                        <div style={{ overflowX: 'auto' }}>
+                        <div className="u-overflow-x">
                             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                 <thead>
                                     <tr>
@@ -289,7 +289,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                 const range = maxDate - minDate || 1;
                 return (
                     <div style={{ ...styles.card, overflowX: 'auto' }}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16 }}>📊 Gantt Chart — Vremenski raspored</div>
+                        <div className="u-section-title u-mb-16">📊 Gantt Chart — Vremenski raspored</div>
                         <div style={{ minWidth: 600 }}>
                             {ordersWithDates.map(o => {
                                 const start = new Date(o.createdAt).getTime();
@@ -343,7 +343,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                 for (let d = 1; d <= daysInMonth; d++) cells.push(d);
                 return (
                     <div style={{ ...styles.card }}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16 }}>📅 Kalendar — {now.toLocaleDateString('hr', { month: 'long', year: 'numeric' })}</div>
+                        <div className="u-section-title u-mb-16">📅 Kalendar — {now.toLocaleDateString('hr', { month: 'long', year: 'numeric' })}</div>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2 }}>
                             {['Pon', 'Uto', 'Sri', 'Čet', 'Pet', 'Sub', 'Ned'].map(d => <div key={d} style={{ fontSize: 10, fontWeight: 700, color: C.textMuted, textAlign: 'center', padding: '4px 0' }}>{d}</div>)}
                             {cells.map((day, i) => (
@@ -373,15 +373,15 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
                                         <div>
                                             <div style={{ fontSize: 10, color: C.accent, fontWeight: 700 }}>{o.orderNumber}</div>
-                                            <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{o.name}</div>
-                                            <div style={{ fontSize: 11, color: C.textMuted }}>🏢 {o.client || '—'}</div>
+                                            <div className="u-section-title">{o.name}</div>
+                                            <div className="u-fs-11" style={{ color: C.textMuted }}>🏢 {o.client || '—'}</div>
                                         </div>
                                         <div style={{ display: 'flex', gap: 4 }}>
                                             <button onClick={() => setDetailId(o.id)} style={styles.btnSmall}>Detalji</button>
                                             {canManage && <button onClick={() => unarchiveOrder(o)} style={styles.btnSmall}>↩️</button>}
                                         </div>
                                     </div>
-                                    <div style={{ fontSize: 12, color: C.textMuted }}>💰 {(o.totalCost || 0).toFixed(2)}€ • 📅 {fmtDate(o.deadline)}</div>
+                                    <div className="u-fs-12" style={{ color: C.textMuted }}>💰 {(o.totalCost || 0).toFixed(2)}€ • 📅 {fmtDate(o.deadline)}</div>
                                 </div>
                             ))}
                         </div>
@@ -425,7 +425,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                 onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}>
                                 <div style={{ fontSize: 32, marginBottom: 8 }}>{tpl.name.split(' ')[0]}</div>
                                 <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 4 }}>{tpl.name.replace(/^[^\s]+\s/, '')}</div>
-                                <div style={{ fontSize: 11, color: C.textMuted }}>{tpl.desc}</div>
+                                <div className="u-fs-11" style={{ color: C.textMuted }}>{tpl.desc}</div>
                                 {tpl.specDefaults?.materials?.length > 0 && (
                                     <div style={{ marginTop: 8, fontSize: 10, color: C.accent, fontWeight: 600 }}>{tpl.specDefaults.materials.length} materijala • {tpl.specDefaults.dimensions?.length || 0} dimenzija</div>
                                 )}

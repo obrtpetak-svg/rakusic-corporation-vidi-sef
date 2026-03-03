@@ -39,7 +39,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
                         <div>
                             <div style={{ fontSize: 11, color: C.accent, fontWeight: 700, marginBottom: 4 }}>{detailOrder.orderNumber}</div>
-                            <div style={{ fontSize: 22, fontWeight: 800, color: C.text }}>{detailOrder.name}</div>
+                            <div className="u-fs-22 u-fw-800" style={{ color: C.text }}>{detailOrder.name}</div>
                             <div style={{ fontSize: 13, color: C.textMuted, marginTop: 4 }}>🏢 {detailOrder.client || '—'} {detailOrder.quantity && `• ${detailOrder.quantity} ${detailOrder.unit}`}</div>
                             {detailOrder.projectId && (() => { const proj = projects.find(p => p.id === detailOrder.projectId); return proj ? <div style={{ fontSize: 12, color: '#7C3AED', fontWeight: 600, marginTop: 2 }}>📁 Projekt: {proj.name}</div> : null; })()}
                         </div>
@@ -68,21 +68,21 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                     {/* Stat cards */}
                     <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 10 }}>
                         <div style={{ padding: '12px 16px', borderRadius: 10, background: C.accentLight }}>
-                            <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Količina</div>
+                            <div className="u-stat-label">Količina</div>
                             <div style={{ fontSize: 20, fontWeight: 800, color: C.accent }}>{detailOrder.quantity} {detailOrder.unit}</div>
                         </div>
                         <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(239,68,68,0.08)' }}>
-                            <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Ukupni trošak</div>
+                            <div className="u-stat-label">Ukupni trošak</div>
                             <div style={{ fontSize: 20, fontWeight: 800, color: '#EF4444' }}>{(detailOrder.totalCost || 0).toFixed(2)}€</div>
                         </div>
                         <div style={{ padding: '12px 16px', borderRadius: 10, background: daysLeft !== null && daysLeft < 0 ? 'rgba(239,68,68,0.08)' : daysLeft !== null && daysLeft <= 3 ? 'rgba(245,158,11,0.08)' : 'rgba(16,185,129,0.08)' }}>
-                            <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Rok isporuke</div>
+                            <div className="u-stat-label">Rok isporuke</div>
                             <div style={{ fontSize: 20, fontWeight: 800, color: daysLeft !== null && daysLeft < 0 ? '#EF4444' : daysLeft !== null && daysLeft <= 3 ? '#F59E0B' : C.green }}>
                                 {daysLeft !== null ? (daysLeft < 0 ? `${Math.abs(daysLeft)}d kasni` : daysLeft === 0 ? 'DANAS' : `${daysLeft}d`) : '—'}
                             </div>
                         </div>
                         <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(29,78,216,0.08)' }}>
-                            <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Stavke troška</div>
+                            <div className="u-stat-label">Stavke troška</div>
                             <div style={{ fontSize: 20, fontWeight: 800, color: C.blue }}>{costItems.length}</div>
                         </div>
                     </div>
@@ -169,7 +169,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
 
                         {/* Stage timeline */}
                         <div style={{ marginTop: 20 }}>
-                            <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>Tok narudžbe</div>
+                            <div className="u-section-title u-mb-12">Tok narudžbe</div>
                             {STAGES.map((s, i) => {
                                 const record = stageHistory.find(r => r.stage === s.id);
                                 const isCurrent = detailOrder.stage === s.id;
@@ -183,7 +183,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                                         </div>
                                         <div style={{ flex: 1, paddingTop: 2 }}>
                                             <div style={{ fontSize: 13, fontWeight: isCurrent ? 700 : 500, color: isCurrent ? C.text : isDone || isPast ? C.textDim : C.textMuted }}>{s.label}</div>
-                                            {record && <div style={{ fontSize: 11, color: C.textMuted }}>
+                                            {record && <div className="u-fs-11" style={{ color: C.textMuted }}>
                                                 {record.enteredAt && `Započeto: ${fmtDate(record.enteredAt)}`}
                                                 {record.completedAt && ` → Završeno: ${fmtDate(record.completedAt)}`}
                                                 {record.signedBy && <span style={{ color: '#10B981', fontWeight: 600 }}>{' '}✍️ {record.signedBy}</span>}
@@ -266,7 +266,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                     return (
                         <div style={{ ...styles.card, marginBottom: 20 }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                                <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>☑️ Radni zadaci ({done}/{subtasks.length})</div>
+                                <div className="u-section-title">☑️ Radni zadaci ({done}/{subtasks.length})</div>
                                 {canManage && <button onClick={addSubtask} style={styles.btnSmall}><Icon name="plus" size={12} /> Novi zadatak</button>}
                             </div>
                             {subtasks.length > 0 && <div style={{ width: '100%', height: 4, borderRadius: 2, background: 'var(--border)', marginBottom: 16 }}><div style={{ width: `${subtasks.length > 0 ? (done / subtasks.length) * 100 : 0}%`, height: 4, borderRadius: 2, background: '#10B981', transition: 'width 0.3s' }} /></div>}
@@ -344,18 +344,18 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                             {/* Summary */}
                             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(2, 1fr)', gap: 10, marginBottom: 20 }}>
                                 <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(59,130,246,0.08)', textAlign: 'center' }}>
-                                    <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Materijali</div>
+                                    <div className="u-stat-label">Materijali</div>
                                     <div style={{ fontSize: 22, fontWeight: 800, color: C.blue }}>{specs.materials.length}</div>
                                 </div>
                                 <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(16,185,129,0.08)', textAlign: 'center' }}>
-                                    <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Ukupna težina</div>
+                                    <div className="u-stat-label">Ukupna težina</div>
                                     <div style={{ fontSize: 22, fontWeight: 800, color: C.green }}>{totalWeight >= 1000 ? `${(totalWeight / 1000).toFixed(2)}t` : `${totalWeight}kg`}</div>
                                 </div>
                             </div>
 
                             {/* Materials */}
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                                <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>🧱 Materijali</div>
+                                <div className="u-section-title">🧱 Materijali</div>
                                 {canManage && <button onClick={addSpecMaterial} style={styles.btnSmall}><Icon name="plus" size={12} /> Dodaj</button>}
                             </div>
                             {specs.materials.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, textAlign: 'center', padding: 20 }}>Nema materijala — dodajte stavke</div> : (
@@ -423,7 +423,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                 {detailTab === 'troskovnik' && (
                     <div style={{ ...styles.card, marginBottom: 20 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                            <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>🧾 Troškovnik ({costItems.length} stavki)</div>
+                            <div className="u-section-title">🧾 Troškovnik ({costItems.length} stavki)</div>
                             {canManage && <button onClick={() => setShowCostForm(true)} style={styles.btnSmall}><Icon name="plus" size={12} /> Nova stavka</button>}
                         </div>
                         {/* Category summary */}
@@ -461,7 +461,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                             );
                         })()}
                         {costItems.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, textAlign: 'center', padding: 20 }}>Nema stavki troškova</div> : (
-                            <div style={{ overflowX: 'auto' }}>
+                            <div className="u-overflow-x">
                                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                     <thead><tr><th style={styles.th}>Stavka</th><th style={styles.th}>Kat.</th><th style={styles.th}>Kol.</th><th style={styles.th}>Cijena</th><th style={styles.th}>Ukupno</th>{canManage && <th style={styles.th}></th>}</tr></thead>
                                     <tbody>
@@ -504,7 +504,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                 {detailTab === 'dokumenti' && (
                     <div style={{ ...styles.card, marginBottom: 20 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                            <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>📎 Dokumenti ({files.length})</div>
+                            <div className="u-section-title">📎 Dokumenti ({files.length})</div>
                             {canManage && (
                                 <label style={{ ...styles.btnSmall, cursor: 'pointer', display: 'inline-flex' }}>
                                     <Icon name="upload" size={12} /> Upload
@@ -539,7 +539,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                 {/* Povijest tab */}
                 {detailTab === 'povijest' && (
                     <div style={{ ...styles.card, marginBottom: 20 }}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>🕐 Povijest promjena</div>
+                        <div className="u-section-title u-mb-12">🕐 Povijest promjena</div>
                         {stageHistory.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13 }}>Nema zapisa</div> : (
                             <div>
                                 {[...stageHistory].reverse().map((h, i) => {
@@ -549,7 +549,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                                             <div style={{ width: 8, height: 8, borderRadius: '50%', background: stage?.color || C.accent, marginTop: 6, flexShrink: 0 }} />
                                             <div>
                                                 <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{stage?.emoji} {stage?.label}</div>
-                                                <div style={{ fontSize: 11, color: C.textMuted }}>
+                                                <div className="u-fs-11" style={{ color: C.textMuted }}>
                                                     Ulaz: {fmtDate(h.enteredAt)}
                                                     {h.completedAt && ` → Izlaz: ${fmtDate(h.completedAt)}`}
                                                     {h.completedBy && ` • ${h.completedBy}`}

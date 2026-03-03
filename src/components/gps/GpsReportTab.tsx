@@ -396,7 +396,7 @@ export default function GpsReportTab({
                     </div>
                 ) : viewMode === 'workers' ? (
                     <div>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16 }}>
+                        <div className="u-section-title u-mb-16">
                             👷 Izvještaj po radnicima ({workerReport.length})
                         </div>
                         {/* Table header */}
@@ -424,19 +424,19 @@ export default function GpsReportTab({
                             }}>
                                 <div>
                                     <div style={{ fontWeight: 600, fontSize: 13, color: C.text }}>{w.name}</div>
-                                    <div style={{ fontSize: 11, color: C.textMuted }}>{w.projects} proj.</div>
+                                    <div className="u-fs-11" style={{ color: C.textMuted }}>{w.projects} proj.</div>
                                 </div>
                                 <div style={{ fontSize: 14, fontWeight: 600, color: C.text }}>{w.days}</div>
                                 <div style={{ fontSize: 14, fontWeight: 600, color: C.text }}>{(w.totalMins / 60).toFixed(1)}h</div>
                                 {!isMobile && <div style={{ fontSize: 13, color: w.avgDist != null && w.avgDist > 300 ? '#EF4444' : C.text }}>{w.avgDist != null ? `${w.avgDist}m` : '—'}</div>}
-                                {!isMobile && <div style={{ fontSize: 13, color: C.textMuted }}>{w.gpsEntries}</div>}
+                                {!isMobile && <div className="u-fs-13" style={{ color: C.textMuted }}>{w.gpsEntries}</div>}
                                 <PresenceBar pct={w.presencePct} />
                             </div>
                         ))}
                     </div>
                 ) : viewMode === 'projects' ? (
                     <div>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16 }}>
+                        <div className="u-section-title u-mb-16">
                             📋 Izvještaj po projektima ({projectReport.length})
                         </div>
                         <div style={{
@@ -462,18 +462,18 @@ export default function GpsReportTab({
                             }}>
                                 <div>
                                     <div style={{ fontWeight: 600, fontSize: 13, color: C.text }}>{p.name}</div>
-                                    <div style={{ fontSize: 11, color: C.textMuted }}>{p.days} dana</div>
+                                    <div className="u-fs-11" style={{ color: C.textMuted }}>{p.days} dana</div>
                                 </div>
                                 <div style={{ fontSize: 14, fontWeight: 600, color: C.text }}>{p.workerCount}</div>
                                 <div style={{ fontSize: 14, fontWeight: 600, color: C.text }}>{(p.totalMins / 60).toFixed(1)}h</div>
-                                {!isMobile && <div style={{ fontSize: 13, color: C.textMuted }}>{p.gpsEntries}</div>}
+                                {!isMobile && <div className="u-fs-13" style={{ color: C.textMuted }}>{p.gpsEntries}</div>}
                                 <PresenceBar pct={p.presencePct} />
                             </div>
                         ))}
                     </div>
                 ) : (
                     <div>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16 }}>
+                        <div className="u-section-title u-mb-16">
                             📅 Dnevni izvještaj ({dailyReport.length} dana)
                         </div>
                         <div style={{
@@ -501,7 +501,7 @@ export default function GpsReportTab({
                                 <div style={{ fontWeight: 600, fontSize: 13, color: C.text }}>{d.date}</div>
                                 <div style={{ fontSize: 14, fontWeight: 600, color: C.text }}>{d.workerCount}</div>
                                 <div style={{ fontSize: 14, fontWeight: 600, color: C.text }}>{(d.totalMins / 60).toFixed(1)}h</div>
-                                {!isMobile && <div style={{ fontSize: 13, color: C.textMuted }}>{d.entries}</div>}
+                                {!isMobile && <div className="u-fs-13" style={{ color: C.textMuted }}>{d.entries}</div>}
                                 {!isMobile && <div style={{ fontSize: 13, color: '#059669' }}>{d.inZone}</div>}
                                 <PresenceBar pct={d.presencePct} />
                             </div>

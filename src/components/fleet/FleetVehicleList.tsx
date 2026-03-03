@@ -130,8 +130,8 @@ export default function FleetVehicleList({ vehicles, onSelectVehicle }: {
                                             display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20,
                                         }}>🚛</div>
                                         <div>
-                                            <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{v.name}</div>
-                                            <div style={{ fontSize: 11, color: C.textMuted }}>🔖 {v.plate}</div>
+                                            <div className="u-section-title">{v.name}</div>
+                                            <div className="u-fs-11" style={{ color: C.textMuted }}>🔖 {v.plate}</div>
                                         </div>
                                     </div>
                                     <div style={{

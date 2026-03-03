@@ -182,8 +182,8 @@ export function TimesheetsPage() {
                 {/* Header */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
                     <div>
-                        <div style={{ fontSize: 22, fontWeight: 800, color: C.text }}> Radni sati</div>
-                        <div style={{ fontSize: 13, color: C.textMuted }}>Upravljanje evidencijom radnog vremena</div>
+                        <div className="u-fs-22 u-fw-800" style={{ color: C.text }}> Radni sati</div>
+                        <div className="u-fs-13" style={{ color: C.textMuted }}>Upravljanje evidencijom radnog vremena</div>
                     </div>
                     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                         <button onClick={exportCSV} style={styles.btnSecondary}><Icon name="download" size={14} /> CSV/Excel</button>
@@ -195,23 +195,23 @@ export function TimesheetsPage() {
                 {/* Stats */}
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(5, 1fr)', gap: 12, marginBottom: 20 }}>
                     <div style={{ ...styles.card, textAlign: 'center', padding: '14px 12px' }}>
-                        <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Ukupno sati</div>
+                        <div className="u-stat-label">Ukupno sati</div>
                         <div style={{ fontSize: 24, fontWeight: 800, color: C.accent }}>{(totalFiltered / 60).toFixed(1)}h</div>
                     </div>
                     <div style={{ ...styles.card, textAlign: 'center', padding: '14px 12px' }}>
-                        <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Unosa</div>
+                        <div className="u-stat-label">Unosa</div>
                         <div style={{ fontSize: 24, fontWeight: 800, color: C.blue }}>{filtered.length}</div>
                     </div>
                     <div style={{ ...styles.card, textAlign: 'center', padding: '14px 12px' }}>
-                        <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Odobreno</div>
+                        <div className="u-stat-label">Odobreno</div>
                         <div style={{ fontSize: 24, fontWeight: 800, color: C.green }}>{approvedCount}</div>
                     </div>
                     <div style={{ ...styles.card, textAlign: 'center', padding: '14px 12px' }}>
-                        <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Na čekanju</div>
+                        <div className="u-stat-label">Na čekanju</div>
                         <div style={{ fontSize: 24, fontWeight: 800, color: C.yellow }}>{pendingCount}</div>
                     </div>
                     <div style={{ ...styles.card, textAlign: 'center', padding: '14px 12px' }}>
-                        <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Prosj./dan</div>
+                        <div className="u-stat-label">Prosj./dan</div>
                         <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--purple)' }}>{avgPerDay}h</div>
                     </div>
                 </div>
@@ -249,7 +249,7 @@ export function TimesheetsPage() {
                         <div style={{ fontSize: 20 }}>⏳</div>
                         <div>
                             <div style={{ fontWeight: 700, color: C.yellow, fontSize: 14 }}>{pendingCount} unos{pendingCount > 1 ? 'a' : ''} čeka odobrenje</div>
-                            <div style={{ fontSize: 12, color: C.textMuted }}>Pregledajte i odobrite/odbijte unose radnika</div>
+                            <div className="u-fs-12" style={{ color: C.textMuted }}>Pregledajte i odobrite/odbijte unose radnika</div>
                         </div>
                         <button onClick={() => { setFilterStatus('na čekanju'); }} style={{ ...styles.btnSmall, marginLeft: 'auto', color: C.yellow, borderColor: 'rgba(180,83,9,0.3)' }}>Prikaži sve</button>
                     </div>
@@ -258,10 +258,10 @@ export function TimesheetsPage() {
                 {/* Table */}
                 <div style={{ ...styles.card, padding: 0, overflow: 'hidden' }}>
                     <div style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>Pregled ({filtered.length})</div>
-                        <div style={{ fontSize: 12, color: C.textMuted }}>{(totalFiltered / 60).toFixed(1)}h ukupno</div>
+                        <div className="u-section-title">Pregled ({filtered.length})</div>
+                        <div className="u-fs-12" style={{ color: C.textMuted }}>{(totalFiltered / 60).toFixed(1)}h ukupno</div>
                     </div>
-                    <div style={{ overflowX: 'auto' }}>
+                    <div className="u-overflow-x">
                         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 800 }}>
                             <thead><tr>
                                 <th style={{ ...styles.th, position: 'sticky', top: 0, background: C.bgElevated, zIndex: 1, width: 36, textAlign: 'center' }}>
@@ -348,7 +348,7 @@ export function TimesheetsPage() {
                                     {detailTs.gpsLocation && <div style={{ marginBottom: 12 }}><span style={styles.label}>GPS Lokacija</span><div style={{ fontSize: 13, color: C.accent }}>📍 {detailTs.gpsLocation}</div></div>}
                                     {detailTs.notes && <div style={{ marginBottom: 12 }}><span style={styles.label}>Napomene</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(245,158,11,0.08)', fontSize: 13, color: C.yellow }}>{detailTs.notes}</div></div>}
                                     {detailTs.rejectReason && <div style={{ marginBottom: 12 }}><span style={styles.label}>Razlog odbijanja</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(239,68,68,0.1)', fontSize: 13, color: C.red }}>{detailTs.rejectReason}</div></div>}
-                                    {detailTs.source && <div style={{ fontSize: 12, color: C.textMuted }}>Izvor: {detailTs.source === 'admin' ? 'Admin unos' : 'Radnički unos'}</div>}
+                                    {detailTs.source && <div className="u-fs-12" style={{ color: C.textMuted }}>Izvor: {detailTs.source === 'admin' ? 'Admin unos' : 'Radnički unos'}</div>}
                                     {detailTs.invoiceFile && <div style={{ marginTop: 12 }}><span style={styles.label}>Priloženi račun</span><div style={{ marginTop: 4 }}><a href={detailTs.invoiceFile.data} download={detailTs.invoiceFile.name} style={styles.btnSmall}><Icon name="download" size={14} /> {detailTs.invoiceFile.name}</a></div></div>}
                                     {detailTs.status === 'na čekanju' && (
                                         <div style={{ display: 'flex', gap: 12, marginTop: 20, borderTop: `1px solid ${C.border}`, paddingTop: 16 }}>

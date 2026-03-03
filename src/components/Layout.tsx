@@ -558,7 +558,7 @@ export function Layout() {
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
                                 <div style={{ fontSize: 13, fontWeight: 700, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{currentUser?.name}</div>
-                                <div style={{ fontSize: 11, color: C.textMuted }}>{isAdmin ? 'Administrator' : isLeader ? 'Voditelj' : 'Radnik'}</div>
+                                <div className="u-fs-11" style={{ color: C.textMuted }}>{isAdmin ? 'Administrator' : isLeader ? 'Voditelj' : 'Radnik'}</div>
                             </div>
                             <button onClick={handleLogout} title="Odjava" style={{ background: 'none', border: 'none', color: C.textMuted, cursor: 'pointer', padding: 4 }}>
                                 <Icon name="logout" size={16} />

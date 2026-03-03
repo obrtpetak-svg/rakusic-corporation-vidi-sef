@@ -308,9 +308,9 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                         <span style={{ fontSize: 20 }}>⚠️</span>
                         <div style={{ flex: 1 }}>
                             <div style={{ fontSize: 13, fontWeight: 700, color: C.red }}>{alerts.length} vremensko upozorenje{alerts.length !== 1 ? 'a' : ''}</div>
-                            <div style={{ fontSize: 12, color: C.textMuted }}>{alerts[0].issues[0]} — klikni za detalje</div>
+                            <div className="u-fs-12" style={{ color: C.textMuted }}>{alerts[0].issues[0]} — klikni za detalje</div>
                         </div>
-                        <span style={{ fontSize: 11, color: C.textMuted }}>▶</span>
+                        <span className="u-fs-11" style={{ color: C.textMuted }}>▶</span>
                     </div>
                 </div>
             )}
@@ -472,8 +472,8 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
             {/* ══════ TAB: WEEKLY PLANNER ══════ */}
             {tab === 'planner' && (
                 <div style={{ ...styles.card }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12 }}>📅 Tjedni vremenski planer</div>
-                    <div style={{ overflowX: 'auto' }}>
+                    <div className="u-section-title u-mb-12">📅 Tjedni vremenski planer</div>
+                    <div className="u-overflow-x">
                         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
                             <thead><tr>
                                 <th style={{ textAlign: 'left', padding: '10px 8px', borderBottom: `2px solid ${C.border}`, fontSize: 11, color: C.textMuted, fontWeight: 700, minWidth: 120 }}>PROJEKT</th>
@@ -540,8 +540,8 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                                 <div key={i} style={{ ...styles.card, borderLeft: `4px solid ${a.score < 50 ? '#EF4444' : '#F59E0B'}`, background: a.score < 50 ? 'rgba(239,68,68,0.03)' : 'rgba(245,158,11,0.03)' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                                         <div>
-                                            <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{a.project.name}</div>
-                                            <div style={{ fontSize: 11, color: C.textMuted }}>{a.daysAhead === 1 ? '⏰ Sutra' : '📅 Za 2 dana'} — {a.day.label}</div>
+                                            <div className="u-section-title">{a.project.name}</div>
+                                            <div className="u-fs-11" style={{ color: C.textMuted }}>{a.daysAhead === 1 ? '⏰ Sutra' : '📅 Za 2 dana'} — {a.day.label}</div>
                                         </div>
                                         <ScoreRing score={a.score} size={52} />
                                     </div>
@@ -568,7 +568,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                         <div>
                             <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>⚙️ Pravila upozorenja</div>
-                            <div style={{ fontSize: 12, color: C.textMuted }}>Definirajte pragove za svaki projekt i tip radova</div>
+                            <div className="u-fs-12" style={{ color: C.textMuted }}>Definirajte pragove za svaki projekt i tip radova</div>
                         </div>
                         <button onClick={() => { setRuleForm({ projectId: '', activities: [], customThresholds: {} }); setShowRuleModal(true); }} style={styles.btn}>
                             <Icon name="plus" size={14} /> Novo pravilo
@@ -581,7 +581,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                         if (!pRules.length) return null;
                         return (
                             <div key={p.id} style={{ ...styles.card, marginBottom: 12 }}>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>{p.name} <span style={{ fontSize: 11, color: C.textMuted }}>— {pRules.length} pravilo{pRules.length !== 1 ? 'a' : ''}</span></div>
+                                <div className="u-section-title" style={{ fontSize: 13, marginBottom: 10 }}>{p.name} <span className="u-fs-11" style={{ color: C.textMuted }}>— {pRules.length} pravilo{pRules.length !== 1 ? 'a' : ''}</span></div>
                                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill,minmax(220px,1fr))', gap: 8 }}>
                                     {pRules.map(r => {
                                         const preset = ACTIVITY_PRESETS[r.activity];
