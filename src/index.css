@@ -2006,3 +2006,228 @@ a,
 [data-theme-transitioning] *::after {
   transition-duration: var(--duration-slow) !important;
 }
+
+/* ── Utility Classes ── */
+.u-flex {
+  display: flex;
+}
+
+.u-flex-center {
+  display: flex;
+  align-items: center;
+}
+
+.u-flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.u-flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.u-flex-wrap {
+  flex-wrap: wrap;
+}
+
+.u-grid {
+  display: grid;
+}
+
+.u-gap-4 {
+  gap: 4px;
+}
+
+.u-gap-6 {
+  gap: 6px;
+}
+
+.u-gap-8 {
+  gap: 8px;
+}
+
+.u-gap-10 {
+  gap: 10px;
+}
+
+.u-gap-12 {
+  gap: 12px;
+}
+
+.u-gap-16 {
+  gap: 16px;
+}
+
+.u-gap-20 {
+  gap: 20px;
+}
+
+.u-text-center {
+  text-align: center;
+}
+
+.u-text-muted {
+  color: var(--text-muted);
+}
+
+.u-fw-600 {
+  font-weight: 600;
+}
+
+.u-fw-700 {
+  font-weight: 700;
+}
+
+.u-fw-800 {
+  font-weight: 800;
+}
+
+.u-fs-10 {
+  font-size: 10px;
+}
+
+.u-fs-11 {
+  font-size: 11px;
+}
+
+.u-fs-12 {
+  font-size: 12px;
+}
+
+.u-fs-13 {
+  font-size: 13px;
+}
+
+.u-fs-14 {
+  font-size: 14px;
+}
+
+.u-fs-20 {
+  font-size: 20px;
+}
+
+.u-fs-22 {
+  font-size: 22px;
+}
+
+.u-fs-24 {
+  font-size: 24px;
+}
+
+.u-mb-4 {
+  margin-bottom: 4px;
+}
+
+.u-mb-8 {
+  margin-bottom: 8px;
+}
+
+.u-mb-12 {
+  margin-bottom: 12px;
+}
+
+.u-mb-16 {
+  margin-bottom: 16px;
+}
+
+.u-mb-20 {
+  margin-bottom: 20px;
+}
+
+.u-mb-24 {
+  margin-bottom: 24px;
+}
+
+.u-mt-8 {
+  margin-top: 8px;
+}
+
+.u-mt-12 {
+  margin-top: 12px;
+}
+
+.u-mt-16 {
+  margin-top: 16px;
+}
+
+.u-mt-20 {
+  margin-top: 20px;
+}
+
+.u-p-12 {
+  padding: 12px;
+}
+
+.u-p-16 {
+  padding: 16px;
+}
+
+.u-p-20 {
+  padding: 20px;
+}
+
+.u-rounded-8 {
+  border-radius: 8px;
+}
+
+.u-rounded-10 {
+  border-radius: 10px;
+}
+
+.u-rounded-12 {
+  border-radius: 12px;
+}
+
+.u-w-full {
+  width: 100%;
+}
+
+.u-overflow-x {
+  overflow-x: auto;
+}
+
+.u-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.u-uppercase {
+  text-transform: uppercase;
+}
+
+.u-stat-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.u-stat-value {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.u-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.u-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.u-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
