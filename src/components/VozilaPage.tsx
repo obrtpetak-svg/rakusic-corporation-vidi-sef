@@ -117,7 +117,7 @@ export function VozilaPage({ workerFilterId }) {
         return (
             <div>
                 <button onClick={() => setDetailId(null)} style={{ ...styles.btnSecondary, marginBottom: 20, display: 'inline-flex' }}><Icon name="back" size={16} /> Natrag</button>
-                <div style={{ ...styles.card, marginBottom: 20 }}>
+                <div style={styles.card} className="u-mb-20">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
                         <div><div className="u-fs-22 u-fw-800" className="u-color-text">{detailVehicle.name || detailVehicle.regNumber}</div><div style={{ color: C.textMuted, fontSize: 13 }}>{detailVehicle.brand} {detailVehicle.model} {detailVehicle.year}</div></div>
                         <div style={{ ...styles.badge('249,115,22'), fontSize: 12 }}>{detailVehicle.regNumber}</div>

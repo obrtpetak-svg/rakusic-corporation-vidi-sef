@@ -205,7 +205,7 @@ export function NotificationsPage() {
 
             {/* Production alerts */}
             {myProdAlerts.length > 0 && (
-                <div style={{ ...styles.card, marginBottom: 20 }}>
+                <div style={styles.card} className="u-mb-20">
                     <SectionHeader icon="settings" iconColor="#7C3AED" iconBg="rgba(124,58,237,0.1)" title="Proizvodnja" count={myProdAlerts.length} />
                     {myProdAlerts.map(a => (
                         <div key={a.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--divider)', gap: 12, flexWrap: 'wrap' }}>
@@ -233,7 +233,7 @@ export function NotificationsPage() {
 
             {/* Items */}
             {total > 0 && (
-                <div style={{ ...styles.card, marginBottom: 20 }}>
+                <div style={styles.card} className="u-mb-20">
                     {pendingTs.length > 0 && pageItems.some(i => i._type === 'ts') && (
                         <SectionHeader icon="clock" iconColor="var(--accent)" iconBg="var(--accent-light)" title="Radni sati" count={pendingTs.length} />
                     )}

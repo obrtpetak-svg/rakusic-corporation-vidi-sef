@@ -154,11 +154,11 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
     
             {/* Stats + Mini Dashboard */}
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(6, 1fr)', gap: 10, marginBottom: 20 }}>
-                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div className="u-stat-label">Ukupno</div><div style={{ fontSize: 22, fontWeight: 800, color: C.accent }}>{stats.total}</div></div>
-                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div className="u-stat-label">U tijeku</div><div style={{ fontSize: 22, fontWeight: 800, color: '#3B82F6' }}>{stats.inProgress}</div></div>
-                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div className="u-stat-label">Na čekanju</div><div style={{ fontSize: 22, fontWeight: 800, color: '#F59E0B' }}>{stats.waiting}</div></div>
-                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div className="u-stat-label">Završeno</div><div style={{ fontSize: 22, fontWeight: 800, color: C.green }}>{stats.doneTotal}</div><div className="u-stat-label">{stats.doneMonth > 0 ? `+${stats.doneMonth} ovaj mj.` : ''}</div></div>
-                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div className="u-stat-label">Troškovi</div><div style={{ fontSize: 22, fontWeight: 800, color: '#EF4444' }}>{stats.totalCost > 0 ? `${stats.totalCost.toFixed(0)}€` : '0€'}</div></div>
+                <div style={{...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center"><div className="u-stat-label">Ukupno</div><div style={{ fontSize: 22, fontWeight: 800, color: C.accent }}>{stats.total}</div></div>
+                <div style={{...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center"><div className="u-stat-label">U tijeku</div><div style={{ fontSize: 22, fontWeight: 800, color: '#3B82F6' }}>{stats.inProgress}</div></div>
+                <div style={{...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center"><div className="u-stat-label">Na čekanju</div><div style={{ fontSize: 22, fontWeight: 800, color: '#F59E0B' }}>{stats.waiting}</div></div>
+                <div style={{...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center"><div className="u-stat-label">Završeno</div><div style={{ fontSize: 22, fontWeight: 800, color: C.green }}>{stats.doneTotal}</div><div className="u-stat-label">{stats.doneMonth > 0 ? `+${stats.doneMonth} ovaj mj.` : ''}</div></div>
+                <div style={{...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center"><div className="u-stat-label">Troškovi</div><div style={{ fontSize: 22, fontWeight: 800, color: '#EF4444' }}>{stats.totalCost > 0 ? `${stats.totalCost.toFixed(0)}€` : '0€'}</div></div>
                 {/* Mini pie chart */}
                 <div style={{ ...styles.card, textAlign: 'center', padding: '10px' }}>
                     <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Faze</div>

@@ -172,7 +172,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
         return (
             <div>
                 <button onClick={() => setDetailId(null)} style={{ ...styles.btnSecondary, marginBottom: 20, display: 'inline-flex' }}><Icon name="back" size={16} /> Natrag</button>
-                <div style={{ ...styles.card, marginBottom: 20 }}>
+                <div style={styles.card} className="u-mb-20">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
                         <div>
                             <div className="u-fs-22 u-fw-800" className="u-color-text">{detailProject.name}</div>
@@ -234,7 +234,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
 
                 {/* Files / Documents */}
                 {projectFiles.length > 0 && (
-                    <div style={{ ...styles.card, marginBottom: 20 }}>
+                    <div style={styles.card} className="u-mb-20">
                         <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="file" size={16} /> Dokumenti i slike ({projectFiles.length})</div>
                         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
                             {projectFiles.map(f => (
@@ -259,7 +259,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                 )}
 
                 {/* Workers on project */}
-                <div style={{ ...styles.card, marginBottom: 20 }}>
+                <div style={styles.card} className="u-mb-20">
                     <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="workers" size={16} /> Radnici na projektu ({detailWorkers.length})</div>
                     {detailWorkers.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13 }}>Nema dodijeljenih radnika</div> : (
                         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 10 }}>
@@ -284,7 +284,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
 
                 {/* Timesheets on project */}
                 {detailTimesheets.length > 0 && (
-                    <div style={{ ...styles.card, marginBottom: 20 }}>
+                    <div style={styles.card} className="u-mb-20">
                         <div className="u-section-title u-mb-12">Radni sati ({detailTimesheets.length})</div>
                         <div className="u-overflow-x">
                             <table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -304,7 +304,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                 )}
 
                 {/* Project Obligations */}
-                <div style={{ ...styles.card, marginBottom: 20 }}>
+                <div style={styles.card} className="u-mb-20">
                     <div className="u-flex-between u-mb-16">
                         <div style={{ fontSize: 14, fontWeight: 700, color: C.text, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="warning" size={16} /> Obaveze ({detailObaveze.filter(o => o.active).length} aktivnih)</div>
                         {!isWorker && <button onClick={openObAdd} style={styles.btnSmall}><Icon name="plus" size={12} /> Nova obaveza</button>}
@@ -337,7 +337,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                 </div>
 
                 {/* Faze rada (Work Phases) */}
-                <div style={{ ...styles.card, marginBottom: 20 }}>
+                <div style={styles.card} className="u-mb-20">
                     <div className="u-flex-between u-mb-16">
                         <div style={{ fontSize: 14, fontWeight: 700, color: C.text, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="check" size={16} /> Faze rada ({detailPhases.filter(p => p.status === 'done').length}/{detailPhases.length})</div>
                     </div>
@@ -438,28 +438,28 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
 
             {/* Stats overview */}
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : (isWorker ? 'repeat(3, 1fr)' : 'repeat(6, 1fr)'), gap: 10, marginBottom: 20 }}>
-                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}>
+                <div style={{...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
                     <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>Projekata</div>
                     <div style={{ fontSize: 22, fontWeight: 800, color: C.accent }}>{projectStats.total}</div>
                 </div>
-                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}>
+                <div style={{...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
                     <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>Aktivni</div>
                     <div style={{ fontSize: 22, fontWeight: 800, color: '#10B981' }}>{projectStats.active}</div>
                 </div>
-                {!isWorker && <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}>
+                {!isWorker && <div style={{...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
                     <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>Završeni</div>
                     <div style={{ fontSize: 22, fontWeight: 800, color: '#6366F1' }}>{projectStats.finished}</div>
                 </div>}
-                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}>
+                <div style={{...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
                     <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>Ukupno sati</div>
                     <div style={{ fontSize: 22, fontWeight: 800, color: C.blue }}>{projectStats.totalHours}h</div>
                 </div>
                 {!isWorker && <>
-                    <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}>
+                    <div style={{...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
                         <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>Troškovi</div>
                         <div style={{ fontSize: 22, fontWeight: 800, color: '#EF4444' }}>{parseFloat(projectStats.totalCosts) > 0 ? `${projectStats.totalCosts}€` : '0€'}</div>
                     </div>
-                    <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}>
+                    <div style={{...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
                         <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>Radnika</div>
                         <div style={{ fontSize: 22, fontWeight: 800, color: '#F59E0B' }}>{projectStats.uniqueWorkers}</div>
                     </div>

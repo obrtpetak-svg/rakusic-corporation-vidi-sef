@@ -146,7 +146,7 @@ export function InvoicesPage({ workerFilterId }) {
             </div>
 
             {/* Filters */}
-            <div style={{ ...styles.card, marginBottom: 20 }}>
+            <div style={styles.card} className="u-mb-20">
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr 1fr 1fr 1fr', gap: 12 }}>
                     <div><label style={styles.label}>Pretraži</label><Input value={filters.search} onChange={e => setFilters(f => ({ ...f, search: e.target.value }))} placeholder="Broj, dobavljač, opis..." /></div>
                     <div><label style={styles.label}>Projekt</label><Select value={filters.project} onChange={e => setFilters(f => ({ ...f, project: e.target.value }))}><option value="">Svi</option>{projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</Select></div>

@@ -12,15 +12,27 @@ export default defineConfig({
         sourcemap: false,
         rollupOptions: {
             output: {
-                manualChunks: {
-                    // Split React into its own chunk (cached separately)
-                    'react-vendor': ['react', 'react-dom'],
-                    // Firebase compat SDK — largest dependency
-                    'firebase-vendor': [
-                        'firebase/app',
-                        'firebase/auth',
-                        'firebase/firestore',
-                    ],
+                manualChunks(id) {
+                    // React core — cached separately
+                    if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/')) {
+                        return 'react-vendor';
+                    }
+                    // Firebase Firestore (largest ~400kB)
+                    if (id.includes('firebase/firestore') || id.includes('@firebase/firestore')) {
+                        return 'firebase-firestore';
+                    }
+                    // Firebase Auth (~100kB)
+                    if (id.includes('firebase/auth') || id.includes('@firebase/auth')) {
+                        return 'firebase-auth';
+                    }
+                    // Firebase core + app
+                    if (id.includes('firebase/') || id.includes('@firebase/')) {
+                        return 'firebase-core';
+                    }
+                    // XLSX (heavy, only used in export)
+                    if (id.includes('node_modules/xlsx')) {
+                        return 'xlsx-vendor';
+                    }
                 },
             },
         },

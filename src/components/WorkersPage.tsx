@@ -156,7 +156,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
         return (
             <div>
                 <button onClick={() => setDetailId(null)} style={{ ...styles.btnSecondary, marginBottom: 20, display: 'inline-flex' }}><Icon name="back" size={16} /> Natrag</button>
-                <div style={{ ...styles.card, marginBottom: 20 }}>
+                <div style={styles.card} className="u-mb-20">
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
                         <div style={{ width: 56, height: 56, borderRadius: '50%', background: C.accentLight, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.accent, fontWeight: 800, fontSize: 22 }}>{detailWorker.name?.charAt(0)}</div>
                         <div>
@@ -186,7 +186,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
 
                 {/* Hours by day chart */}
                 {hoursByDay.length > 1 && (
-                    <div style={{ ...styles.card, marginBottom: 20 }}>
+                    <div style={styles.card} className="u-mb-20">
                         <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="clock" size={16} /> Sati po danu (zadnjih {hoursByDay.length} dana)</div>
                         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 120 }}>
                             {hoursByDay.map((d, i) => (
@@ -201,7 +201,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                 )}
 
                 {/* Projects with hours */}
-                {wProjects.length > 0 && <div style={{ ...styles.card, marginBottom: 20 }}>
+                {wProjects.length > 0 && <div style={styles.card} className="u-mb-20">
                     <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="project" size={16} /> Projekti ({wProjects.length})</div>
                     {projectHours.map(p => (
                         <div key={p.name} style={{ padding: '10px 0', borderBottom: `1px solid ${C.border}7A` }}>

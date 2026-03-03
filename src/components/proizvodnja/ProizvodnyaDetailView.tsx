@@ -35,7 +35,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                 <button onClick={() => { setDetailId(null); setDetailTab('info'); setSignOffOrder(null); setShowForm(false); }} style={{ ...styles.btnSecondary, marginBottom: 20, display: 'inline-flex' }}><Icon name="back" size={16} /> Natrag</button>
 
                 {/* Header card */}
-                <div style={{ ...styles.card, marginBottom: 20 }}>
+                <div style={styles.card} className="u-mb-20">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
                         <div>
                             <div style={{ fontSize: 11, color: C.accent, fontWeight: 700, marginBottom: 4 }}>{detailOrder.orderNumber}</div>
@@ -157,7 +157,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
 
                 {/* Info tab */}
                 {detailTab === 'info' && (
-                    <div style={{ ...styles.card, marginBottom: 20 }}>
+                    <div style={styles.card} className="u-mb-20">
                         {detailOrder.description && <div style={{ padding: '12px 16px', borderRadius: 8, background: C.bgElevated, fontSize: 13, color: C.textDim, lineHeight: 1.6, marginBottom: 12 }}>{detailOrder.description}</div>}
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, fontSize: 13 }}>
                             <div><span className="u-text-muted">📅 Kreiran:</span> <strong>{fmtDate(detailOrder.createdAt)}</strong></div>
@@ -264,7 +264,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                     };
                     const done = subtasks.filter(t => t.status === 'gotovo').length;
                     return (
-                        <div style={{ ...styles.card, marginBottom: 20 }}>
+                        <div style={styles.card} className="u-mb-20">
                             <div className="u-flex-between u-mb-16">
                                 <div className="u-section-title">☑️ Radni zadaci ({done}/{subtasks.length})</div>
                                 {canManage && <button onClick={addSubtask} style={styles.btnSmall}><Icon name="plus" size={12} /> Novi zadatak</button>}
@@ -340,7 +340,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                     const totalWeight = specs.materials.reduce((s, m) => s + ((['kg', 't'].includes(m.unit)) ? (m.unit === 't' ? m.quantity * 1000 : m.quantity) : 0), 0);
 
                     return (
-                        <div style={{ ...styles.card, marginBottom: 20 }}>
+                        <div style={styles.card} className="u-mb-20">
                             {/* Summary */}
                             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(2, 1fr)', gap: 10, marginBottom: 20 }}>
                                 <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(59,130,246,0.08)', textAlign: 'center' }}>
@@ -421,7 +421,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
 
                 {/* Troškovnik tab */}
                 {detailTab === 'troskovnik' && (
-                    <div style={{ ...styles.card, marginBottom: 20 }}>
+                    <div style={styles.card} className="u-mb-20">
                         <div className="u-flex-between u-mb-16">
                             <div className="u-section-title">🧾 Troškovnik ({costItems.length} stavki)</div>
                             {canManage && <button onClick={() => setShowCostForm(true)} style={styles.btnSmall}><Icon name="plus" size={12} /> Nova stavka</button>}
@@ -502,7 +502,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
 
                 {/* Dokumenti tab */}
                 {detailTab === 'dokumenti' && (
-                    <div style={{ ...styles.card, marginBottom: 20 }}>
+                    <div style={styles.card} className="u-mb-20">
                         <div className="u-flex-between u-mb-16">
                             <div className="u-section-title">📎 Dokumenti ({files.length})</div>
                             {canManage && (
@@ -538,7 +538,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
 
                 {/* Povijest tab */}
                 {detailTab === 'povijest' && (
-                    <div style={{ ...styles.card, marginBottom: 20 }}>
+                    <div style={styles.card} className="u-mb-20">
                         <div className="u-section-title u-mb-12">🕐 Povijest promjena</div>
                         {stageHistory.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13 }}>Nema zapisa</div> : (
                             <div>
