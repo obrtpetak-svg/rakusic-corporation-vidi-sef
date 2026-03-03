@@ -6,6 +6,7 @@ import { Icon, Modal, Field, Input, Textarea, Select, StatusBadge, Pagination, u
 import { C, styles, genId, fmtDate, diffMins, hashPin } from '../utils/helpers';
 import { EmptyState } from './ui/EmptyState';
 import { EditableField } from './ui/EditableField';
+import './workers.css';
 
 export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId, onDetailConsumed }) {
     const confirm = useConfirm();
@@ -157,22 +158,22 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
             <div>
                 <button onClick={() => setDetailId(null)} style={{ ...styles.btnSecondary, marginBottom: 20, display: 'inline-flex' }}><Icon name="back" size={16} /> Natrag</button>
                 <div style={styles.card} className="u-mb-20">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
-                        <div style={{ width: 56, height: 56, borderRadius: '50%', background: C.accentLight, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.accent, fontWeight: 800, fontSize: 22 }}>{detailWorker.name?.charAt(0)}</div>
+                    <div className="workers__detail-header">
+                        <div className="workers__avatar workers__avatar--active workers__avatar--large">{detailWorker.name?.charAt(0)}</div>
                         <div>
                             <div className="u-fs-22 u-fw-800 u-color-text">{detailWorker.name}</div>
-                            <div style={{ color: C.textMuted, fontSize: 13 }}>{detailWorker.position || 'Radnik'} • {detailWorker.active !== false ? '🟢 Aktivan' : '🔴 Neaktivan'}</div>
+                            <div className="workers__detail-subtitle">{detailWorker.position || 'Radnik'} • {detailWorker.active !== false ? '🟢 Aktivan' : '🔴 Neaktivan'}</div>
                         </div>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(6, 1fr)', gap: 10, marginBottom: 16 }}>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: C.accentLight }}><div className="u-stat-label">Projekti</div><div style={{ fontSize: 20, fontWeight: 800, color: C.accent }}>{wProjects.length}</div></div>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(29,78,216,0.08)' }}><div className="u-stat-label">Ukupno sati</div><div style={{ fontSize: 20, fontWeight: 800, color: C.blue }}>{Math.round(totalMins / 60)}h</div></div>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(16,185,129,0.08)' }}><div className="u-stat-label">Ovaj mjesec</div><div style={{ fontSize: 20, fontWeight: 800, color: C.green }}>{Math.round(monthMins / 60)}h</div></div>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(4,120,87,0.08)' }}><div className="u-stat-label">Unosi</div><div style={{ fontSize: 20, fontWeight: 800, color: '#047857' }}>{wTimesheets.length}</div></div>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(245,158,11,0.08)' }}><div className="u-stat-label">Prosjek dolaska</div><div style={{ fontSize: 20, fontWeight: 800, color: '#F59E0B' }}>{avgArrival}</div></div>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(124,58,237,0.08)' }}><div className="u-stat-label">Vozilo</div><div style={{ fontSize: 20, fontWeight: 800, color: '#7C3AED' }}>{wVehicle ? '✔️' : '—'}</div></div>
+                    <div className={`workers__stats ${isMobile ? 'workers__stats--mobile' : 'workers__stats--desktop'}`}>
+                        <div className="workers__stat-card workers__stat-card--accent"><div className="u-stat-label">Projekti</div><div className="workers__stat-value">{wProjects.length}</div></div>
+                        <div className="workers__stat-card workers__stat-card--blue"><div className="u-stat-label">Ukupno sati</div><div className="workers__stat-value">{Math.round(totalMins / 60)}h</div></div>
+                        <div className="workers__stat-card workers__stat-card--green"><div className="u-stat-label">Ovaj mjesec</div><div className="workers__stat-value">{Math.round(monthMins / 60)}h</div></div>
+                        <div className="workers__stat-card workers__stat-card--teal"><div className="u-stat-label">Unosi</div><div className="workers__stat-value">{wTimesheets.length}</div></div>
+                        <div className="workers__stat-card workers__stat-card--amber"><div className="u-stat-label">Prosjek dolaska</div><div className="workers__stat-value">{avgArrival}</div></div>
+                        <div className="workers__stat-card workers__stat-card--purple"><div className="u-stat-label">Vozilo</div><div className="workers__stat-value">{wVehicle ? '✔️' : '—'}</div></div>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 8, fontSize: 13 }}>
+                    <div className={`workers__fields-grid ${isMobile ? 'workers__fields-grid--mobile' : 'workers__fields-grid--desktop'}`}>
                         <EditableField label="📞 Tel" value={detailWorker.phone} onSave={v => updateDoc('workers', detailWorker.id, { phone: v })} type="tel" placeholder="Dodaj telefon" />
                         <EditableField label="📧 Email" value={detailWorker.email} onSave={v => updateDoc('workers', detailWorker.id, { email: v })} type="email" placeholder="Dodaj email" />
                         <EditableField label="🆔 OIB" value={detailWorker.oib} onSave={v => updateDoc('workers', detailWorker.id, { oib: v })} placeholder="Dodaj OIB" />
@@ -187,13 +188,13 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                 {/* Hours by day chart */}
                 {hoursByDay.length > 1 && (
                     <div style={styles.card} className="u-mb-20">
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="clock" size={16} /> Sati po danu (zadnjih {hoursByDay.length} dana)</div>
-                        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 120 }}>
+                        <div className="workers__section-title"><Icon name="clock" size={16} /> Sati po danu (zadnjih {hoursByDay.length} dana)</div>
+                        <div className="workers__chart">
                             {hoursByDay.map((d, i) => (
-                                <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                                    <div style={{ fontSize: 10, fontWeight: 700, color: C.accent }}>{d.hours > 0 ? `${d.hours}` : ''}</div>
-                                    <div style={{ width: '100%', minHeight: 4, height: `${Math.max(4, d.hours / Math.max(...hoursByDay.map(x => x.hours), 1) * 80)}px`, background: C.accent, borderRadius: '4px 4px 0 0', transition: 'height 0.3s ease' }} />
-                                    <div style={{ fontSize: 9, color: C.textMuted, transform: 'rotate(-45deg)', transformOrigin: 'top', whiteSpace: 'nowrap' }}>{d.dan}</div>
+                                <div key={i} className="workers__chart-bar-wrap">
+                                    <div className="workers__chart-bar-label">{d.hours > 0 ? `${d.hours}` : ''}</div>
+                                    <div className="workers__chart-bar" style={{ height: `${Math.max(4, d.hours / Math.max(...hoursByDay.map(x => x.hours), 1) * 80)}px` }} />
+                                    <div className="workers__chart-bar-date">{d.dan}</div>
                                 </div>
                             ))}
                         </div>
@@ -202,18 +203,18 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
 
                 {/* Projects with hours */}
                 {wProjects.length > 0 && <div style={styles.card} className="u-mb-20">
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="project" size={16} /> Projekti ({wProjects.length})</div>
+                    <div className="workers__section-title"><Icon name="project" size={16} /> Projekti ({wProjects.length})</div>
                     {projectHours.map(p => (
-                        <div key={p.name} style={{ padding: '10px 0', borderBottom: `1px solid ${C.border}7A` }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                                <span style={{ fontWeight: 600, fontSize: 13, color: C.text }}>{p.name}</span>
+                        <div key={p.name} className="workers__project-row">
+                            <div className="workers__project-row-top">
+                                <span className="workers__project-name">{p.name}</span>
                                 <div className="u-flex-center u-gap-8">
-                                    <span style={{ fontSize: 13, fontWeight: 700, color: C.accent }}>{p.hours}h</span>
+                                    <span className="workers__project-hours">{p.hours}h</span>
                                     <StatusBadge status={p.status} />
                                 </div>
                             </div>
-                            <div style={{ height: 4, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
-                                <div style={{ height: '100%', width: `${p.hours / maxProjectHours * 100}%`, background: C.accent, borderRadius: 2, transition: 'width 0.3s ease' }} />
+                            <div className="workers__progress-track">
+                                <div className="workers__progress-fill" style={{ width: `${p.hours / maxProjectHours * 100}%` }} />
                             </div>
                         </div>
                     ))}
@@ -224,42 +225,42 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
+            <div className="workers__header">
                 <div className="u-fs-22 u-fw-800 u-color-text">Radnici</div>
                 <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> Novi radnik</button>
             </div>
-            <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
-                <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
+            <div className="workers__toolbar">
+                <div className="workers__search-wrap">
                     <Input placeholder="Traži radnika..." value={search} onChange={e => setSearch(e.target.value)} className="u-pl-36" />
-                    <div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: C.textMuted }}><Icon name="search" size={16} /></div>
+                    <div className="workers__search-icon"><Icon name="search" size={16} /></div>
                 </div>
-                <Select value={filterActive} onChange={e => setFilterActive(e.target.value)} style={{ width: 160 }}>
+                <Select value={filterActive} onChange={e => setFilterActive(e.target.value)} className="workers__filter-select">
                     <option value="active">Aktivni</option>
                     <option value="inactive">Neaktivni</option>
                     <option value="all">Svi</option>
                 </Select>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+            <div className={`workers__grid ${isMobile ? 'workers__grid--mobile' : 'workers__grid--desktop'}`}>
                 {paginatedWorkers.map(w => {
                     const wProjects = projects.filter(p => (p.workers || []).includes(w.id));
                     const wHours = timesheets.filter(t => t.workerId === w.id).reduce((s, t) => s + diffMins(t.startTime, t.endTime), 0);
                     return (
-                        <div key={w.id} role="button" tabIndex={0} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && e.currentTarget.click()} style={{ ...styles.card, cursor: 'pointer' }} onClick={() => setDetailId(w.id)}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 12 }}>
-                                <div style={{ width: 44, height: 44, borderRadius: '50%', background: w.active !== false ? C.accentLight : 'rgba(100,116,139,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 800, color: w.active !== false ? C.accent : C.textMuted, flexShrink: 0 }}>{w.name?.charAt(0)}</div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{w.name}</div>
+                        <div key={w.id} role="button" tabIndex={0} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && e.currentTarget.click()} style={styles.card} className="workers__card" onClick={() => setDetailId(w.id)}>
+                            <div className="workers__card-top">
+                                <div className={`workers__avatar ${w.active !== false ? 'workers__avatar--active' : 'workers__avatar--inactive'}`}>{w.name?.charAt(0)}</div>
+                                <div className="workers__card-info">
+                                    <div className="workers__card-name">{w.name}</div>
                                     <div className="u-fs-12 u-text-muted">{w.position || 'Radnik'}{w.phone ? ` • ${w.phone}` : ''}</div>
                                 </div>
                             </div>
-                            <div style={{ display: 'flex', gap: 12, fontSize: 12, color: C.textMuted, marginBottom: 12 }}>
+                            <div className="workers__card-meta">
                                 <span>📂 {wProjects.length} projekata</span>
                                 <span>⏱️ {Math.round(wHours / 60)}h ukupno</span>
                             </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: `1px solid ${C.border}`, paddingTop: 12 }} onClick={e => e.stopPropagation()}>
-                                <span style={{ fontSize: 11, color: w.active !== false ? C.green : C.red, fontWeight: 600 }}>{w.active !== false ? '🟢 Aktivan' : '🔴 Neaktivan'}</span>
-                                <div style={{ display: 'flex', gap: 6 }}>
+                            <div className="workers__card-footer" onClick={e => e.stopPropagation()}>
+                                <span className="workers__card-status" style={{ color: w.active !== false ? C.green : C.red }}>{w.active !== false ? '🟢 Aktivan' : '🔴 Neaktivan'}</span>
+                                <div className="workers__card-actions">
                                     <button onClick={() => toggleActive(w)} style={{ ...styles.btnSmall, fontSize: 11 }}>{w.active !== false ? 'Deaktiviraj' : 'Aktiviraj'}</button>
                                     <button onClick={() => openEdit(w)} style={styles.btnSmall}><Icon name="edit" size={12} /></button>
                                     <button onClick={() => doDelete(w.id)} style={styles.btnDanger}><Icon name="trash" size={12} /></button>
@@ -281,7 +282,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
             {/* Add/Edit Modal */}
             {showForm && (
                 <Modal title={editId ? 'Uredi radnika' : 'Novi radnik'} onClose={() => setShowForm(false)} wide>
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }} className="u-gap-16">
+                    <div className={`workers__form-grid ${isMobile ? 'workers__form-grid--mobile' : 'workers__form-grid--desktop'} u-gap-16`}>
                         <Field label="Ime i prezime" required><Input value={form.name} onChange={e => update('name', e.target.value)} placeholder="Ivan Horvat" autoFocus /></Field>
                         <Field label="Pozicija / Zanimanje"><Input value={form.position} onChange={e => update('position', e.target.value)} placeholder="Zidar, Tesar, Vozač..." /></Field>
                         <Field label="Tel. Broj"><Input type="tel" value={form.phone} onChange={e => update('phone', e.target.value)} placeholder="+385 91 234 5678" /></Field>
@@ -290,9 +291,9 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                         <Field label="Adresa"><Input value={form.address} onChange={e => update('address', e.target.value)} placeholder="Ulica i broj, Grad" /></Field>
 
                     </div>
-                    <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 16, marginTop: 16 }}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="user" size={16} /> Pristup aplikaciji</div>
-                        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: 16 }}>
+                    <div className="workers__form-section">
+                        <div className="workers__section-title"><Icon name="user" size={16} /> Pristup aplikaciji</div>
+                        <div className={`workers__form-access-grid ${isMobile ? 'workers__form-access-grid--mobile' : 'workers__form-access-grid--desktop'}`}>
                             <Field label="Korisničko ime"><Input value={form.username} onChange={e => update('username', e.target.value.toLowerCase())} placeholder="ivan.h" /></Field>
                             <Field label="Lozinka"><Input type="password" value={form.pin} onChange={e => update('pin', e.target.value)} placeholder={editId ? 'Ostavi prazno ako ne mijenjaš' : 'min. 6 znakova'} /></Field>
                             <Field label="Uloga"><Select value={form.role} onChange={e => update('role', e.target.value)}><option value="radnik">Radnik</option><option value="leader">Voditelj</option><option value="admin">Administrator</option></Select></Field>
@@ -300,19 +301,13 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                         {form.role === 'leader' && (
                             <div className="u-mt-12">
                                 <Field label="Projekti voditelja (odaberi koje projekte smije vidjeti)">
-                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                                    <div className="workers__project-tags">
                                         {projects.map(p => {
                                             const selected = (form.assignedProjects || []).includes(p.id);
                                             return (
-                                                <button key={p.id} type="button" onClick={() => {
+                                                <button key={p.id} type="button" className={`workers__project-tag ${selected ? 'workers__project-tag--selected' : 'workers__project-tag--unselected'}`} onClick={() => {
                                                     const cur = form.assignedProjects || [];
                                                     update('assignedProjects', selected ? cur.filter(id => id !== p.id) : [...cur, p.id]);
-                                                }} style={{
-                                                    padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: selected ? 700 : 500,
-                                                    border: `2px solid ${selected ? 'var(--accent)' : C.border}`,
-                                                    background: selected ? 'var(--accent-light)' : 'var(--input-bg)',
-                                                    color: selected ? 'var(--accent)' : 'var(--text-secondary)',
-                                                    cursor: 'pointer', transition: 'all 0.15s',
                                                 }}>
                                                     {selected ? '✓ ' : ''}{p.name}
                                                 </button>
@@ -325,9 +320,9 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                         )}
                     </div>
                     <Field label="Napomene"><Textarea value={form.notes} onChange={e => update('notes', e.target.value)} placeholder="Interne napomene o radniku..." rows={2} /></Field>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: C.textDim }}>
-                            <input type="checkbox" checked={form.active} onChange={e => update('active', e.target.checked)} style={{ accentColor: C.accent }} /> Aktivan
+                    <div className="workers__form-footer">
+                        <label className="workers__form-checkbox">
+                            <input type="checkbox" checked={form.active} onChange={e => update('active', e.target.checked)} /> Aktivan
                         </label>
                     </div>
                     <div className="u-flex-end">

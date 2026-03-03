@@ -1,0 +1,404 @@
+/* ═══════════════════════════════════════════════════════════════
+   WorkersPage — CSS Extracted from inline styles
+   BEM-style naming: .workers__block--modifier
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Header ── */
+.workers__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* ── Search & Filter Bar ── */
+.workers__toolbar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.workers__search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+}
+
+.workers__search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+}
+
+.workers__filter-select {
+    width: 160px;
+}
+
+/* ── Worker Cards Grid ── */
+.workers__grid {
+    display: grid;
+    gap: 16px;
+}
+
+.workers__grid--desktop {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.workers__grid--mobile {
+    grid-template-columns: 1fr;
+}
+
+/* ── Worker Card ── */
+.workers__card {
+    cursor: pointer;
+}
+
+.workers__card-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+}
+
+.workers__avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.workers__avatar--active {
+    background: var(--accent-light);
+    color: var(--accent);
+}
+
+.workers__avatar--inactive {
+    background: rgba(100, 116, 139, 0.15);
+    color: var(--text-muted);
+}
+
+.workers__avatar--large {
+    width: 56px;
+    height: 56px;
+    font-size: 22px;
+}
+
+.workers__card-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.workers__card-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.workers__card-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+
+.workers__card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+}
+
+.workers__card-status {
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.workers__card-actions {
+    display: flex;
+    gap: 6px;
+}
+
+/* ── Detail View ── */
+.workers__detail-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.workers__detail-subtitle {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+/* ── Stats Grid ── */
+.workers__stats {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.workers__stats--desktop {
+    grid-template-columns: repeat(6, 1fr);
+}
+
+.workers__stats--mobile {
+    grid-template-columns: 1fr 1fr;
+}
+
+.workers__stat-card {
+    padding: 12px 16px;
+    border-radius: 10px;
+}
+
+.workers__stat-value {
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.workers__stat-card--accent {
+    background: var(--accent-light);
+}
+
+.workers__stat-card--accent .workers__stat-value {
+    color: var(--accent);
+}
+
+.workers__stat-card--blue {
+    background: rgba(29, 78, 216, 0.08);
+}
+
+.workers__stat-card--blue .workers__stat-value {
+    color: var(--blue, #1D4ED8);
+}
+
+.workers__stat-card--green {
+    background: rgba(16, 185, 129, 0.08);
+}
+
+.workers__stat-card--green .workers__stat-value {
+    color: var(--green, #10B981);
+}
+
+.workers__stat-card--teal {
+    background: rgba(4, 120, 87, 0.08);
+}
+
+.workers__stat-card--teal .workers__stat-value {
+    color: #047857;
+}
+
+.workers__stat-card--amber {
+    background: rgba(245, 158, 11, 0.08);
+}
+
+.workers__stat-card--amber .workers__stat-value {
+    color: #F59E0B;
+}
+
+.workers__stat-card--purple {
+    background: rgba(124, 58, 237, 0.08);
+}
+
+.workers__stat-card--purple .workers__stat-value {
+    color: #7C3AED;
+}
+
+/* ── Contact Fields Grid ── */
+.workers__fields-grid {
+    display: grid;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.workers__fields-grid--desktop {
+    grid-template-columns: 1fr 1fr;
+}
+
+.workers__fields-grid--mobile {
+    grid-template-columns: 1fr;
+}
+
+/* ── Section Title ── */
+.workers__section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ── Bar Chart (Hours by Day) ── */
+.workers__chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 120px;
+}
+
+.workers__chart-bar-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.workers__chart-bar-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.workers__chart-bar {
+    width: 100%;
+    min-height: 4px;
+    background: var(--accent);
+    border-radius: 4px 4px 0 0;
+    transition: height 0.3s ease;
+}
+
+.workers__chart-bar-date {
+    font-size: 9px;
+    color: var(--text-muted);
+    transform: rotate(-45deg);
+    transform-origin: top;
+    white-space: nowrap;
+}
+
+/* ── Project Hours List ── */
+.workers__project-row {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(var(--border-rgb, 0, 0, 0), 0.48);
+}
+
+.workers__project-row-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.workers__project-name {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text);
+}
+
+.workers__project-hours {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.workers__progress-track {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.workers__progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+/* ── Form Modal ── */
+.workers__form-grid {
+    display: grid;
+}
+
+.workers__form-grid--desktop {
+    grid-template-columns: 1fr 1fr;
+}
+
+.workers__form-grid--mobile {
+    grid-template-columns: 1fr;
+}
+
+.workers__form-section {
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    margin-top: 16px;
+}
+
+.workers__form-access-grid {
+    display: grid;
+    gap: 16px;
+}
+
+.workers__form-access-grid--desktop {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.workers__form-access-grid--mobile {
+    grid-template-columns: 1fr;
+}
+
+.workers__form-footer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.workers__form-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-dim);
+}
+
+.workers__form-checkbox input {
+    accent-color: var(--accent);
+}
+
+/* ── Project Tag Buttons ── */
+.workers__project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.workers__project-tag {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.workers__project-tag--selected {
+    font-weight: 700;
+    border: 2px solid var(--accent);
+    background: var(--accent-light);
+    color: var(--accent);
+}
+
+.workers__project-tag--unselected {
+    font-weight: 500;
+    border: 2px solid var(--border);
+    background: var(--input-bg);
+    color: var(--text-secondary);
+}
