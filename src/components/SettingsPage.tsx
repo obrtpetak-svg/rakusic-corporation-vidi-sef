@@ -12,6 +12,8 @@ export function SettingsPage({ workerFilterId }) {
         loadDeletedItems, cleanupOldDeleted, changePassword, exportUserData } = useApp();
     const [editing, setEditing] = useState(false);
     const [trashItems, setTrashItems] = useState(null);
+    const [provisionStatus, setProvisionStatus] = useState('');
+    const [provisionLoading, setProvisionLoading] = useState(false);
     const [trashLoading, setTrashLoading] = useState(false);
     // User management state
     const [showAddUser, setShowAddUser] = useState(false);
@@ -390,6 +392,42 @@ export function SettingsPage({ workerFilterId }) {
                         </button>
                     </div>
 
+                    {/* Bulk Provision Firebase Auth */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 10, background: 'rgba(16,185,129,0.04)', border: '1px solid rgba(16,185,129,0.12)', marginTop: 12 }}>
+                        <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>👥 Aktiviraj prijavu za sve radnike</div>
+                            <div style={{ fontSize: 11, color: C.textMuted }}>Kreira Firebase Auth račune za sve radnike koji ih nemaju (ista lozinka za sve).</div>
+                        </div>
+                        <button onClick={async () => {
+                            if (!(await confirm('Kreirati Firebase Auth račune za sve radnike s lozinkom RakusicCorp2026.! ?'))) return;
+                            setProvisionLoading(true); setProvisionStatus('');
+                            try {
+                                const { getAuth: ga } = await import('../context/firebaseCore');
+                                const auth = ga();
+                                if (!auth?.currentUser) throw new Error('Niste prijavljeni');
+                                const token = await auth.currentUser.getIdToken();
+                                const resp = await fetch('/api/admin/bulk-provision', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                                    body: JSON.stringify({ defaultPassword: 'RakusicCorp2026.!' }),
+                                });
+                                const data = await resp.json();
+                                if (resp.ok) {
+                                    setProvisionStatus(`✅ ${data.summary}`);
+                                    await addAuditLog('BULK_PROVISION', data.summary);
+                                } else {
+                                    setProvisionStatus(`❌ ${data.error}`);
+                                }
+                            } catch (e: any) {
+                                setProvisionStatus(`❌ ${e.message}`);
+                            }
+                            setProvisionLoading(false);
+                        }} disabled={provisionLoading} style={{ ...styles.btnSmall, color: C.green, borderColor: 'rgba(16,185,129,0.3)', padding: '8px 14px', fontWeight: 700, whiteSpace: 'nowrap', opacity: provisionLoading ? 0.5 : 1 }}>
+                            {provisionLoading ? '⏳ Kreiram...' : '🔑 Aktiviraj sve'}
+                        </button>
+                    </div>
+                    {provisionStatus && <div style={{ fontSize: 12, fontWeight: 600, color: provisionStatus.startsWith('✅') ? C.green : C.red, marginTop: 8, padding: '8px 12px', borderRadius: 8, background: provisionStatus.startsWith('✅') ? 'rgba(16,185,129,0.06)' : 'rgba(239,68,68,0.06)' }}>{provisionStatus}</div>}
+
                     {/* Sync Mode */}
                     <div style={{ marginTop: 20, padding: '16px', borderRadius: 10, background: 'rgba(99,102,241,0.04)', border: '1px solid rgba(99,102,241,0.12)' }}>
                         <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 4 }}>🔄 Način sinkronizacije</div>
@@ -504,16 +542,20 @@ export function SettingsPage({ workerFilterId }) {
                                     if (!/[0-9]/.test(userForm.password)) { setUserMsg('❌ Lozinka mora sadržavati barem 1 broj'); return; }
                                     // Check duplicate username
                                     if (users?.some(u => u.username === userForm.username.trim())) { setUserMsg('❌ Korisničko ime već postoji'); return; }
-                                    // Create Firebase Auth account
-                                    const auth = (window as any).firebase?.auth();
-                                    if (auth) {
-                                        const email = `${userForm.username.trim()}@rakusic-corporation.live`;
-                                        const wrapped = userForm.password;
-                                        try {
-                                            await auth.createUserWithEmailAndPassword(email, wrapped);
-                                        } catch (authErr: any) {
-                                            if (authErr.code !== 'auth/email-already-in-use') throw authErr;
+                                    // Create Firebase Auth account via API
+                                    try {
+                                        const { getAuth: ga } = await import('../context/firebaseCore');
+                                        const authObj = ga();
+                                        if (authObj?.currentUser) {
+                                            const tok = await authObj.currentUser.getIdToken();
+                                            await fetch('/api/admin/create-user', {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${tok}` },
+                                                body: JSON.stringify({ username: userForm.username.trim(), password: userForm.password, displayName: userForm.name.trim() }),
+                                            });
                                         }
+                                    } catch (authErr: any) {
+                                        console.warn('[Settings] Firebase Auth provision error:', authErr);
                                     }
                                     const newUser = { id: genId(), name: userForm.name.trim(), username: userForm.username.trim(), role: userForm.role, createdAt: new Date().toISOString(), createdBy: currentUser?.name || 'admin' };
                                     await add('users', newUser);
