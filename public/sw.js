@@ -4,8 +4,8 @@
 // Offline fallback page when network unavailable
 // ═══════════════════════════════════════════════════════
 
-const CACHE_STATIC = 'vidisef-static-v4';
-const CACHE_PAGES = 'vidisef-pages-v4';
+const CACHE_STATIC = 'vidisef-static-v5';
+const CACHE_PAGES = 'vidisef-pages-v5';
 const CACHE_FONTS = 'vidisef-fonts-v1';
 
 // App shell — pre-cache on install for instant offline start
