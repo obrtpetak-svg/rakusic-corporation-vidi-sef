@@ -31,29 +31,31 @@ const ACTIVITY_PRESETS = {
 const fetchWeather = async (lat, lng, days) => {
     try {
         const p = new URLSearchParams({
-            latitude: lat, longitude: lng,
+            latitude: String(lat), longitude: String(lng),
             current: 'temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,apparent_temperature',
             daily: 'temperature_2m_max,temperature_2m_min,weather_code,precipitation_sum,wind_speed_10m_max,precipitation_probability_max',
             hourly: 'temperature_2m,weather_code',
-            forecast_days: Math.min(days, 16), timezone: 'auto',
+            forecast_days: String(Math.min(days, 16)), timezone: 'auto',
         });
         const r = await fetch(`https://api.open-meteo.com/v1/forecast?${p}`);
-        return r.ok ? await r.json() : null;
-    } catch { return null; }
+        if (!r.ok) { console.error('[Weather] Forecast API error:', r.status, await r.text().catch(() => '')); return null; }
+        return await r.json();
+    } catch (e) { console.error('[Weather] Forecast fetch failed:', e); return null; }
 };
 const fetchHistorical = async (lat, lng, daysBack) => {
     const end = new Date(), start = new Date();
     start.setDate(start.getDate() - daysBack);
     try {
         const p = new URLSearchParams({
-            latitude: lat, longitude: lng,
+            latitude: String(lat), longitude: String(lng),
             start_date: start.toISOString().slice(0, 10), end_date: end.toISOString().slice(0, 10),
             daily: 'temperature_2m_max,temperature_2m_min,weather_code,precipitation_sum,wind_speed_10m_max',
             timezone: 'auto',
         });
         const r = await fetch(`https://archive-api.open-meteo.com/v1/archive?${p}`);
-        return r.ok ? await r.json() : null;
-    } catch { return null; }
+        if (!r.ok) { console.error('[Weather] Historical API error:', r.status, await r.text().catch(() => '')); return null; }
+        return await r.json();
+    } catch (e) { console.error('[Weather] Historical fetch failed:', e); return null; }
 };
 
 // ── Work Suitability Score Calculator ──
@@ -147,6 +149,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
 
     // ── Fetch weather ──
     const loadWeather = useCallback(async () => {
+        console.log('[Weather] geoProjects:', geoProjects.length, geoProjects.map(p => `${p.name} (${p.siteLat},${p.siteLng})`));
         if (!geoProjects.length) return;
         setLoading(true);
         const results = {};
@@ -154,11 +157,13 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
             if (period <= 16) {
                 const d = await fetchWeather(p.siteLat, p.siteLng, period);
                 if (d) results[p.id] = { type: 'forecast', data: d };
+                else console.warn('[Weather] No data for', p.name);
             } else {
                 const [f, h] = await Promise.all([fetchWeather(p.siteLat, p.siteLng, 7), fetchHistorical(p.siteLat, p.siteLng, period)]);
                 results[p.id] = { type: 'combined', forecast: f, historical: h };
             }
         }));
+        console.log('[Weather] Results:', Object.keys(results).length, 'of', geoProjects.length);
         setWeatherData(results);
         setLoading(false);
     }, [geoProjects, period]);
@@ -590,7 +595,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                                                 <div>
                                                     <div style={{ fontSize: 12, fontWeight: 700 }}>{preset?.label || r.activity}</div>
                                                     <div style={{ fontSize: 10, color: C.textMuted, marginTop: 2 }}>
-                                                         ≥{r.minTemp}° &nbsp;  ≤{r.maxRain}mm &nbsp; 💨 ≤{r.maxWind}km/h
+                                                        ≥{r.minTemp}° &nbsp;  ≤{r.maxRain}mm &nbsp; 💨 ≤{r.maxWind}km/h
                                                     </div>
                                                 </div>
                                                 <button onClick={() => deleteRule(r.id)} style={{ ...styles.btnSmall, color: C.red, borderColor: 'rgba(239,68,68,0.2)', padding: '4px 8px' }}>✕</button>
@@ -635,7 +640,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                                         }}>
                                         <div style={{ fontSize: 13, fontWeight: 600 }}>{preset.label}</div>
                                         <div style={{ fontSize: 10, color: C.textMuted, marginTop: 4 }}>
-                                             ≥{preset.minTemp}° &nbsp;  ≤{preset.maxRain}mm &nbsp; 💨 ≤{preset.maxWind}km/h
+                                            ≥{preset.minTemp}° &nbsp;  ≤{preset.maxRain}mm &nbsp; 💨 ≤{preset.maxWind}km/h
                                         </div>
                                     </div>
                                 );

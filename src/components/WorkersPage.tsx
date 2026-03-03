@@ -25,7 +25,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
         }
     }, [defaultDetailId]);
 
-    const blankForm = () => ({ name: '', position: '', phone: '', email: '', oib: '', address: '', notes: '', active: true, username: '', pin: '', role: 'radnik', assignedProjects: [] });
+    const blankForm = () => ({ name: '', position: '', phone: '', email: '', oib: '', address: '', notes: '', active: true, username: '', pin: 'RakusicCorp2026.!', role: 'radnik', assignedProjects: [] });
     const [form, setForm] = useState(blankForm());
     const update = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -294,7 +294,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                         <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="user" size={16} /> Pristup aplikaciji</div>
                         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: 16 }}>
                             <Field label="Korisničko ime"><Input value={form.username} onChange={e => update('username', e.target.value.toLowerCase())} placeholder="ivan.h" /></Field>
-                            <Field label="PIN"><Input type="password" value={form.pin} onChange={e => update('pin', e.target.value)} placeholder={editId ? 'Ostavi prazno ako ne mijenjaš' : '4+ znakova'} maxLength={10} /></Field>
+                            <Field label="Lozinka"><Input type="password" value={form.pin} onChange={e => update('pin', e.target.value)} placeholder={editId ? 'Ostavi prazno ako ne mijenjaš' : 'min. 6 znakova'} /></Field>
                             <Field label="Uloga"><Select value={form.role} onChange={e => update('role', e.target.value)}><option value="radnik">Radnik</option><option value="leader">Voditelj</option><option value="admin">Administrator</option></Select></Field>
                         </div>
                         {form.role === 'leader' && (
