@@ -406,10 +406,10 @@ export function SettingsPage({ workerFilterId }) {
                                 const auth = ga();
                                 if (!auth?.currentUser) throw new Error('Niste prijavljeni');
                                 const token = await auth.currentUser.getIdToken();
-                                const resp = await fetch('/api/admin/bulk-provision', {
+                                const resp = await fetch('/api/admin', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                                    body: JSON.stringify({ defaultPassword: 'RakusicCorp2026.!' }),
+                                    body: JSON.stringify({ action: 'bulk-provision', defaultPassword: 'RakusicCorp2026.!' }),
                                 });
                                 const data = await resp.json();
                                 if (resp.ok) {
@@ -548,10 +548,10 @@ export function SettingsPage({ workerFilterId }) {
                                         const authObj = ga();
                                         if (authObj?.currentUser) {
                                             const tok = await authObj.currentUser.getIdToken();
-                                            await fetch('/api/admin/create-user', {
+                                            await fetch('/api/admin', {
                                                 method: 'POST',
                                                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${tok}` },
-                                                body: JSON.stringify({ username: userForm.username.trim(), password: userForm.password, displayName: userForm.name.trim() }),
+                                                body: JSON.stringify({ action: 'create-user', username: userForm.username.trim(), password: userForm.password, displayName: userForm.name.trim() }),
                                             });
                                         }
                                     } catch (authErr: any) {

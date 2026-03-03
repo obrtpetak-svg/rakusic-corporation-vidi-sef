@@ -60,10 +60,10 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                     const auth = (await import('../context/firebaseCore')).getAuth();
                     if (!auth?.currentUser) return;
                     const token = await auth.currentUser.getIdToken();
-                    const resp = await fetch('/api/admin/create-user', {
+                    const resp = await fetch('/api/admin', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                        body: JSON.stringify({ username, password, displayName }),
+                        body: JSON.stringify({ action: 'create-user', username, password, displayName }),
                     });
                     const data = await resp.json();
                     if (!resp.ok) console.warn('[Worker] Firebase Auth provision failed:', data.error);
