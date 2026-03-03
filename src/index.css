@@ -1860,6 +1860,19 @@ a,
   overflow-x: auto;
 }
 
+/* Screen-reader only — visually hidden, accessible to assistive tech */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 /* ═══ SKELETON LAYOUT (LazyFallback) ═══ */
 
 .skel-root {
@@ -1969,8 +1982,14 @@ a,
 }
 
 /* Flex helpers for skeleton */
-.skel-flex-1 { flex: 1; }
-.skel-gap-6 { display: flex; gap: 6px; }
+.skel-flex-1 {
+  flex: 1;
+}
+
+.skel-gap-6 {
+  display: flex;
+  gap: 6px;
+}
 
 /* Smooth theme transition for all elements */
 *,

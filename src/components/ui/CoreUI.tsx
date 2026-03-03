@@ -38,19 +38,19 @@ const iconPaths = {
     gauge: 'M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 0v4m0 14v-2M4.93 4.93l2.83 2.83m8.48 8.48l1.41 1.41M2 12h4m14 0h-4M4.93 19.07l2.83-2.83m8.48-8.48l1.41-1.41M12 8l2 4h-4l2-4z'
 };
 
-export const Icon = ({ name, size = 20 }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+export const Icon = ({ name, size = 20, ariaLabel = undefined }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden={!ariaLabel} aria-label={ariaLabel} role={ariaLabel ? 'img' : undefined}>
         <path d={iconPaths[name] || iconPaths.file} />
     </svg>
 );
 
 // ── Modal ────────────────────────────────────────────────────────────────
 export const Modal = ({ title, onClose, children, wide }) => (
-    <div className="modal-overlay">
+    <div className="modal-overlay" role="dialog" aria-modal="true" aria-label={title}>
         <div className={`modal${wide ? ' modal-wide' : ''}`}>
             <div className="modal-header">
-                <div className="modal-title">{title}</div>
-                <button onClick={onClose} className="modal-close"><Icon name="close" size={20} /></button>
+                <div className="modal-title" id="modal-title">{title}</div>
+                <button onClick={onClose} className="modal-close" aria-label="Zatvori"><Icon name="close" size={20} /></button>
             </div>
             <div className="modal-body">{children}</div>
         </div>
@@ -60,7 +60,7 @@ export const Modal = ({ title, onClose, children, wide }) => (
 // ── Form Components ──────────────────────────────────────────────────────
 export const Field = ({ label, children, required }) => (
     <div className="form-group">
-        <label className="form-label">{label}{required && <span style={{ color: 'var(--accent)' }}> *</span>}</label>
+        <label className="form-label">{label}{required && <span style={{ color: 'var(--accent)' }} aria-hidden="true"> *</span>}{required && <span className="sr-only"> (obavezno)</span>}</label>
         {children}
     </div>
 );
@@ -87,8 +87,8 @@ export const StatusBadge = memo(({ status }) => {
 
 // ── StatCard ─────────────────────────────────────────────────────────────
 export const StatCard = memo(({ label, value, icon, color = C.accent, sub }) => (
-    <div className="stat-card">
-        <div className="stat-icon" style={{ background: `rgba(${hexToRgb(color)},0.15)`, color }}>
+    <div className="stat-card" role="group" aria-label={label}>
+        <div className="stat-icon" style={{ background: `rgba(${hexToRgb(color)},0.15)`, color }} aria-hidden="true">
             <Icon name={icon} size={24} />
         </div>
         <div>

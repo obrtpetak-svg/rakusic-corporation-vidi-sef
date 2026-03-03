@@ -42,19 +42,19 @@ const iconPaths = {
     gauge: 'M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 0v4m0 14v-2M4.93 4.93l2.83 2.83m8.48 8.48l1.41 1.41M2 12h4m14 0h-4M4.93 19.07l2.83-2.83m8.48-8.48l1.41-1.41M12 8l2 4h-4l2-4z'
 };
 
-export const Icon = ({ name, size = 20 }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+export const Icon = ({ name, size = 20, ariaLabel = undefined }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden={!ariaLabel} aria-label={ariaLabel} role={ariaLabel ? 'img' : undefined}>
         <path d={iconPaths[name] || iconPaths.file} />
     </svg>
 );
 
 // ── Modal ────────────────────────────────────────────────────────────────
 export const Modal = ({ title, onClose, children, wide }) => (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px 12px' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px 12px' }} role="dialog" aria-modal="true" aria-label={title}>
         <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, width: '100%', maxWidth: wide ? 820 : 560, position: 'relative', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
                 <div style={{ fontSize: 18, fontWeight: 700, color: C.text }}>{title}</div>
-                <button onClick={onClose} style={{ background: 'none', border: 'none', color: C.textMuted, cursor: 'pointer' }}><Icon name="close" size={20} /></button>
+                <button onClick={onClose} style={{ background: 'none', border: 'none', color: C.textMuted, cursor: 'pointer' }} aria-label="Zatvori"><Icon name="close" size={20} /></button>
             </div>
             <div style={{ padding: 24, overflowY: 'auto', flex: 1, WebkitOverflowScrolling: 'touch' }}>{children}</div>
         </div>
@@ -64,7 +64,7 @@ export const Modal = ({ title, onClose, children, wide }) => (
 // ── Form Components ──────────────────────────────────────────────────────
 export const Field = ({ label, children, required }) => (
     <div style={{ marginBottom: 16 }}>
-        <label style={styles.label}>{label}{required && <span style={{ color: C.accent }}> *</span>}</label>
+        <label style={styles.label}>{label}{required && <span style={{ color: C.accent }} aria-hidden="true"> *</span>}{required && <span className="sr-only"> (obavezno)</span>}</label>
         {children}
     </div>
 );
@@ -89,8 +89,8 @@ export const StatusBadge = ({ status }) => {
 
 // ── StatCard ─────────────────────────────────────────────────────────────
 export const StatCard = ({ label, value, icon, color = C.accent, sub }) => (
-    <div style={{ ...styles.card, display: 'flex', alignItems: 'center', gap: 16 }}>
-        <div style={{ background: `rgba(${hexToRgb(color)},0.15)`, borderRadius: 12, padding: 14, color }}>
+    <div style={{ ...styles.card, display: 'flex', alignItems: 'center', gap: 16 }} role="group" aria-label={label}>
+        <div style={{ background: `rgba(${hexToRgb(color)},0.15)`, borderRadius: 12, padding: 14, color }} aria-hidden="true">
             <Icon name={icon} size={24} />
         </div>
         <div>
@@ -120,7 +120,7 @@ export const WorkerCheckboxList = ({ allWorkers, selected, onChange }) => {
         : allWorkers;
     return (
         <div ref={ref} style={{ position: 'relative' }}>
-            <button type="button" onClick={() => { setOpen(v => !v); setSearch(''); }} style={{ ...styles.input, textAlign: 'left', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <button type="button" onClick={() => { setOpen(v => !v); setSearch(''); }} style={{ ...styles.input, textAlign: 'left', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} aria-haspopup="listbox" aria-expanded={open}>
                 <span style={{ color: names.length > 0 ? C.text : C.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '90%' }}>
                     {names.length > 0 ? names.join(', ') : '— Odaberite radnike —'}
                 </span>
@@ -144,7 +144,7 @@ export const WorkerCheckboxList = ({ allWorkers, selected, onChange }) => {
                         {filtered.map(w => {
                             const checked = selected.includes(w.id);
                             return (
-                                <div key={w.id} onClick={() => toggle(w.id)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 16px', cursor: 'pointer', borderBottom: `1px solid ${C.border}`, background: checked ? C.accentLight : 'transparent' }}>
+                                <div key={w.id} onClick={() => toggle(w.id)} role="option" aria-selected={checked} tabIndex={0} onKeyDown={e => e.key === 'Enter' && toggle(w.id)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 16px', cursor: 'pointer', borderBottom: `1px solid ${C.border}`, background: checked ? C.accentLight : 'transparent' }}>
                                     <div style={{ width: 18, height: 18, borderRadius: 5, border: `2px solid ${checked ? C.accent : C.border}`, background: checked ? C.accent : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                                         {checked && <Icon name="check" size={12} />}
                                     </div>
@@ -352,7 +352,7 @@ export const Pagination = ({ currentPage, totalPages, pageSize, setCurrentPage, 
     const btnDisabled = { ...btnBase, opacity: 0.4, cursor: 'default' };
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderTop: `1px solid ${C.border}`, flexWrap: 'wrap', gap: 8 }}>
+        <nav aria-label="Straničenje" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderTop: `1px solid ${C.border}`, flexWrap: 'wrap', gap: 8 }}>
             <div style={{ fontSize: 12, color: C.textMuted }}>
                 Prikazano <b style={{ color: C.text }}>{showingFrom}–{showingTo}</b> od <b style={{ color: C.text }}>{totalItems}</b> {label}
             </div>
@@ -373,7 +373,7 @@ export const Pagination = ({ currentPage, totalPages, pageSize, setCurrentPage, 
                     <option value={200}>200</option>
                 </select>
             </div>
-        </div>
+        </nav>
     );
 };
 
