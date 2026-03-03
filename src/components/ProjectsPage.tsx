@@ -245,7 +245,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                                         </div>
                                     ) : (
                                         <div style={{ height: 140, background: 'rgba(128,128,128,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                            <div style={{ textAlign: 'center' }}><Icon name="file" size={32} /><div style={{ fontSize: 11, color: C.textMuted, marginTop: 4 }}>{f.type || 'File'}</div></div>
+                                            <div className="u-text-center"><Icon name="file" size={32} /><div style={{ fontSize: 11, color: C.textMuted, marginTop: 4 }}>{f.type || 'File'}</div></div>
                                         </div>
                                     )}
                                     <div style={{ padding: '8px 12px' }}>
@@ -270,7 +270,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                                 return (
                                     <div key={w.id} onClick={() => onNavigate && onNavigate('radnici', w.id)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderRadius: 10, background: isLeader ? 'rgba(29,78,216,0.06)' : isEngineer ? 'rgba(4,120,87,0.06)' : 'var(--bg)', border: `1px solid ${isLeader ? 'rgba(29,78,216,0.2)' : isEngineer ? 'rgba(4,120,87,0.2)' : C.border}`, cursor: onNavigate ? 'pointer' : 'default', transition: 'transform 0.15s, box-shadow 0.15s' }} onMouseEnter={e => { if (onNavigate) { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'; } }} onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}>
                                         <div style={{ width: 36, height: 36, borderRadius: '50%', background: C.accentLight, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.accent, fontWeight: 800, fontSize: 14, flexShrink: 0 }}>{w.name?.charAt(0)}</div>
-                                        <div style={{ flex: 1 }}>
+                                        <div className="u-flex-1">
                                             <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{w.name} {isLeader && <span style={{ fontSize: 10, color: C.blue }}>👷 Voditelj</span>} {isEngineer && <span style={{ fontSize: 10, color: C.green }}> Inženjer</span>}</div>
                                             <div className="u-fs-11" style={{ color: C.textMuted }}>{w.position || 'Radnik'} • {Math.round(wHours / 60)}h</div>
                                         </div>
@@ -305,7 +305,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
 
                 {/* Project Obligations */}
                 <div style={{ ...styles.card, marginBottom: 20 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                    <div className="u-flex-between u-mb-16">
                         <div style={{ fontSize: 14, fontWeight: 700, color: C.text, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="warning" size={16} /> Obaveze ({detailObaveze.filter(o => o.active).length} aktivnih)</div>
                         {!isWorker && <button onClick={openObAdd} style={styles.btnSmall}><Icon name="plus" size={12} /> Nova obaveza</button>}
                     </div>
@@ -319,7 +319,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                                         <button onClick={() => toggleOb(ob)} style={{ background: 'none', border: `2px solid ${ob.active ? (isOverdue ? C.red : C.accent) : C.green}`, borderRadius: 5, width: 20, height: 20, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 2 }}>
                                             {!ob.active && <span style={{ color: C.green, fontSize: 12 }}>✓</span>}
                                         </button>
-                                        <div style={{ flex: 1 }}>
+                                        <div className="u-flex-1">
                                             <div style={{ fontWeight: 600, fontSize: 13, color: ob.active ? C.text : C.textMuted, textDecoration: ob.active ? 'none' : 'line-through' }}>{ob.title}</div>
                                             {ob.description && <div className="u-fs-12" style={{ color: C.textMuted, marginTop: 2 }}>{ob.description}</div>}
                                             <div style={{ display: 'flex', gap: 8, marginTop: 4, fontSize: 11, color: C.textMuted, flexWrap: 'wrap' }}>
@@ -338,12 +338,12 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
 
                 {/* Faze rada (Work Phases) */}
                 <div style={{ ...styles.card, marginBottom: 20 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                    <div className="u-flex-between u-mb-16">
                         <div style={{ fontSize: 14, fontWeight: 700, color: C.text, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="check" size={16} /> Faze rada ({detailPhases.filter(p => p.status === 'done').length}/{detailPhases.length})</div>
                     </div>
                     {/* Progress bar */}
                     {detailPhases.length > 0 && (
-                        <div style={{ marginBottom: 16 }}>
+                        <div className="u-mb-16">
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: C.textMuted, marginBottom: 4 }}>
                                 <span>Napredak</span>
                                 <span style={{ fontWeight: 700, color: detailPhases.every(p => p.status === 'done') ? C.green : C.accent }}>{Math.round(detailPhases.filter(p => p.status === 'done').length / detailPhases.length * 100)}%</span>
@@ -360,7 +360,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                                     <button onClick={() => togglePhase(ph.id)} disabled={!canManagePhases} style={{ border: `2px solid ${ph.status === 'done' ? C.green : C.accent}`, borderRadius: 5, width: 22, height: 22, cursor: canManagePhases ? 'pointer' : 'default', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 2, background: ph.status === 'done' ? C.green : 'transparent' }}>
                                         {ph.status === 'done' && <span style={{ color: '#fff', fontSize: 12, fontWeight: 800 }}>✓</span>}
                                     </button>
-                                    <div style={{ flex: 1 }}>
+                                    <div className="u-flex-1">
                                         <div style={{ fontWeight: 600, fontSize: 14, color: ph.status === 'done' ? C.textMuted : C.text, textDecoration: ph.status === 'done' ? 'line-through' : 'none' }}>
                                             <span style={{ fontSize: 12, fontWeight: 700, color: C.accent, marginRight: 6 }}>{i + 1}.</span>{ph.name}
                                         </div>
@@ -470,7 +470,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
             <div style={{ ...styles.card, marginBottom: 20, padding: '12px 16px' }}>
                 <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
                     <div style={{ position: 'relative', flex: 1, minWidth: 180 }}>
-                        <Input placeholder="Pretraži projekt, lokaciju, klijenta..." value={search} onChange={e => setSearch(e.target.value)} style={{ paddingLeft: 36 }} />
+                        <Input placeholder="Pretraži projekt, lokaciju, klijenta..." value={search} onChange={e => setSearch(e.target.value)} className="u-pl-36" />
                         <div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: C.textMuted }}><Icon name="search" size={16} /></div>
                     </div>
                     <Select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ width: 140 }}>
@@ -520,7 +520,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                     return (
                         <div key={p.id} role="button" tabIndex={0} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setDetailId(p.id)} style={{ ...styles.card, cursor: 'pointer', transition: 'all 0.2s', borderLeft: `4px solid ${p.status === 'aktivan' ? '#10B981' : p.status === 'završen' ? '#6366F1' : p.status === 'pausa' ? '#F59E0B' : '#3B82F6'}` }} onClick={() => setDetailId(p.id)} onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,0,0,0.1)'; e.currentTarget.style.transform = 'translateY(-2px)'; }} onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'none'; }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-                                <div style={{ flex: 1 }}>
+                                <div className="u-flex-1">
                                     <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{p.name}</div>
                                     {p.location && <div className="u-fs-12" style={{ color: C.textMuted, marginTop: 2 }}>📍 {p.location} {p.siteLat ? <span style={{ fontSize: 9, color: '#10B981', fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: 'rgba(16,185,129,0.1)', marginLeft: 4 }}>GPS ✓</span> : <span style={{ fontSize: 9, color: '#F59E0B', fontWeight: 600, padding: '1px 5px', borderRadius: 4, background: 'rgba(245,158,11,0.08)', marginLeft: 4 }}>Bez GPS</span>}</div>}
                                 </div>
@@ -529,10 +529,10 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                             {p.client && <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 8 }}>🏢 {p.client}</div>}
                             {leader && <div style={{ fontSize: 12, color: C.blue, marginBottom: 8 }}>👷 Voditelj: {leader.name}</div>}
                             <div style={{ display: 'grid', gridTemplateColumns: isWorker ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 8, marginBottom: 12, padding: '10px 0', borderTop: `1px solid ${C.border}7A`, borderBottom: `1px solid ${C.border}7A` }}>
-                                <div style={{ textAlign: 'center' }}><div style={{ fontSize: 16, fontWeight: 800, color: C.accent }}>{pWorkers.length}</div><div style={{ fontSize: 10, color: C.textMuted }}>Radnika</div></div>
-                                <div style={{ textAlign: 'center' }}><div style={{ fontSize: 16, fontWeight: 800, color: C.blue }}>{Math.round(pHours / 60)}h</div><div style={{ fontSize: 10, color: C.textMuted }}>Sati</div></div>
-                                {!isWorker && <div style={{ textAlign: 'center' }}><div style={{ fontSize: 16, fontWeight: 800, color: '#7C3AED' }}>{pTimesheets.length}</div><div style={{ fontSize: 10, color: C.textMuted }}>Unosa</div></div>}
-                                {!isWorker && <div style={{ textAlign: 'center' }}><div style={{ fontSize: 16, fontWeight: 800, color: pCosts > 0 ? '#EF4444' : C.textDim }}>{pCosts > 0 ? `${pCosts.toFixed(0)}€` : '—'}</div><div style={{ fontSize: 10, color: C.textMuted }}>Troškovi</div></div>}
+                                <div className="u-text-center"><div style={{ fontSize: 16, fontWeight: 800, color: C.accent }}>{pWorkers.length}</div><div style={{ fontSize: 10, color: C.textMuted }}>Radnika</div></div>
+                                <div className="u-text-center"><div style={{ fontSize: 16, fontWeight: 800, color: C.blue }}>{Math.round(pHours / 60)}h</div><div style={{ fontSize: 10, color: C.textMuted }}>Sati</div></div>
+                                {!isWorker && <div className="u-text-center"><div style={{ fontSize: 16, fontWeight: 800, color: '#7C3AED' }}>{pTimesheets.length}</div><div style={{ fontSize: 10, color: C.textMuted }}>Unosa</div></div>}
+                                {!isWorker && <div className="u-text-center"><div style={{ fontSize: 16, fontWeight: 800, color: pCosts > 0 ? '#EF4444' : C.textDim }}>{pCosts > 0 ? `${pCosts.toFixed(0)}€` : '—'}</div><div style={{ fontSize: 10, color: C.textMuted }}>Troškovi</div></div>}
                             </div>
                             {/* Worker avatars */}
                             {pWorkers.length > 0 && (
@@ -567,12 +567,12 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
             {/* Add/Edit Modal */}
             {showForm && (
                 <Modal title={editId ? 'Uredi projekt' : 'Novi projekt'} onClose={() => setShowForm(false)} wide>
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }} className="u-gap-16">
                         <Field label="Naziv projekta" required><Input value={form.name} onChange={e => update('name', e.target.value)} placeholder="Naziv gradilišta / projekta" autoFocus /></Field>
                         <Field label="Status"><Select value={form.status} onChange={e => update('status', e.target.value)}><option value="aktivan">Aktivan</option><option value="planiran">Planiran</option><option value="pausa">Pauza</option><option value="završen">Završen</option></Select></Field>
                         <Field label="Lokacija">
-                            <div style={{ display: 'flex', gap: 8 }}>
-                                <Input value={form.location} onChange={e => update('location', e.target.value)} placeholder="Adresa / grad" style={{ flex: 1 }} />
+                            <div className="u-flex-gap-8">
+                                <Input value={form.location} onChange={e => update('location', e.target.value)} placeholder="Adresa / grad" className="u-flex-1" />
                                 <button type="button" disabled={geocoding || !form.location.trim()} onClick={async () => {
                                     setGeocoding(true);
                                     try {
@@ -630,7 +630,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                             <input type="file" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx" onChange={handleFileUpload} style={{ display: 'none' }} />
                         </label>
                     </Field>
-                    <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 20 }}>
+                    <div className="u-flex-end">
                         <button onClick={() => setShowForm(false)} style={styles.btnSecondary}>Odustani</button>
                         <button onClick={doSave} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
                     </div>

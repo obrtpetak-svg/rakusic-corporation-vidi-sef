@@ -279,7 +279,7 @@ export default function GpsReportTab({
 
     // ═══════════════════════════════════ PRESENCE BAR ══
     const PresenceBar = ({ pct }) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div className="u-flex-center u-gap-8">
             <div style={{ flex: 1, height: 8, borderRadius: 4, background: `${C.border}30`, overflow: 'hidden', minWidth: 60 }}>
                 <div style={{
                     height: '100%', borderRadius: 4, width: `${Math.min(100, pct)}%`,
@@ -365,7 +365,7 @@ export default function GpsReportTab({
                     ))}
                 </div>
 
-                <div style={{ display: 'flex', gap: 8 }}>
+                <div className="u-flex-gap-8">
                     <button onClick={exportCSV} style={{ ...styles.btnSmall, fontSize: 12 }}>
                         📊 Excel/CSV
                     </button>

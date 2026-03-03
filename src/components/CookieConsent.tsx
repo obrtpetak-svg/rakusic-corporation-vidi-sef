@@ -48,7 +48,7 @@ export function CookieConsent() {
                         </button>
                     </div>
                 </div>
-                <div style={{ display: 'flex', gap: 8 }}>
+                <div className="u-flex-gap-8">
                     <button onClick={decline} style={{ ...styles.btnSecondary, padding: '8px 16px', fontSize: 13 }}>
                         Odbij
                     </button>

@@ -63,7 +63,7 @@ export const Modal = ({ title, onClose, children, wide }) => (
 
 // ── Form Components ──────────────────────────────────────────────────────
 export const Field = ({ label, children, required }) => (
-    <div style={{ marginBottom: 16 }}>
+    <div className="u-mb-16">
         <label style={styles.label}>{label}{required && <span style={{ color: C.accent }} aria-hidden="true"> *</span>}{required && <span className="sr-only"> (obavezno)</span>}</label>
         {children}
     </div>
@@ -119,7 +119,7 @@ export const WorkerCheckboxList = ({ allWorkers, selected, onChange }) => {
         ? allWorkers.filter(w => w.name?.toLowerCase().includes(search.toLowerCase()))
         : allWorkers;
     return (
-        <div ref={ref} style={{ position: 'relative' }}>
+        <div ref={ref} className="u-relative">
             <button type="button" onClick={() => { setOpen(v => !v); setSearch(''); }} style={{ ...styles.input, textAlign: 'left', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} aria-haspopup="listbox" aria-expanded={open}>
                 <span style={{ color: names.length > 0 ? C.text : C.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '90%' }}>
                     {names.length > 0 ? names.join(', ') : '— Odaberite radnike —'}

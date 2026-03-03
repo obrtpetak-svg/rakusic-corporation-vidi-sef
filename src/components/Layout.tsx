@@ -421,7 +421,7 @@ export function Layout() {
             <div className={mobileOpen ? 'sidebar sidebar-open' : 'sidebar'} role="navigation" aria-label="Glavni izbornik" style={{ width: 240, background: 'var(--sidebar-bg)', borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', height: '100vh', position: 'fixed', left: 0, top: 0, zIndex: 99, transition: 'transform 0.25s cubic-bezier(0.16,1,0.3,1), background 0.4s ease' }}>
                 {/* Logo */}
                 <div style={{ padding: '20px 20px 16px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div className="u-flex-center u-gap-12">
                         <img src="/icon-192.png" alt="Logo" style={{ width: 38, height: 38, borderRadius: 10, flexShrink: 0 }} />
                         <div>
                             <div style={{ fontSize: 14, fontWeight: 800, color: C.text }}>{companyProfile?.companyName || 'Vi-Di-Sef'}</div>
@@ -595,7 +595,7 @@ export function Layout() {
                 notifPermission !== 'granted' && notifPermission !== 'denied' && (
                     <div style={{ position: 'fixed', bottom: 80, right: 16, zIndex: 1000, background: C.sidebar, border: `1px solid ${C.border}`, borderRadius: 14, padding: '14px 18px', maxWidth: 320, boxShadow: '0 8px 30px rgba(0,0,0,0.15)', display: 'flex', alignItems: 'center', gap: 12 }}>
                         <div style={{ fontSize: 28 }}><Icon name="bell" size={28} /></div>
-                        <div style={{ flex: 1 }}>
+                        <div className="u-flex-1">
                             <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 4 }}>Uključi obavijesti</div>
                             <div style={{ fontSize: 11, color: C.textMuted, marginBottom: 8 }}>Primaj obavijesti na mobitel u stvarnom vremenu</div>
                             <div style={{ display: 'flex', gap: 6 }}>
@@ -626,7 +626,7 @@ export function Layout() {
                             aria-selected={page === tab.id}
                             aria-label={tab.label}
                         >
-                            <span className="tab-icon" style={{ position: 'relative' }}>
+                            <span className="tab-icon" className="u-relative">
                                 {tab.icon}
                                 {tab.badge > 0 && <span style={{ position: 'absolute', top: -4, right: -8, background: 'var(--red)', color: '#fff', borderRadius: 10, fontSize: 9, fontWeight: 800, padding: '1px 5px', minWidth: 14, textAlign: 'center', animation: 'badgePop 0.3s cubic-bezier(0.34,1.56,0.64,1)' }}>{tab.badge}</span>}
                             </span>

@@ -320,7 +320,7 @@ export function DailyLogPage({ workerFilterId, leaderProjectIds }) {
                         Dnevni izvještaji, vremenske prilike, foto dokumentacija
                     </div>
                 </div>
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <div className="u-flex-center u-gap-8">
                     <button onClick={exportPDF} style={{ ...styles.btnSecondary, fontSize: 13, padding: '8px 14px' }}>📄 PDF</button>
                     <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> Novi unos</button>
                 </div>
@@ -391,7 +391,7 @@ export function DailyLogPage({ workerFilterId, leaderProjectIds }) {
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                                     <span className="u-fs-11" style={{ color: C.textMuted }}>{log.createdBy}</span>
-                                    <div style={{ display: 'flex', gap: 4 }} onClick={e => e.stopPropagation()}>
+                                    <div className="u-flex-gap-4" onClick={e => e.stopPropagation()}>
                                         {canApprove(log) && <>
                                             <button onClick={() => approveLog(log)} style={{ ...styles.btnSmall, background: C.green, color: '#fff', borderColor: C.green }}>✓ Odobri</button>
                                             <button onClick={() => rejectLog(log)} style={{ ...styles.btnSmall, background: C.red, color: '#fff', borderColor: C.red }}>✕ Odbij</button>
@@ -423,22 +423,22 @@ export function DailyLogPage({ workerFilterId, leaderProjectIds }) {
             {detailLog && (
                 <Modal title={` Dnevnik: ${fmtDate(detailLog.date)}`} onClose={() => setDetailId(null)} wide>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
-                        <div><span style={styles.label}>Datum</span><div style={{ fontWeight: 600 }}>{fmtDate(detailLog.date)}</div></div>
+                        <div><span style={styles.label}>Datum</span><div className="u-fw-600">{fmtDate(detailLog.date)}</div></div>
                         <div><span style={styles.label}>Projekt</span><div style={{ fontWeight: 600, color: C.accent }}>{projects.find(p => p.id === detailLog.projectId)?.name || '—'}</div></div>
                         <div><span style={styles.label}>Vrijeme</span><div>{weatherIcons[detailLog.weather]} {detailLog.weather} {detailLog.temperature ? `${detailLog.temperature}°C` : ''}</div></div>
                         <div><span style={styles.label}>Prisutni radnici</span><div>{detailLog.workersPresent || '—'}</div></div>
                     </div>
 
-                    {detailLog.workDescription && <div style={{ marginBottom: 12 }}><span style={styles.label}>Opis radova</span><div style={{ padding: '10px 14px', borderRadius: 8, background: C.bgElevated, fontSize: 13, whiteSpace: 'pre-wrap' }}>{detailLog.workDescription}</div></div>}
-                    {detailLog.materialsUsed && <div style={{ marginBottom: 12 }}><span style={styles.label}>Korišteni materijali</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(34,197,94,0.08)', fontSize: 13 }}>{detailLog.materialsUsed}</div></div>}
-                    {detailLog.equipmentUsed && <div style={{ marginBottom: 12 }}><span style={styles.label}>Korištena oprema</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(59,130,246,0.08)', fontSize: 13 }}>{detailLog.equipmentUsed}</div></div>}
-                    {detailLog.issues && <div style={{ marginBottom: 12 }}><span style={styles.label}>⚠️ Problemi / Zastoji</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(239,68,68,0.08)', fontSize: 13, color: C.red }}>{detailLog.issues}</div></div>}
-                    {detailLog.safetyNotes && <div style={{ marginBottom: 12 }}><span style={styles.label}>🛡️ Sigurnosne napomene</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(234,179,8,0.08)', fontSize: 13, color: C.yellow }}>{detailLog.safetyNotes}</div></div>}
-                    {detailLog.notes && <div style={{ marginBottom: 12 }}><span style={styles.label}>Napomene</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(245,158,11,0.08)', fontSize: 13 }}>{detailLog.notes}</div></div>}
+                    {detailLog.workDescription && <div className="u-mb-12"><span style={styles.label}>Opis radova</span><div style={{ padding: '10px 14px', borderRadius: 8, background: C.bgElevated, fontSize: 13, whiteSpace: 'pre-wrap' }}>{detailLog.workDescription}</div></div>}
+                    {detailLog.materialsUsed && <div className="u-mb-12"><span style={styles.label}>Korišteni materijali</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(34,197,94,0.08)', fontSize: 13 }}>{detailLog.materialsUsed}</div></div>}
+                    {detailLog.equipmentUsed && <div className="u-mb-12"><span style={styles.label}>Korištena oprema</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(59,130,246,0.08)', fontSize: 13 }}>{detailLog.equipmentUsed}</div></div>}
+                    {detailLog.issues && <div className="u-mb-12"><span style={styles.label}>⚠️ Problemi / Zastoji</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(239,68,68,0.08)', fontSize: 13, color: C.red }}>{detailLog.issues}</div></div>}
+                    {detailLog.safetyNotes && <div className="u-mb-12"><span style={styles.label}>🛡️ Sigurnosne napomene</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(234,179,8,0.08)', fontSize: 13, color: C.yellow }}>{detailLog.safetyNotes}</div></div>}
+                    {detailLog.notes && <div className="u-mb-12"><span style={styles.label}>Napomene</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(245,158,11,0.08)', fontSize: 13 }}>{detailLog.notes}</div></div>}
 
                     {/* Photos gallery */}
                     {(detailLog.photos || []).length > 0 && (
-                        <div style={{ marginBottom: 12 }}>
+                        <div className="u-mb-12">
                             <span style={styles.label}>📷 Fotografije ({detailLog.photos.length})</span>
                             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: 8, marginTop: 8 }}>
                                 {detailLog.photos.map((ph, i) => (
@@ -459,7 +459,7 @@ export function DailyLogPage({ workerFilterId, leaderProjectIds }) {
             {/* Add/Edit Modal */}
             {showForm && (
                 <Modal title={editId ? 'Uredi dnevnik' : 'Novi dnevnik gradilišta'} onClose={() => setShowForm(false)} wide>
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }} className="u-gap-16">
                         <Field label="Datum" required><Input type="date" value={form.date} onChange={e => update('date', e.target.value)} /></Field>
                         <Field label="Projekt" required>
                             <Select value={form.projectId} onChange={e => handleProjectChange(e.target.value)}>
@@ -502,7 +502,7 @@ export function DailyLogPage({ workerFilterId, leaderProjectIds }) {
                         </div>
                     )}
 
-                    <div style={{ marginTop: 16 }}>
+                    <div className="u-mt-16">
                         <Field label="Opis izvršenih radova *">
                             <Textarea value={form.workDescription} onChange={e => update('workDescription', e.target.value)} placeholder="Što je danas napravljeno na gradilištu..." rows={3} />
                         </Field>
@@ -517,36 +517,36 @@ export function DailyLogPage({ workerFilterId, leaderProjectIds }) {
                         </Field>
                     </div>
 
-                    <div style={{ marginTop: 12 }}>
+                    <div className="u-mt-12">
                         <Field label="⚠️ Problemi / Zastoji">
                             <Textarea value={form.issues} onChange={e => update('issues', e.target.value)} placeholder="Kašnjenje materijala, loše vrijeme..." rows={2} />
                         </Field>
                     </div>
-                    <div style={{ marginTop: 12 }}>
+                    <div className="u-mt-12">
                         <Field label="🛡️ Sigurnosne napomene">
                             <Textarea value={form.safetyNotes} onChange={e => update('safetyNotes', e.target.value)} placeholder="Incidenti, zaštitna oprema..." rows={2} />
                         </Field>
                     </div>
-                    <div style={{ marginTop: 12 }}>
+                    <div className="u-mt-12">
                         <Field label="Napomene">
                             <Textarea value={form.notes} onChange={e => update('notes', e.target.value)} placeholder="Dodatne napomene..." rows={2} />
                         </Field>
                     </div>
 
                     {/* Photo upload */}
-                    <div style={{ marginTop: 16 }}>
+                    <div className="u-mt-16">
                         <span style={styles.label}>📷 Fotografije (max 5)</span>
                         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
                             {/* Existing photos */}
                             {(form.photos || []).map((ph, i) => (
-                                <div key={`ex-${i}`} style={{ position: 'relative' }}>
+                                <div key={`ex-${i}`} className="u-relative">
                                     <img src={ph.data} alt={`Foto ${i + 1}`} style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 8, border: `1px solid ${C.border}` }} />
                                     <button onClick={() => removeExistingPhoto(i)} style={{ position: 'absolute', top: -6, right: -6, width: 20, height: 20, borderRadius: '50%', background: C.red, color: '#fff', border: 'none', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
                                 </div>
                             ))}
                             {/* New photos */}
                             {photoQueue.map((ph, i) => (
-                                <div key={`new-${i}`} style={{ position: 'relative' }}>
+                                <div key={`new-${i}`} className="u-relative">
                                     <img src={ph.data} alt={`Nova ${i + 1}`} style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 8, border: `2px solid ${C.green}` }} />
                                     <button onClick={() => removePhoto(i)} style={{ position: 'absolute', top: -6, right: -6, width: 20, height: 20, borderRadius: '50%', background: C.red, color: '#fff', border: 'none', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
                                 </div>
@@ -568,7 +568,7 @@ export function DailyLogPage({ workerFilterId, leaderProjectIds }) {
                         </div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 20 }}>
+                    <div className="u-flex-end">
                         <button onClick={() => setShowForm(false)} style={styles.btnSecondary}>Odustani</button>
                         <button onClick={doSave} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
                     </div>

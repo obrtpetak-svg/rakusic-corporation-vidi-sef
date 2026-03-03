@@ -47,7 +47,7 @@ export default function GpsWorkersTab({ workers, projects, getProjectName, isMob
                         style={{ ...styles.input, paddingLeft: 36 }}
                     />
                 </div>
-                <div style={{ display: 'flex', gap: 4 }}>
+                <div className="u-flex-gap-4">
                     {[
                         { id: 'all', label: 'Svi' },
                         { id: 'active', label: '🟢 Aktivni' },

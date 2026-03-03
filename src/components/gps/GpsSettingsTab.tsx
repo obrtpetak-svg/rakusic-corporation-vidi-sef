@@ -122,7 +122,7 @@ export default function GpsSettingsTab({
 
             {/* Project/Worker selector */}
             {settingsLevel === 'project' && (
-                <div style={{ marginBottom: 16 }}>
+                <div className="u-mb-16">
                     <select
                         value={selectedProjectId}
                         onChange={e => setSelectedProjectId(e.target.value)}
@@ -134,7 +134,7 @@ export default function GpsSettingsTab({
                 </div>
             )}
             {settingsLevel === 'worker' && (
-                <div style={{ marginBottom: 16 }}>
+                <div className="u-mb-16">
                     <select
                         value={selectedWorkerId}
                         onChange={e => setSelectedWorkerId(e.target.value)}
@@ -267,7 +267,7 @@ export default function GpsSettingsTab({
                                             <ToggleSwitch value={form.alertOnLeave} onChange={v => updateField('alertOnLeave', v)} size="sm" />
                                             <span style={{ fontSize: 12, color: C.textDim }}>Alarm kad napusti</span>
                                         </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <div className="u-flex-center u-gap-8">
                                             <ToggleSwitch value={form.alertOnEnter} onChange={v => updateField('alertOnEnter', v)} size="sm" />
                                             <span style={{ fontSize: 12, color: C.textDim }}>Alarm kad uđe</span>
                                         </div>

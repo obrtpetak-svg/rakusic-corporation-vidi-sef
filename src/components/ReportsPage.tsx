@@ -273,7 +273,7 @@ return (
                     <div style={styles.card}><div className="u-section-title u-mb-12">Po danima u tjednu</div><SvgBarChart data={weeklyDist} dataKey="sati" label="name" height={160} color="#047857" /></div>
                 </div>
                 <div style={styles.card}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <div className="u-card-header">
                         <div className="u-section-title">Detaljna tablica po radnicima</div>
                         <div className="u-fs-12" style={{ color: C.textMuted }}>{hoursByWorker.length} radnika | {filterWorker !== 'sve' ? workers.find(w => w.id === filterWorker)?.name : 'Svi'}{filterProject !== 'sve' ? ` • ${projects.find(p => p.id === filterProject)?.name}` : ''}</div>
                     </div>
@@ -295,7 +295,7 @@ return (
                     <div style={styles.card}><div className="u-section-title u-mb-12">Usporedba projekata</div><SvgBarChart data={hoursByProject} dataKey="sati" label="name" height={200} /></div>
                 </div>
                 <div style={styles.card}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <div className="u-card-header">
                         <div className="u-section-title">Projekti - detalji</div>
                         <div className="u-fs-12" style={{ color: C.textMuted }}>{hoursByProject.length} projekata | {filterProject !== 'sve' ? projects.find(p => p.id === filterProject)?.name : 'Svi'}{filterWorker !== 'sve' ? ` • ${workers.find(w => w.id === filterWorker)?.name}` : ''}</div>
                     </div>
@@ -472,9 +472,9 @@ return (
                     <StatCard label="Prosj. iznos" value={`${otpStats.avgAmount}€`} color="#6366F1" />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: 16, marginBottom: 20 }}>
-                    {otpStats.statusChart?.length > 0 && <div style={styles.card}><div className="u-section-title" style={{ fontSize: 13, marginBottom: 10 }}>Status otpremnica</div><SvgDonutChart data={otpStats.statusChart} height={160} /></div>}
-                    {otpStats.projectChart?.length > 0 && <div style={styles.card}><div className="u-section-title" style={{ fontSize: 13, marginBottom: 10 }}>Po projektu (iznos)</div><SvgHBarChart data={otpStats.projectChart} dataKey="iznos" height={180} /></div>}
-                    {otpStats.supplierChart?.length > 0 && <div style={styles.card}><div className="u-section-title" style={{ fontSize: 13, marginBottom: 10 }}>Po dobavljaču</div><SvgHBarChart data={otpStats.supplierChart} dataKey="iznos" color="#10B981" height={180} /></div>}
+                    {otpStats.statusChart?.length > 0 && <div style={styles.card}><div className="u-section-title" className="u-fs-13 u-mb-12" style={{ marginBottom: 10 }}>Status otpremnica</div><SvgDonutChart data={otpStats.statusChart} height={160} /></div>}
+                    {otpStats.projectChart?.length > 0 && <div style={styles.card}><div className="u-section-title" className="u-fs-13 u-mb-12" style={{ marginBottom: 10 }}>Po projektu (iznos)</div><SvgHBarChart data={otpStats.projectChart} dataKey="iznos" height={180} /></div>}
+                    {otpStats.supplierChart?.length > 0 && <div style={styles.card}><div className="u-section-title" className="u-fs-13 u-mb-12" style={{ marginBottom: 10 }}>Po dobavljaču</div><SvgHBarChart data={otpStats.supplierChart} dataKey="iznos" color="#10B981" height={180} /></div>}
                 </div>
                 <div style={styles.card}>
                     <div className="u-section-title u-mb-16">📦 Sve otpremnice u periodu ({otpremnicePeriod.length})</div>

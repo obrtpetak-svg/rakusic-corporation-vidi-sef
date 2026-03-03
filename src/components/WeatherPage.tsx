@@ -306,7 +306,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                 <div style={{ ...styles.card, background: 'linear-gradient(135deg,rgba(239,68,68,0.06),rgba(249,115,22,0.06))', border: '1px solid rgba(239,68,68,0.2)', marginBottom: 16, cursor: 'pointer' }} onClick={() => setTab('alerts')}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                         <span style={{ fontSize: 20 }}>⚠️</span>
-                        <div style={{ flex: 1 }}>
+                        <div className="u-flex-1">
                             <div style={{ fontSize: 13, fontWeight: 700, color: C.red }}>{alerts.length} vremensko upozorenje{alerts.length !== 1 ? 'a' : ''}</div>
                             <div className="u-fs-12" style={{ color: C.textMuted }}>{alerts[0].issues[0]} — klikni za detalje</div>
                         </div>
@@ -366,7 +366,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                                             <div style={{ fontSize: 15, fontWeight: 700 }}>{p.name}</div>
                                             <div style={{ fontSize: 11, opacity: 0.8 }}>📍 {p.location || `${p.siteLat?.toFixed(2)}°N`}</div>
                                         </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <div className="u-flex-center u-gap-8">
                                             {rules.length > 0 && <ScoreRing score={todayScore.score} size={48} />}
                                             <span style={{ fontSize: 28 }}>{wmo.i}</span>
                                         </div>
@@ -565,7 +565,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
             {/* ══════ TAB: SETTINGS ══════ */}
             {tab === 'settings' && (
                 <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                    <div className="u-flex-between u-mb-16">
                         <div>
                             <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>⚙️ Pravila upozorenja</div>
                             <div className="u-fs-12" style={{ color: C.textMuted }}>Definirajte pragove za svaki projekt i tip radova</div>
@@ -581,7 +581,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                         if (!pRules.length) return null;
                         return (
                             <div key={p.id} style={{ ...styles.card, marginBottom: 12 }}>
-                                <div className="u-section-title" style={{ fontSize: 13, marginBottom: 10 }}>{p.name} <span className="u-fs-11" style={{ color: C.textMuted }}>— {pRules.length} pravilo{pRules.length !== 1 ? 'a' : ''}</span></div>
+                                <div className="u-section-title" className="u-fs-13 u-mb-12" style={{ marginBottom: 10 }}>{p.name} <span className="u-fs-11" style={{ color: C.textMuted }}>— {pRules.length} pravilo{pRules.length !== 1 ? 'a' : ''}</span></div>
                                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill,minmax(220px,1fr))', gap: 8 }}>
                                     {pRules.map(r => {
                                         const preset = ACTIVITY_PRESETS[r.activity];
@@ -622,7 +622,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                         </Select>
                     </Field>
 
-                    <div style={{ marginTop: 12 }}>
+                    <div className="u-mt-12">
                         <span style={styles.label}>Tipovi radova</span>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 6 }}>
                             {Object.entries(ACTIVITY_PRESETS).map(([key, preset]) => {
@@ -644,7 +644,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                     </div>
 
                     {ruleForm.activities.length > 0 && (
-                        <div style={{ marginTop: 16 }}>
+                        <div className="u-mt-16">
                             <span style={styles.label}>Prilagodi pragove (opcionalno)</span>
                             {ruleForm.activities.map(act => {
                                 const preset = ACTIVITY_PRESETS[act];
@@ -667,7 +667,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                         </div>
                     )}
 
-                    <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 20 }}>
+                    <div className="u-flex-end">
                         <button onClick={() => setShowRuleModal(false)} style={styles.btnSecondary}>Odustani</button>
                         <button onClick={saveRule} style={styles.btn}><Icon name="check" size={14} /> Spremi</button>
                     </div>

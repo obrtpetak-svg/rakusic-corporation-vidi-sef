@@ -145,7 +145,7 @@ export function VozilaPage({ workerFilterId }) {
                 {/* Fuel tab */}
                 {detailTab === 'fuel' && (
                     <div style={styles.card}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                        <div className="u-flex-between u-mb-16">
                             <div className="u-section-title">⛽ Evidencija goriva ({fuelLogs.length})</div>
                             <button onClick={() => setShowFuelForm(detailVehicle.id)} style={styles.btn}><Icon name="plus" size={14} /> Dodaj tankanje</button>
                         </div>
@@ -163,7 +163,7 @@ export function VozilaPage({ workerFilterId }) {
                 {/* Km tab */}
                 {detailTab === 'km' && (
                     <div style={styles.card}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                        <div className="u-flex-between u-mb-16">
                             <div className="u-section-title">🛣️ Evidencija kilometara ({kmLogs.length})</div>
                             <button onClick={() => setShowKmForm(detailVehicle.id)} style={styles.btn}><Icon name="plus" size={14} /> Dodaj km</button>
                         </div>
@@ -181,7 +181,7 @@ export function VozilaPage({ workerFilterId }) {
                 {/* Diary tab */}
                 {detailTab === 'diary' && (
                     <div style={styles.card}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                        <div className="u-flex-between u-mb-16">
                             <div className="u-section-title">📋 Dnevnik obavijesti ({diaryEntries.length})</div>
                             <button onClick={() => setShowDiaryForm(detailVehicle.id)} style={styles.btn}><Icon name="plus" size={14} /> Nova obavijest</button>
                         </div>
@@ -194,7 +194,7 @@ export function VozilaPage({ workerFilterId }) {
                                                 <span style={styles.badge(d.priority === 'hitna' ? '185,28,28' : d.priority === 'važna' ? '180,89,9' : '100,116,139')}>{d.priority}</span>
                                                 <span style={{ marginLeft: 8, fontSize: 14, fontWeight: 700, color: C.text }}>{d.title}</span>
                                             </div>
-                                            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                                            <div className="u-flex-center u-gap-8">
                                                 <span className="u-fs-11" style={{ color: C.textMuted }}>{fmtDate(d.date)}</span>
                                                 {!isWorker && <button onClick={() => deleteDiaryEntry(detailVehicle.id, d.id)} style={styles.btnDanger}><Icon name="trash" size={12} /></button>}
                                             </div>
@@ -268,7 +268,7 @@ export function VozilaPage({ workerFilterId }) {
                 <div className="u-fs-22 u-fw-800" style={{ color: C.text }}>{isWorker ? 'Moje vozilo' : 'Vozila'}</div>
                 {!isWorker && <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> Novo vozilo</button>}
             </div>
-            <div style={{ position: 'relative', marginBottom: 20 }}><Input placeholder="Traži vozilo..." value={search} onChange={e => setSearch(e.target.value)} style={{ paddingLeft: 36 }} /><div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: C.textMuted }}><Icon name="search" size={16} /></div></div>
+            <div style={{ position: 'relative', marginBottom: 20 }}><Input placeholder="Traži vozilo..." value={search} onChange={e => setSearch(e.target.value)} className="u-pl-36" /><div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: C.textMuted }}><Icon name="search" size={16} /></div></div>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
                 {filtered.map(v => {
                     const w = workers.find(x => x.id === v.assignedWorker);
@@ -298,7 +298,7 @@ export function VozilaPage({ workerFilterId }) {
 
             {showForm && (
                 <Modal title={editId ? 'Uredi vozilo' : 'Novo vozilo'} onClose={() => setShowForm(false)} wide>
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }} className="u-gap-16">
                         <Field label="Naziv / Opis"><Input value={form.name} onChange={e => update('name', e.target.value)} placeholder="Kamion 1" /></Field>
                         <Field label="Registracija"><Input value={form.regNumber} onChange={e => update('regNumber', e.target.value)} placeholder="ZG-1234-AB" /></Field>
                         <Field label="Marka"><Input value={form.brand} onChange={e => update('brand', e.target.value)} placeholder="Mercedes, MAN..." /></Field>
@@ -309,7 +309,7 @@ export function VozilaPage({ workerFilterId }) {
                         <Field label="Dodijeljeni radnik"><Select value={form.assignedWorker} onChange={e => update('assignedWorker', e.target.value)}><option value="">— Nije dodijeljeno —</option>{workers.filter(w => w.active !== false).map(w => <option key={w.id} value={w.id}>{w.name}</option>)}</Select></Field>
                     </div>
                     <Field label="Napomene"><Textarea value={form.notes} onChange={e => update('notes', e.target.value)} placeholder="Napomene o vozilu..." rows={2} /></Field>
-                    <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 20 }}>
+                    <div className="u-flex-end">
                         <button onClick={() => setShowForm(false)} style={styles.btnSecondary}>Odustani</button>
                         <button onClick={doSave} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
                     </div>

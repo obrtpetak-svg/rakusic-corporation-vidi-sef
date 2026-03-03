@@ -111,7 +111,7 @@ export default function GpsAlertTab({
                 ...(severity === 'critical' ? { animation: 'pulse-alert 2s infinite' } : {}),
             }}>
                 <div style={{ fontSize: 36 }}>{severityConfig.icon}</div>
-                <div style={{ flex: 1 }}>
+                <div className="u-flex-1">
                     <div style={{ fontWeight: 800, fontSize: 18, color: severityConfig.color }}>
                         {severityConfig.text}
                     </div>
@@ -125,7 +125,7 @@ export default function GpsAlertTab({
                                     : 'Nema aktivnih alarma'}
                     </div>
                 </div>
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <div className="u-flex-center u-gap-8">
                     {alertsEnabled && stats.active > 0 && (
                         <button onClick={acknowledgeAll} style={{
                             ...styles.btn, background: severityConfig.color, fontSize: 13,
@@ -228,7 +228,7 @@ export default function GpsAlertTab({
 
                     {/* Filters */}
                     <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-                        <div style={{ display: 'flex', gap: 4 }}>
+                        <div className="u-flex-gap-4">
                             {[
                                 { id: 'all', label: 'Svi' },
                                 { id: 'active', label: '🔴 Aktivni' },
@@ -279,7 +279,7 @@ export default function GpsAlertTab({
                                             }}>
                                                 {meta.icon}
                                             </div>
-                                            <div style={{ flex: 1 }}>
+                                            <div className="u-flex-1">
                                                 <div style={{
                                                     fontWeight: 700, fontSize: 14,
                                                     color: isAlarm && !alert.acknowledged ? '#DC2626' : C.text,

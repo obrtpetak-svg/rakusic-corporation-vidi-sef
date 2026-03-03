@@ -140,7 +140,7 @@ export default function FleetVehicleDetail({ vehicle, onBack }: {
                 <div style={{ background: 'var(--card)', border: `1px solid ${C.border}`, borderRadius: 16, padding: 20, borderLeft: `4px solid ${meta.color}` }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
                         <div style={{ width: 56, height: 56, borderRadius: 16, background: `${meta.color}12`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>🚛</div>
-                        <div style={{ flex: 1 }}>
+                        <div className="u-flex-1">
                             <div style={{ fontSize: 18, fontWeight: 800, color: C.text }}>{vehicle.name}</div>
                             <div className="u-fs-13" style={{ color: C.textMuted }}>🔖 {vehicle.plate} · {vehicle.group || '—'}</div>
                         </div>
@@ -223,7 +223,7 @@ export default function FleetVehicleDetail({ vehicle, onBack }: {
                 <div>
                     {/* Engine hours */}
                     <div style={{ background: 'var(--card)', border: `1px solid ${C.border}`, borderRadius: 14, padding: 16, marginBottom: 12 }}>
-                        <div className="u-section-title" style={{ fontSize: 13, marginBottom: 10 }}>🔑 Rad motora (zadnja 3 dana)</div>
+                        <div className="u-section-title" className="u-fs-13 u-mb-12" style={{ marginBottom: 10 }}>🔑 Rad motora (zadnja 3 dana)</div>
                         <div style={{ display: 'grid', gap: 6 }}>
                             {ignLoading ? (
                                 <div style={{ padding: 20, textAlign: 'center', color: C.textMuted, fontSize: 12 }}>⏳ Učitavam podatke o radu motora...</div>
@@ -248,7 +248,7 @@ export default function FleetVehicleDetail({ vehicle, onBack }: {
 
                     {/* Maintenance log */}
                     <div style={{ background: 'var(--card)', border: `1px solid ${C.border}`, borderRadius: 14, padding: 16 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                        <div className="u-card-header">
                             <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>🔧 Evidencija održavanja</div>
                             <button style={{ ...styles.btn, fontSize: 11, padding: '6px 12px' }}>+ Dodaj</button>
                         </div>
@@ -260,7 +260,7 @@ export default function FleetVehicleDetail({ vehicle, onBack }: {
                                         background: m.status === 'done' ? 'rgba(16,185,129,0.12)' : 'rgba(245,158,11,0.12)',
                                         fontSize: 16,
                                     }}>{m.status === 'done' ? '✅' : '📅'}</div>
-                                    <div style={{ flex: 1 }}>
+                                    <div className="u-flex-1">
                                         <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{m.type}: {m.desc}</div>
                                         <div className="u-fs-11" style={{ color: C.textMuted }}>
                                             {m.date} {m.km ? `· ${m.km.toLocaleString()} km` : ''} · {m.cost}€
@@ -283,7 +283,7 @@ export default function FleetVehicleDetail({ vehicle, onBack }: {
 
 function InfoRow({ icon, label, value }: { icon: string; label: string; value: string }) {
     return (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div className="u-flex-center u-gap-8">
             <span style={{ fontSize: 14 }}>{icon}</span>
             <span className="u-fs-12" style={{ color: C.textMuted }}>{label}:</span>
             <span style={{ fontSize: 12, fontWeight: 600, color: C.text }}>{value}</span>

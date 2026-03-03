@@ -13,7 +13,7 @@ const NotifItem = memo(({ icon, iconColor, iconBg, title, subtitle, detail, atta
         background: selected ? 'rgba(217,93,8,0.04)' : 'transparent',
         animation: 'cardEntry 0.4s cubic-bezier(0.16,1,0.3,1) both'
     }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div className="u-flex-center u-gap-8">
             <input type="checkbox" checked={selected} onChange={onToggle} style={{ accentColor: 'var(--accent)', width: 16, height: 16, cursor: 'pointer' }} />
         </div>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, flex: 1, minWidth: 200 }}>

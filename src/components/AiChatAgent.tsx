@@ -261,7 +261,7 @@ export function AiChatAgent() {
                         color: 'var(--text-on-accent)', display: 'flex', alignItems: 'center', gap: 10
                     }}>
                         <span style={{ fontSize: 22 }}>🤖</span>
-                        <div style={{ flex: 1 }}>
+                        <div className="u-flex-1">
                             <div style={{ fontWeight: 700, fontSize: 14 }}>Vi-Di-Sef AI</div>
                             <div style={{ fontSize: 11, opacity: 0.8 }}>Pametni asistent za gradilište</div>
                         </div>
@@ -349,14 +349,14 @@ function SettingsForm({ onSave, onClose, currentProvider }) {
             boxShadow: 'var(--shadow-xl)', padding: 24,
             animation: 'modalEntry 0.3s cubic-bezier(0.34,1.56,0.64,1)'
         }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <div className="u-flex-between u-mb-20">
                 <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text)' }}>🤖 AI Postavke</div>
                 <button onClick={onClose} style={{ background: 'var(--divider)', border: 'none', fontSize: 16, cursor: 'pointer', color: 'var(--text-muted)', borderRadius: 8, padding: '4px 8px' }}>✕</button>
             </div>
 
-            <div style={{ marginBottom: 16 }}>
+            <div className="u-mb-16">
                 <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5 }}>Provider</div>
-                <div style={{ display: 'flex', gap: 8 }}>
+                <div className="u-flex-gap-8">
                     {[['openai', '🟢 OpenAI (GPT-4o-mini)'], ['anthropic', '🟣 Claude (Haiku)']].map(([val, label]) => (
                         <button key={val} onClick={() => setProv(val)} style={{
                             flex: 1, padding: '10px 12px', borderRadius: 10,
@@ -374,7 +374,7 @@ function SettingsForm({ onSave, onClose, currentProvider }) {
                 🔒 API ključevi su sigurno pohranjeni na serveru. Ne trebate ih unositi ovdje.
             </div>
 
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div className="u-flex-gap-8">
                 <button onClick={onClose} style={{ ...styles.btnSecondary, flex: 1, justifyContent: 'center' }}>Odustani</button>
                 <button onClick={() => onSave(prov)} style={{ ...styles.btn, flex: 1, justifyContent: 'center' }}>✅ Spremi</button>
             </div>

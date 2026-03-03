@@ -233,7 +233,7 @@ export function SettingsPage({ workerFilterId }) {
                 <div style={{ ...styles.card, marginTop: 16 }}>
                     <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 8 }}>📦 Preuzmi moje podatke</div>
                     <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 16 }}>GDPR — preuzmite sve svoje osobne podatke u JSON formatu (evidencija sati, dnevni logovi, zahtjevi za dopust).</div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div className="u-flex-center u-gap-12">
                         <button onClick={doExportData} disabled={exportLoading} style={{ ...styles.btn, opacity: exportLoading ? 0.5 : 1 }}>
                             {exportLoading ? '⏳ Pripremam...' : '📦 Preuzmi moje podatke'}
                         </button>
@@ -262,7 +262,7 @@ export function SettingsPage({ workerFilterId }) {
 
             {/* Company info */}
             <div style={styles.card}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <div className="u-flex-between u-mb-16">
                     <div className="u-section-title">🏢 Podaci tvrtke</div>
                     <button onClick={startEdit} style={styles.btnSmall}><Icon name="edit" size={12} /> Uredi</button>
                 </div>
@@ -333,9 +333,9 @@ export function SettingsPage({ workerFilterId }) {
 
             {/* Audit Log */}
             <div style={{ ...styles.card, marginTop: 16 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <div className="u-card-header">
                     <div className="u-section-title">📝 Audit log ({auditLog.length})</div>
-                    <div style={{ display: 'flex', gap: 8 }}>
+                    <div className="u-flex-gap-8">
                         <button onClick={() => setShowAudit(!showAudit)} style={styles.btnSmall}>{showAudit ? 'Sakrij' : 'Prikaži'}</button>
                         <button onClick={clearAuditLog} style={styles.btnDanger}><Icon name="trash" size={12} /> Obriši</button>
                     </div>
@@ -384,7 +384,7 @@ export function SettingsPage({ workerFilterId }) {
                         ))}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 10, background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.12)' }}>
-                        <div style={{ flex: 1 }}>
+                        <div className="u-flex-1">
                             <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>🚪 Odjavi sve korisnike</div>
                             <div className="u-fs-11" style={{ color: C.textMuted }}>Svi aktivni korisnici bit će odmah odjavljeni iz aplikacije.</div>
                         </div>
@@ -395,7 +395,7 @@ export function SettingsPage({ workerFilterId }) {
 
                     {/* Bulk Provision Firebase Auth – v2 */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 10, background: 'rgba(16,185,129,0.04)', border: '1px solid rgba(16,185,129,0.12)', marginTop: 12 }}>
-                        <div style={{ flex: 1 }}>
+                        <div className="u-flex-1">
                             <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>👥 Aktiviraj prijavu za sve radnike</div>
                             <div className="u-fs-11" style={{ color: C.textMuted }}>Kreira Firebase Auth račune za sve radnike koji ih nemaju (ista lozinka za sve).</div>
                         </div>
@@ -472,7 +472,7 @@ export function SettingsPage({ workerFilterId }) {
 
             {/* ── KORISNICI (User Management) ──────────────── */}
             <div style={{ ...styles.card, marginTop: 16, borderColor: 'rgba(99,102,241,0.3)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <div className="u-flex-between u-mb-16">
                     <div>
                         <div className="u-section-title">👥 Korisnici sustava</div>
                         <div className="u-fs-12" style={{ color: C.textMuted, marginTop: 2 }}>Upravljanje korisnicima koji se mogu prijaviti u aplikaciju ({users?.length || 0})</div>
@@ -512,7 +512,7 @@ export function SettingsPage({ workerFilterId }) {
             {/* Add/Edit User Modal */}
             {showAddUser && (
                 <Modal title={editingUser ? '✏️ Uredi korisnika' : '👤 Novi korisnik'} onClose={() => setShowAddUser(false)} wide>
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }} className="u-gap-16">
                         <Field label="Ime i prezime" required><Input value={userForm.name} onChange={e => setUserForm(f => ({ ...f, name: e.target.value }))} placeholder="npr. Ivan Horvat" /></Field>
                         <Field label="Korisničko ime" required><Input value={userForm.username} onChange={e => setUserForm(f => ({ ...f, username: e.target.value.toLowerCase().replace(/\s+/g, '.') }))} placeholder="npr. ivan.horvat" disabled={!!editingUser} /></Field>
                         <Field label="Uloga" required>
@@ -590,7 +590,7 @@ export function SettingsPage({ workerFilterId }) {
             {/* Edit modal */}
             {editing && (
                 <Modal title="Uredi podatke tvrtke" onClose={() => setEditing(false)} wide>
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }} className="u-gap-16">
                         <Field label="Naziv tvrtke"><Input value={form.companyName} onChange={e => setForm(f => ({ ...f, companyName: e.target.value }))} /></Field>
                         <Field label="OIB"><Input value={form.oib} onChange={e => setForm(f => ({ ...f, oib: e.target.value }))} /></Field>
                         <Field label="Email"><Input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} /></Field>
@@ -602,7 +602,7 @@ export function SettingsPage({ workerFilterId }) {
                         <Field label="Default pauza (min)"><Input type="number" value={form.defaultBreak} onChange={e => setForm(f => ({ ...f, defaultBreak: parseInt(e.target.value) || 0 }))} /></Field>
                     </div>
                     <Field label="Napomene"><Textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={2} /></Field>
-                    <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 20 }}>
+                    <div className="u-flex-end">
                         <button onClick={() => setEditing(false)} style={styles.btnSecondary}>Odustani</button>
                         <button onClick={doSave} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
                     </div>
@@ -613,7 +613,7 @@ export function SettingsPage({ workerFilterId }) {
                 <div style={styles.card}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
                         <div style={{ fontSize: 16, fontWeight: 700, color: C.text }}>🗑️ Koš za smeće</div>
-                        <div style={{ display: 'flex', gap: 8 }}>
+                        <div className="u-flex-gap-8">
                             <button onClick={async () => { setTrashLoading(true); setTrashItems(await loadDeletedItems()); setTrashLoading(false); }} style={styles.btnSmall}>
                                 {trashLoading ? '⏳' : '🔄'} Učitaj
                             </button>

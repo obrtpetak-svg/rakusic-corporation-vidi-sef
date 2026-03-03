@@ -228,7 +228,7 @@ export function AiInsightsPage({ leaderProjectIds }) {
                         {insights.map((ins, i) => <InsightBadge key={i} type={ins.type}>{ins.text}</InsightBadge>)}
                     </Card>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }} className="u-gap-16">
                         <Card title="📈 Tjedni trend sati"><SvgLineChart data={weeklyData} dataKey="hours" color="#F97316" /></Card>
                         <Card title="📊 Sati po projektu (mjesec)"><SvgDonutChart data={projectHours} /></Card>
                     </div>
@@ -237,7 +237,7 @@ export function AiInsightsPage({ leaderProjectIds }) {
                     {anomalies.length > 0 && (
                         <Card title="⚠️ Anomalije & Upozorenja">
                             {anomalies.map((a, i) => (
-                                <div key={i} style={{ marginBottom: 12 }}>
+                                <div key={i} className="u-mb-12">
                                     <InsightBadge type={a.type}>{a.title}</InsightBadge>
                                     {a.items && <div style={{ paddingLeft: 16, fontSize: 12, color: C.textMuted }}>{a.items.slice(0, 5).map((item, j) => <div key={j}>• {item}</div>)}{a.items.length > 5 && <div>... i još {a.items.length - 5}</div>}</div>}
                                 </div>
@@ -400,7 +400,7 @@ export function AiInsightsPage({ leaderProjectIds }) {
                         {teamScores.map((s, i) => (
                             <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: `1px solid ${C.border}7A` }}>
                                 <div style={{ width: 32, textAlign: 'center', fontSize: 14, fontWeight: 800, color: i < 3 ? C.accent : C.textMuted }}>{i < 3 ? medals[i] : `#${i + 1}`}</div>
-                                <div style={{ flex: 1 }}>
+                                <div className="u-flex-1">
                                     <div style={{ fontWeight: 700, fontSize: 14, color: C.text }}>{s.name}</div>
                                     <div className="u-fs-12" style={{ color: C.textMuted }}>{s.totalH}h ukupno • {s.avgH}h/dan • {s.daysWorked} dana</div>
                                 </div>

@@ -135,12 +135,12 @@ export function AppLogin() {
                         <div style={{ fontSize: 16, fontWeight: 700, color: '#F1F5F9' }}>Sigurna prijava</div>
                         <div style={{ fontSize: 10, color: '#94A3B8', marginLeft: 'auto', background: 'rgba(16,185,129,0.1)', padding: '2px 8px', borderRadius: 6, fontWeight: 600 }}>🔒 Firebase Auth</div>
                     </div>
-                    <div style={{ marginBottom: 12 }}>
+                    <div className="u-mb-12">
                         <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#94A3B8', marginBottom: 6 }}>Korisničko ime *</label>
                         <input placeholder="npr. admin.josip" value={username} onChange={e => setUsername(e.target.value)} onKeyDown={e => e.key === 'Enter' && submit()}
                             style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: '1px solid #334155', background: '#0F172A', color: '#F1F5F9', fontSize: 14, outline: 'none', boxSizing: 'border-box' }} />
                     </div>
-                    <div style={{ marginBottom: 16 }}>
+                    <div className="u-mb-16">
                         <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#94A3B8', marginBottom: 6 }}>Lozinka *</label>
                         <input type="password" placeholder="Unesite lozinku" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && submit()}
                             style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: '1px solid #334155', background: '#0F172A', color: '#F1F5F9', fontSize: 14, outline: 'none', boxSizing: 'border-box' }} />

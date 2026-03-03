@@ -95,7 +95,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                     )}
                     {prediction && (
                         <div style={{ flex: 1, minWidth: 200, background: Math.abs(prediction.diff) > 20 ? 'var(--red-light)' : 'var(--blue-light)', borderRadius: 12, padding: '10px 16px', fontSize: 12, color: 'var(--text)', border: `1px solid ${Math.abs(prediction.diff) > 20 ? 'rgba(220,38,38,0.15)' : 'rgba(37,99,235,0.15)'}`, animation: 'cardEntry 0.3s ease 0.1s both' }}>
-                            <span style={{ fontWeight: 700 }}>Predikcija:</span> ~{prediction.projected}h do kraja mjeseca
+                            <span className="u-fw-700">Predikcija:</span> ~{prediction.projected}h do kraja mjeseca
                             <span style={{ fontWeight: 700, color: prediction.diff > 0 ? 'var(--green)' : 'var(--red)', marginLeft: 6 }}>
                                 {prediction.diff > 0 ? '↑' : '↓'}{Math.abs(prediction.diff)}% vs prošli
                             </span>
@@ -209,7 +209,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
             }}>
                 {/* ── Activity (2×1 — first, most prominent) ── */}
                 <BentoCard style={{ animationDelay: '0.1s' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="u-bento-header">
                         <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--green-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--green)' }}>
                             <Icon name="history" size={14} />
                         </div>
@@ -234,7 +234,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
 
                 {/* ── Bar Chart (2×1) ── */}
                 <BentoCard style={{ animationDelay: '0.15s' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="u-bento-header">
                         <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--blue-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--blue)' }}>
                             <Icon name="report" size={14} />
                         </div>
@@ -248,7 +248,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
 
                 {/* ── Donut Chart (1×1) ── */}
                 <BentoCard style={{ animationDelay: '0.25s' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="u-bento-header" style={{ marginBottom: 12 }}>
                         <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--purple-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--purple)' }}>
                             <Icon name="project" size={14} />
                         </div>
@@ -290,7 +290,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr', gap: 20, marginBottom: 24 }}>
                 {/* ── Line Chart 30 days ── */}
                 <BentoCard style={{ animationDelay: '0.3s' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="u-bento-header">
                         <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--accent-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)' }}>
                             <Icon name="report" size={14} />
                         </div>
@@ -304,7 +304,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
 
                 {/* ── Heat Map ── */}
                 <BentoCard style={{ animationDelay: '0.35s' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="u-bento-header">
                         <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--green-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--green)' }}>
                             <Icon name="calendar" size={14} />
                         </div>
@@ -323,7 +323,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, marginBottom: 24 }}>
                 {/* ── Top Workers ── */}
                 <BentoCard style={{ animationDelay: '0.4s' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="u-bento-header">
                         <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--blue-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--blue)' }}>
                             <Icon name="workers" size={14} />
                         </div>
@@ -352,7 +352,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
 
                 {/* ── Currently at Work + Streak ── */}
                 <BentoCard style={{ animationDelay: '0.45s' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="u-bento-header">
                         <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--green-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--green)' }}>
                             <span style={{ fontSize: 14 }}>📍</span>
                         </div>
@@ -390,9 +390,9 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
             </div>
 
             {/* ═══ ROW 4: Sortable Project Table ═══ */}
-            <div style={{ marginBottom: 24 }}>
+            <div className="u-mb-24">
                 <BentoCard style={{ animationDelay: '0.5s' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="u-bento-header">
                         <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--blue-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--blue)' }}>
                             <Icon name="project" size={14} />
                         </div>
@@ -437,7 +437,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: 20, marginBottom: 24 }}>
                 {/* ── Financial with Donut ── */}
                 <BentoCard style={{ animationDelay: '0.55s' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="u-bento-header">
                         <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--yellow-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--yellow)' }}>
                             <Icon name="invoice" size={14} />
                         </div>
@@ -455,7 +455,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                     </div>
                     {financialCategories.length > 0 && <SvgDonutChart data={financialCategories} height={120} />}
                     {topSuppliers.length > 0 && (
-                        <div style={{ marginTop: 12 }}>
+                        <div className="u-mt-12">
                             <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6 }}>Top dobavljači</div>
                             {topSuppliers.slice(0, 3).map((s, i) => (
                                 <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--divider)', fontSize: 12 }}>
@@ -469,7 +469,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
 
                 {/* ── Fleet Dashboard ── */}
                 <BentoCard style={{ animationDelay: '0.6s' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="u-bento-header">
                         <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--purple-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--purple)' }}>
                             <Icon name="car" size={14} />
                         </div>
@@ -510,7 +510,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
 
                 {/* ── Obaveze Timeline ── */}
                 <BentoCard style={{ animationDelay: '0.65s' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="u-bento-header">
                         <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--accent-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)' }}>
                             <span style={{ fontSize: 14 }}>🎯</span>
                         </div>
@@ -543,7 +543,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, marginBottom: 24 }}>
                 {/* ── Workers without entries (>2 days) ── */}
                 <BentoCard style={{ animationDelay: '0.7s' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="u-bento-header">
                         <div style={{ width: 28, height: 28, borderRadius: 8, background: workersNoEntries.length > 0 ? 'var(--red-light)' : 'var(--green-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: workersNoEntries.length > 0 ? 'var(--red)' : 'var(--green)' }}>
                             <Icon name="alert-circle" size={14} />
                         </div>
@@ -566,7 +566,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
 
                 {/* ── Weekday Pattern ── */}
                 <BentoCard style={{ animationDelay: '0.75s' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="u-bento-header">
                         <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--accent-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)' }}>
                             <Icon name="calendar" size={14} />
                         </div>
@@ -580,7 +580,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, marginBottom: 24 }}>
                 {/* ── Workers per project ── */}
                 <BentoCard style={{ animationDelay: '0.8s' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="u-bento-header">
                         <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--green-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--green)' }}>
                             <Icon name="workers" size={14} />
                         </div>
@@ -591,7 +591,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                             {workersPerProject.map((p, i) => {
                                 const maxV = workersPerProject[0]?.value || 1;
                                 return (
-                                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <div key={i} className="u-flex-center u-gap-8">
                                         <span style={{ fontSize: 11, color: 'var(--text-muted)', width: 90, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flexShrink: 0 }}>{p.name}</span>
                                         <div style={{ flex: 1, height: 20, borderRadius: 5, background: 'var(--divider)', overflow: 'hidden' }}>
                                             <div style={{ height: '100%', borderRadius: 5, background: p.color, width: `${(p.value / maxV) * 100}%`, transition: 'width 0.8s ease', animation: `fadeIn 0.5s ease ${0.1 * i}s both` }} />
@@ -606,7 +606,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
 
                 {/* ── Cost per project ── */}
                 <BentoCard style={{ animationDelay: '0.85s' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="u-bento-header">
                         <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--red-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--red)' }}>
                             <Icon name="invoice" size={14} />
                         </div>
@@ -617,7 +617,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                             {costPerProject.map((p, i) => {
                                 const maxC = costPerProject[0]?.cost || 1;
                                 return (
-                                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <div key={i} className="u-flex-center u-gap-8">
                                         <span style={{ fontSize: 11, color: 'var(--text-muted)', width: 90, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flexShrink: 0 }}>{p.name}</span>
                                         <div style={{ flex: 1, height: 20, borderRadius: 5, background: 'var(--divider)', overflow: 'hidden' }}>
                                             <div style={{ height: '100%', borderRadius: 5, background: p.color, width: `${(p.cost / maxC) * 100}%`, transition: 'width 0.8s ease', animation: `fadeIn 0.5s ease ${0.1 * i}s both` }} />
@@ -635,7 +635,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, marginBottom: 24 }}>
                 {/* ── Project Status Donut ── */}
                 <BentoCard style={{ animationDelay: '0.9s' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="u-bento-header">
                         <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--blue-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--blue)' }}>
                             <Icon name="project" size={14} />
                         </div>
@@ -650,7 +650,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
 
                 {/* ── Unpaid Invoices Highlight ── */}
                 <BentoCard style={{ animationDelay: '0.95s' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="u-bento-header">
                         <div style={{ width: 28, height: 28, borderRadius: 8, background: unpaidInvoices.count > 0 ? 'var(--yellow-light)' : 'var(--green-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: unpaidInvoices.count > 0 ? 'var(--yellow)' : 'var(--green)' }}>
                             <Icon name="invoice" size={14} />
                         </div>
@@ -675,9 +675,9 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
             </div>
 
             {/* ═══ ROW 9: Audit Log ═══ */}
-            <div style={{ marginBottom: 24 }}>
+            <div className="u-mb-24">
                 <BentoCard style={{ animationDelay: '0.65s' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="u-bento-header">
                         <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--red-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--red)' }}>
                             <Icon name="security" size={14} />
                         </div>

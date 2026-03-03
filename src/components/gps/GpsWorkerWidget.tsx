@@ -116,7 +116,7 @@ export default function GpsWorkerWidget({ currentUser, projects, timesheets, isM
                 onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
             >
                 {/* Pulse dot */}
-                <div style={{ position: 'relative' }}>
+                <div className="u-relative">
                     <div style={{
                         width: 12, height: 12, borderRadius: '50%',
                         background: statusConfig.color,
@@ -159,7 +159,7 @@ export default function GpsWorkerWidget({ currentUser, projects, timesheets, isM
                 borderBottom: `1px solid ${C.border}40`,
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div className="u-flex-center u-gap-8">
                     <div style={{
                         width: 10, height: 10, borderRadius: '50%', background: statusConfig.color,
                         ...(status === 'inZone' ? { animation: 'pulse-dot 2s infinite' } : {}),

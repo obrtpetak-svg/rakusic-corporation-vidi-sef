@@ -227,14 +227,14 @@ export default function FleetRouteHistory({ vehicles }: { vehicles: FleetVehicle
 
                     {/* Replay Map */}
                     <div style={{ background: 'var(--card)', border: `1px solid ${C.border}`, borderRadius: 14, padding: 20 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                        <div className="u-card-header">
                             <div className="u-section-title">
                                 🗺️ Replay rute
                                 {currentPoint && <span style={{ fontSize: 11, color: C.textMuted, marginLeft: 8 }}>
                                     {Math.round(currentPoint.speed || 0)} km/h · {currentPoint.ts ? new Date(currentPoint.ts).toLocaleTimeString('hr') : ''}
                                 </span>}
                             </div>
-                            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                            <div className="u-flex-center u-gap-8">
                                 <button onClick={() => { setPlayIndex(0); setPlaying(false); }} style={ctrlBtn}>⏮</button>
                                 <button onClick={() => setPlaying(!playing)} style={{ ...ctrlBtn, background: playing ? '#EF4444' : C.accent, color: '#fff', border: 'none' }}>
                                     {playing ? '⏸' : '▶️'}

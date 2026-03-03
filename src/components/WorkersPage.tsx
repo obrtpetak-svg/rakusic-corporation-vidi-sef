@@ -179,7 +179,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                         <EditableField label="📍 Adresa" value={detailWorker.address} onSave={v => updateDoc('workers', detailWorker.id, { address: v })} placeholder="Dodaj adresu" />
                         {detailWorker.username && <EditableField label="👤 User" value={detailWorker.username} onSave={v => updateDoc('workers', detailWorker.id, { username: v })} placeholder="—" />}
                     </div>
-                    <div style={{ marginTop: 12 }}>
+                    <div className="u-mt-12">
                         <EditableField label="📝 Napomene" value={detailWorker.notes} onSave={v => updateDoc('workers', detailWorker.id, { notes: v })} placeholder="Dodaj napomenu..." />
                     </div>
                 </div>
@@ -207,7 +207,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                         <div key={p.name} style={{ padding: '10px 0', borderBottom: `1px solid ${C.border}7A` }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
                                 <span style={{ fontWeight: 600, fontSize: 13, color: C.text }}>{p.name}</span>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <div className="u-flex-center u-gap-8">
                                     <span style={{ fontSize: 13, fontWeight: 700, color: C.accent }}>{p.hours}h</span>
                                     <StatusBadge status={p.status} />
                                 </div>
@@ -230,7 +230,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
             </div>
             <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
                 <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
-                    <Input placeholder="Traži radnika..." value={search} onChange={e => setSearch(e.target.value)} style={{ paddingLeft: 36 }} />
+                    <Input placeholder="Traži radnika..." value={search} onChange={e => setSearch(e.target.value)} className="u-pl-36" />
                     <div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: C.textMuted }}><Icon name="search" size={16} /></div>
                 </div>
                 <Select value={filterActive} onChange={e => setFilterActive(e.target.value)} style={{ width: 160 }}>
@@ -273,7 +273,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
 
             {/* Pagination */}
             {filtered.length > pg.pageSize && (
-                <div style={{ marginTop: 16 }}>
+                <div className="u-mt-16">
                     <Pagination {...pg} totalItems={filtered.length} label="radnika" />
                 </div>
             )}
@@ -281,7 +281,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
             {/* Add/Edit Modal */}
             {showForm && (
                 <Modal title={editId ? 'Uredi radnika' : 'Novi radnik'} onClose={() => setShowForm(false)} wide>
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }} className="u-gap-16">
                         <Field label="Ime i prezime" required><Input value={form.name} onChange={e => update('name', e.target.value)} placeholder="Ivan Horvat" autoFocus /></Field>
                         <Field label="Pozicija / Zanimanje"><Input value={form.position} onChange={e => update('position', e.target.value)} placeholder="Zidar, Tesar, Vozač..." /></Field>
                         <Field label="Tel. Broj"><Input type="tel" value={form.phone} onChange={e => update('phone', e.target.value)} placeholder="+385 91 234 5678" /></Field>
@@ -298,7 +298,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                             <Field label="Uloga"><Select value={form.role} onChange={e => update('role', e.target.value)}><option value="radnik">Radnik</option><option value="leader">Voditelj</option><option value="admin">Administrator</option></Select></Field>
                         </div>
                         {form.role === 'leader' && (
-                            <div style={{ marginTop: 12 }}>
+                            <div className="u-mt-12">
                                 <Field label="Projekti voditelja (odaberi koje projekte smije vidjeti)">
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                                         {projects.map(p => {
@@ -330,7 +330,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                             <input type="checkbox" checked={form.active} onChange={e => update('active', e.target.checked)} style={{ accentColor: C.accent }} /> Aktivan
                         </label>
                     </div>
-                    <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 20 }}>
+                    <div className="u-flex-end">
                         <button onClick={() => setShowForm(false)} style={styles.btnSecondary}>Odustani</button>
                         <button onClick={doSave} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
                     </div>

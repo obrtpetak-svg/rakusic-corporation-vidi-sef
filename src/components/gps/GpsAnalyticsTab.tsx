@@ -296,7 +296,7 @@ export default function GpsAnalyticsTab({
                                 return (
                                     <div key={e.type} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                         <div style={{ fontSize: 18, width: 28, textAlign: 'center', flexShrink: 0 }}>{e.icon}</div>
-                                        <div style={{ flex: 1 }}>
+                                        <div className="u-flex-1">
                                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 2 }}>
                                                 <span style={{ fontWeight: 600, color: C.text }}>{e.label}</span>
                                                 <span style={{ color: C.textMuted }}>{e.count}x</span>

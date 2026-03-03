@@ -51,7 +51,7 @@ export function SmjestajPage({ workerFilterId }) {
                 <div className="u-fs-22 u-fw-800" style={{ color: C.text }}>{isWorker ? 'Moj smještaj' : 'Smještaj'}</div>
                 {!isWorker && <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> Novi smještaj</button>}
             </div>
-            <div style={{ position: 'relative', marginBottom: 20 }}><Input placeholder="Traži smještaj..." value={search} onChange={e => setSearch(e.target.value)} style={{ paddingLeft: 36 }} /><div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: C.textMuted }}><Icon name="search" size={16} /></div></div>
+            <div style={{ position: 'relative', marginBottom: 20 }}><Input placeholder="Traži smještaj..." value={search} onChange={e => setSearch(e.target.value)} className="u-pl-36" /><div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: C.textMuted }}><Icon name="search" size={16} /></div></div>
 
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
                 {filtered.map(s => {
@@ -86,7 +86,7 @@ export function SmjestajPage({ workerFilterId }) {
 
             {showForm && (
                 <Modal title={editId ? 'Uredi smještaj' : 'Novi smještaj'} onClose={() => setShowForm(false)} wide>
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }} className="u-gap-16">
                         <Field label="Naziv smještaja" required><Input value={form.name} onChange={e => update('name', e.target.value)} placeholder="Stan / Hostel / Apartman" autoFocus /></Field>
                         <Field label="Grad"><Input value={form.city} onChange={e => update('city', e.target.value)} placeholder="Zagreb" /></Field>
                         <Field label="Adresa"><Input value={form.address} onChange={e => update('address', e.target.value)} placeholder="Ulica i broj" /></Field>
@@ -99,7 +99,7 @@ export function SmjestajPage({ workerFilterId }) {
                     </div>
                     <Field label="Dodjeljeni radnici"><WorkerCheckboxList allWorkers={activeWorkers} selected={form.workerIds} onChange={v => update('workerIds', v)} /></Field>
                     <Field label="Napomene"><Textarea value={form.notes} onChange={e => update('notes', e.target.value)} placeholder="Napomene..." rows={2} /></Field>
-                    <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 20 }}>
+                    <div className="u-flex-end">
                         <button onClick={() => setShowForm(false)} style={styles.btnSecondary}>Odustani</button>
                         <button onClick={doSave} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
                     </div>

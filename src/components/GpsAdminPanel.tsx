@@ -57,7 +57,7 @@ export default function GpsAdminPanel({ leaderProjectIds }) {
     return (
         <div>
             {/* Header */}
-            <div style={{ marginBottom: 20 }}>
+            <div className="u-mb-20">
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
                     <div style={{
                         width: 44, height: 44, borderRadius: 12,
@@ -65,7 +65,7 @@ export default function GpsAdminPanel({ leaderProjectIds }) {
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: 22, color: 'white',
                     }}>📡</div>
-                    <div style={{ flex: 1 }}>
+                    <div className="u-flex-1">
                         <div className="u-fs-24 u-fw-800" style={{ color: C.text }}>GPS Nadzor</div>
                         <div className="u-fs-13" style={{ color: C.textMuted }}>
                             {gpsProjects.length} projekt{gpsProjects.length !== 1 ? 'a' : ''} s GPS-om
@@ -103,7 +103,7 @@ export default function GpsAdminPanel({ leaderProjectIds }) {
                     display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
                 }}>
                     <span style={{ fontSize: 24 }}>⚠️</span>
-                    <div style={{ flex: 1 }}>
+                    <div className="u-flex-1">
                         <div style={{ fontWeight: 700, color: C.yellow, fontSize: 14 }}>GPS modul je isključen</div>
                         <div style={{ color: C.textMuted, fontSize: 13 }}>Uključite GPS praćenje u Postavkama da počnete koristiti ovaj modul.</div>
                     </div>
@@ -265,7 +265,7 @@ function StatBox({ label, value, icon, color, sub, alert }) {
                 width: 70, height: 70, borderRadius: '50%',
                 background: `${color}08`,
             }} />
-            <div style={{ position: 'relative' }}>
+            <div className="u-relative">
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                     <span style={{ fontSize: 20 }}>{icon}</span>
                     <span style={{ fontSize: 10, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>

@@ -43,7 +43,7 @@ export function BulkActionBar({ count, actions = [], onClear }) {
             </div>
 
             {/* Spacer */}
-            <div style={{ flex: 1 }} />
+            <div className="u-flex-1" />
 
             {/* Actions */}
             {actions.map((action, i) => (

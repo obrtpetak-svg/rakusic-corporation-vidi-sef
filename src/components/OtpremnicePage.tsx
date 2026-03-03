@@ -142,7 +142,7 @@ export function OtpremnicePage({ workerFilterId }) {
                         {(otpremnice || []).length} otpremnica ukupno · Iznos: <b style={{ color: C.green }}>{totalAmount.toFixed(2)} €</b>
                     </div>
                 </div>
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <div className="u-flex-center u-gap-8">
                     <button onClick={exportPDF} style={{ ...styles.btnSecondary, fontSize: 13, padding: '8px 14px' }}>📄 PDF</button>
                     <button onClick={exportCSV} style={{ ...styles.btnSecondary, fontSize: 13, padding: '8px 14px' }}>📊 Excel/CSV</button>
                     <button style={styles.btn} onClick={() => setEditItem({})}><Icon name="plus" size={16} /> Nova otpremnica</button>
@@ -267,7 +267,7 @@ function OtpremniceForm({ item, projects, onSave, onClose, isMobile, isWorker })
 
     return (
         <Modal title={item.id ? 'Uredi otpremnicu' : 'Nova otpremnica'} onClose={onClose} wide>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }} className="u-gap-16">
                 <Field label="Datum" required><Input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} /></Field>
                 <Field label="Gradilište / Projekt" required><Select value={form.projectId} onChange={e => setForm(f => ({ ...f, projectId: e.target.value }))}><option value="">— Odaberi —</option>{projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</Select></Field>
                 <Field label="Dobavljač" required><Input value={form.supplier} onChange={e => setForm(f => ({ ...f, supplier: e.target.value }))} placeholder="Naziv dobavljača" /></Field>
@@ -284,7 +284,7 @@ function OtpremniceForm({ item, projects, onSave, onClose, isMobile, isWorker })
             </div>
             <Field label="Stavke"><Textarea value={form.items} onChange={e => setForm(f => ({ ...f, items: e.target.value }))} rows={3} placeholder="Popis stavki..." /></Field>
             <Field label="Napomena"><Textarea value={form.note} onChange={e => setForm(f => ({ ...f, note: e.target.value }))} rows={2} placeholder="Dodatne napomene..." /></Field>
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 20 }}>
+            <div className="u-flex-end">
                 <button onClick={onClose} style={styles.btnSecondary}>Odustani</button>
                 <button onClick={handleSave} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
             </div>

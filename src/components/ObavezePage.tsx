@@ -74,7 +74,7 @@ export function ObavezePage({ workerFilterId }) {
                 <div className="u-fs-22 u-fw-800" style={{ color: C.text }}>{isWorker ? 'Moje obaveze' : 'Obaveze'}</div>
                 {!isWorker && <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> Nova obaveza</button>}
             </div>
-            <div style={{ position: 'relative', marginBottom: 20 }}><Input placeholder="Traži..." value={search} onChange={e => setSearch(e.target.value)} style={{ paddingLeft: 36 }} /><div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: C.textMuted }}><Icon name="search" size={16} /></div></div>
+            <div style={{ position: 'relative', marginBottom: 20 }}><Input placeholder="Traži..." value={search} onChange={e => setSearch(e.target.value)} className="u-pl-36" /><div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: C.textMuted }}><Icon name="search" size={16} /></div></div>
 
             {filtered.map(o => {
                 const oWorkers = (o.workerIds || []).map(wid => workers.find(w => w.id === wid)).filter(Boolean);
@@ -86,7 +86,7 @@ export function ObavezePage({ workerFilterId }) {
                 return (
                     <div key={o.id} style={{ ...styles.card, marginBottom: 12, opacity: o.active === false ? 0.5 : 1 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
-                            <div style={{ flex: 1 }}>
+                            <div className="u-flex-1">
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                                     <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{o.title}</div>
                                     {o.priority !== 'normalan' && <span style={{ ...styles.badge(o.priority === 'hitno' ? '239,68,68' : '234,179,8'), fontSize: 10 }}>{o.priority?.toUpperCase()}</span>}
@@ -118,7 +118,7 @@ export function ObavezePage({ workerFilterId }) {
                                     const comp = completions.find(c => c.workerId === w.id);
                                     return (
                                         <div key={w.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 0', fontSize: 13 }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                            <div className="u-flex-center u-gap-8">
                                                 <div style={{ width: 24, height: 24, borderRadius: '50%', background: comp ? 'rgba(34,197,94,0.15)' : '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: comp ? C.green : C.textMuted }}>{comp ? '✓' : w.name?.charAt(0)}</div>
                                                 <span style={{ color: comp ? C.green : C.textDim, fontWeight: comp ? 600 : 400 }}>{w.name}</span>
                                             </div>
@@ -169,7 +169,7 @@ export function ObavezePage({ workerFilterId }) {
                             <input type="file" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx" onChange={handleFileUpload} style={{ display: 'none' }} />
                         </label>
                     </Field>
-                    <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 20 }}>
+                    <div className="u-flex-end">
                         <button onClick={() => setShowForm(false)} style={styles.btnSecondary}>Odustani</button>
                         <button onClick={doSave} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
                     </div>

@@ -71,7 +71,7 @@ export function KalendarPage() {
 
             <div style={styles.card}>
                 {/* Month nav */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                <div className="u-flex-between u-mb-20">
                     <button onClick={prev} style={styles.btnSecondary}><Icon name="back" size={16} /></button>
                     <div style={{ fontSize: 18, fontWeight: 800, color: C.text }}>{monthNames[currentMonth.month]} {currentMonth.year}</div>
                     <button onClick={next} style={{ ...styles.btnSecondary, transform: 'rotate(180deg)' }}><Icon name="back" size={16} /></button>
@@ -123,7 +123,7 @@ export function KalendarPage() {
             {/* Selected day detail */}
             {selectedDay && selectedTs.length > 0 && (
                 <div style={{ ...styles.card, marginTop: 20 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <div className="u-card-header">
                         <div className="u-section-title">{fmtDate(selectedDay)} — {selectedTs.length} unos{selectedTs.length > 1 ? 'a' : ''} ({(selectedTs.reduce((s, t) => s + diffMins(t.startTime, t.endTime), 0) / 60).toFixed(1)}h)</div>
                         <div className="u-fs-12" style={{ color: C.textMuted }}>{new Set(selectedTs.map(t => t.workerId)).size} radnika</div>
                     </div>
@@ -135,9 +135,9 @@ export function KalendarPage() {
                             <div key={t.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: `1px solid ${C.border}7A`, fontSize: 13 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                     <div style={{ width: 28, height: 28, borderRadius: '50%', background: C.accentLight, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: C.accent }}>{w?.name?.charAt(0)}</div>
-                                    <div><div style={{ fontWeight: 600 }}>{w?.name || '—'}</div><div className="u-fs-11" style={{ color: C.textMuted }}>{p?.name || '—'} • {t.startTime}–{t.endTime}</div></div>
+                                    <div><div className="u-fw-600">{w?.name || '—'}</div><div className="u-fs-11" style={{ color: C.textMuted }}>{p?.name || '—'} • {t.startTime}–{t.endTime}</div></div>
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <div className="u-flex-center u-gap-8">
                                     <span style={{ fontWeight: 700, color: C.accent }}>{(mins / 60).toFixed(1)}h</span>
                                     <StatusBadge status={t.status} />
                                 </div>

@@ -28,7 +28,7 @@ export default function WorkerLocationCard({ worker: w, getProjectName }) {
         >
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                 {/* Avatar with status ring */}
-                <div style={{ position: 'relative' }}>
+                <div className="u-relative">
                     <div style={{
                         width: 44, height: 44, borderRadius: '50%',
                         background: `${statusColor}20`,
@@ -49,7 +49,7 @@ export default function WorkerLocationCard({ worker: w, getProjectName }) {
                     )}
                 </div>
 
-                <div style={{ flex: 1 }}>
+                <div className="u-flex-1">
                     <div style={{ fontWeight: 700, fontSize: 14, color: C.text }}>{w.name}</div>
                     <div className="u-fs-12" style={{ color: C.textMuted }}>{w.position || w.role || 'Radnik'}</div>
                 </div>

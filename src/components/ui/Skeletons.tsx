@@ -22,7 +22,7 @@ export const SkeletonLine = ({ width = '100%', height = 14, style: sx = {} }) =>
 
 export const SkeletonCard = ({ lines = 3, style: sx = {} }) => (
     <div style={{ ...styles.card, ...sx }}>
-        <SkeletonLine width="40%" height={18} style={{ marginBottom: 16 }} />
+        <SkeletonLine width="40%" height={18} className="u-mb-16" />
         {Array.from({ length: lines }).map((_, i) => <SkeletonLine key={i} width={`${85 - i * 15}%`} style={{ marginBottom: 10 }} />)}
     </div>
 );
@@ -32,7 +32,7 @@ export const SkeletonStatCards = ({ count = 4 }) => (
         {Array.from({ length: count }).map((_, i) => (
             <div key={i} style={{ ...styles.card, display: 'flex', alignItems: 'center', gap: 16 }}>
                 <SkeletonLine width={44} height={44} style={{ borderRadius: 12, flexShrink: 0 }} />
-                <div style={{ flex: 1 }}><SkeletonLine width="60%" height={12} style={{ marginBottom: 8 }} /><SkeletonLine width="40%" height={22} /></div>
+                <div className="u-flex-1"><SkeletonLine width="60%" height={12} style={{ marginBottom: 8 }} /><SkeletonLine width="40%" height={22} /></div>
             </div>
         ))}
     </div>

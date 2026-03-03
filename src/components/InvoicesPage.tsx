@@ -138,7 +138,7 @@ export function InvoicesPage({ workerFilterId }) {
                     <div style={{ fontSize: 26, fontWeight: 800, color: C.text }}>{isWorker ? 'Moji računi' : 'Računi R1'}</div>
                     <div style={{ color: C.textMuted, fontSize: 14 }}>{isWorker ? `${filtered.length} računa` : <>Ukupno troškovi: <b style={{ color: C.green }}>{totalAmount.toFixed(2)} €</b></>}</div>
                 </div>
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <div className="u-flex-center u-gap-8">
                     <button onClick={exportPDF} style={{ ...styles.btnSecondary, fontSize: 13, padding: '8px 14px' }}>📄 PDF</button>
                     <button onClick={exportCSV} style={{ ...styles.btnSecondary, fontSize: 13, padding: '8px 14px' }}>📊 Excel/CSV</button>
                     <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> {isWorker ? 'Pošalji račun' : 'Novi račun'}</button>
@@ -180,7 +180,7 @@ export function InvoicesPage({ workerFilterId }) {
                                     <td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{inv.amount ? `${parseFloat(inv.amount).toFixed(2)} ${inv.currency || '€'}` : '—'}</td>
                                     <td style={styles.td}><StatusBadge status={inv.status} /></td>
                                     <td style={styles.td}>
-                                        <div style={{ display: 'flex', gap: 4 }}>
+                                        <div className="u-flex-gap-4">
                                             {isPending && !isWorker && <>
                                                 <button onClick={() => approveInvoice(inv)} style={{ ...styles.btnSmall, background: 'rgba(34,197,94,0.15)', color: C.green, border: '1px solid rgba(34,197,94,0.3)' }}><Icon name="check" size={14} /></button>
                                                 <button onClick={() => rejectInvoice(inv)} style={styles.btnDanger}><Icon name="close" size={14} /></button>
@@ -205,7 +205,7 @@ export function InvoicesPage({ workerFilterId }) {
             {detailInv && (
                 <Modal title={`Račun: ${detailInv.invoiceNumber || detailInv.id}`} onClose={() => setDetailId(null)}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
-                        <div><span style={styles.label}>Broj računa</span><div style={{ fontWeight: 600 }}>{detailInv.invoiceNumber || '—'}</div></div>
+                        <div><span style={styles.label}>Broj računa</span><div className="u-fw-600">{detailInv.invoiceNumber || '—'}</div></div>
                         <div><span style={styles.label}>Datum</span><div>{fmtDate(detailInv.date)}</div></div>
                         <div><span style={styles.label}>Dobavljač</span><div>{detailInv.supplier || '—'}</div></div>
                         <div><span style={styles.label}>Kategorija</span><div>{detailInv.category || '—'}</div></div>
@@ -214,11 +214,11 @@ export function InvoicesPage({ workerFilterId }) {
                         {detailInv.projectId && <div><span style={styles.label}>Projekt</span><div>{projects.find(p => p.id === detailInv.projectId)?.name || '—'}</div></div>}
                         {detailInv.source && <div><span style={styles.label}>Izvor</span><div>{detailInv.source === 'admin' ? 'Admin' : 'Radnik'}</div></div>}
                     </div>
-                    {detailInv.description && <div style={{ marginBottom: 12 }}><span style={styles.label}>Opis</span><div style={{ padding: '10px 14px', borderRadius: 8, background: C.bgElevated, fontSize: 13 }}>{detailInv.description}</div></div>}
-                    {detailInv.notes && <div style={{ marginBottom: 12 }}><span style={styles.label}>Napomene</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(245,158,11,0.08)', fontSize: 13, color: C.yellow }}>{detailInv.notes}</div></div>}
-                    {detailInv.rejectReason && <div style={{ marginBottom: 12 }}><span style={styles.label}>Razlog odbijanja</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(239,68,68,0.1)', fontSize: 13, color: C.red }}>{detailInv.rejectReason}</div></div>}
+                    {detailInv.description && <div className="u-mb-12"><span style={styles.label}>Opis</span><div style={{ padding: '10px 14px', borderRadius: 8, background: C.bgElevated, fontSize: 13 }}>{detailInv.description}</div></div>}
+                    {detailInv.notes && <div className="u-mb-12"><span style={styles.label}>Napomene</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(245,158,11,0.08)', fontSize: 13, color: C.yellow }}>{detailInv.notes}</div></div>}
+                    {detailInv.rejectReason && <div className="u-mb-12"><span style={styles.label}>Razlog odbijanja</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(239,68,68,0.1)', fontSize: 13, color: C.red }}>{detailInv.rejectReason}</div></div>}
                     {detailInv.file && (
-                        <div style={{ marginBottom: 12 }}>
+                        <div className="u-mb-12">
                             <span style={styles.label}>Priložena datoteka</span>
                             {detailInv.file.type?.startsWith('image/') ? (
                                 <img src={detailInv.file.data} alt="Račun" style={{ maxWidth: '100%', maxHeight: 400, borderRadius: 8, border: `1px solid ${C.border}`, marginTop: 8 }} />
@@ -239,7 +239,7 @@ export function InvoicesPage({ workerFilterId }) {
             {/* Add/Edit Modal */}
             {showForm && (
                 <Modal title={editId ? 'Uredi račun' : (isWorker ? 'Pošalji račun' : 'Novi račun')} onClose={() => setShowForm(false)} wide>
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }} className="u-gap-16">
                         <Field label="Broj računa"><Input value={form.invoiceNumber} onChange={e => update('invoiceNumber', e.target.value)} placeholder="R1-001" /></Field>
                         <Field label="Datum"><Input type="date" value={form.date} onChange={e => update('date', e.target.value)} /></Field>
                         <Field label="Dobavljač"><Input value={form.supplier} onChange={e => update('supplier', e.target.value)} placeholder="Ime dobavljača" /></Field>
@@ -270,13 +270,13 @@ export function InvoicesPage({ workerFilterId }) {
                     <Field label="Opis"><Textarea value={form.description} onChange={e => update('description', e.target.value)} placeholder="Opis stavki računa..." /></Field>
                     <Field label="Napomene"><Input value={form.notes} onChange={e => update('notes', e.target.value)} placeholder="Interne napomene..." /></Field>
                     <Field label="Priloži fotografiju/PDF računa">
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div className="u-flex-center u-gap-12">
                             <label style={{ ...styles.btnSmall, cursor: 'pointer' }}><Icon name="upload" size={14} /> {fileData ? fileData.name : 'Odaberi datoteku'}<input type="file" accept="image/*,application/pdf" onChange={handleFile} style={{ display: 'none' }} /></label>
                             {fileData && <button onClick={() => setFileData(null)} style={{ background: 'none', border: 'none', color: C.red, cursor: 'pointer', fontSize: 12 }}>✕ Ukloni</button>}
                         </div>
                         {fileData && fileData.type?.startsWith('image/') && <img src={fileData.data} alt="Preview" style={{ marginTop: 8, maxWidth: 200, maxHeight: 150, borderRadius: 8, border: `1px solid ${C.border}` }} />}
                     </Field>
-                    <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 20 }}>
+                    <div className="u-flex-end">
                         <button onClick={() => setShowForm(false)} style={styles.btnSecondary}>Odustani</button>
                         <button onClick={doSave} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
                     </div>

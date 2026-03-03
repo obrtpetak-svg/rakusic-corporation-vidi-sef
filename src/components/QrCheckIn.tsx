@@ -145,8 +145,8 @@ export function QrCheckIn() {
                         <div>
                             <button onClick={startScan} style={{ ...styles.btn, width: '100%', justifyContent: 'center', padding: '18px 24px', fontSize: 16, marginBottom: 16 }}>📷 Skeniraj QR kod</button>
                             <div style={{ fontSize: 12, color: C.textMuted, textAlign: 'center', marginBottom: 16 }}>ili unesite kod ručno</div>
-                            <div style={{ display: 'flex', gap: 8 }}>
-                                <Input value={manualCode} onChange={e => setManualCode(e.target.value)} placeholder="VIDISEF:project-id" style={{ flex: 1 }} onKeyDown={e => e.key === 'Enter' && handleManualSubmit()} />
+                            <div className="u-flex-gap-8">
+                                <Input value={manualCode} onChange={e => setManualCode(e.target.value)} placeholder="VIDISEF:project-id" className="u-flex-1" onKeyDown={e => e.key === 'Enter' && handleManualSubmit()} />
                                 <button onClick={handleManualSubmit} disabled={!manualCode.trim()} style={styles.btn}><Icon name="check" size={16} /></button>
                             </div>
                         </div>

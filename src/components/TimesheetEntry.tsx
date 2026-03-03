@@ -142,8 +142,8 @@ export function TimesheetEntry() {
                 <Field label="Opis rada"><Input value={form.description} onChange={e => update('description', e.target.value)} placeholder="Što ste radili..." /></Field>
 
                 <Field label="GPS Lokacija">
-                    <div style={{ display: 'flex', gap: 8 }}>
-                        <Input value={form.gpsLocation} onChange={e => update('gpsLocation', e.target.value)} placeholder="Automatski ili ručno" style={{ flex: 1 }} readOnly />
+                    <div className="u-flex-gap-8">
+                        <Input value={form.gpsLocation} onChange={e => update('gpsLocation', e.target.value)} placeholder="Automatski ili ručno" className="u-flex-1" readOnly />
                         <button type="button" onClick={getGPS} disabled={form.gpsLoading} style={{ ...styles.btn, whiteSpace: 'nowrap' }}>
                             {form.gpsLoading ? '📡 ...' : '📍 GPS'}
                         </button>
@@ -152,7 +152,7 @@ export function TimesheetEntry() {
                 </Field>
 
                 <Field label="Priloži račun (opcionalno)">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div className="u-flex-center u-gap-12">
                         <label style={{ ...styles.btnSmall, cursor: 'pointer' }}>
                             <Icon name="upload" size={14} /> {invoiceFile ? invoiceFile.name : 'Odaberi datoteku'}
                             <input type="file" accept="image/*,application/pdf" onChange={handleFile} style={{ display: 'none' }} />
@@ -180,7 +180,7 @@ export function TimesheetEntry() {
                     return (
                         <div key={t.id} style={{ padding: '12px 0', borderBottom: `1px solid ${C.border}7A` }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13 }}>
-                                <div style={{ flex: 1 }}>
+                                <div className="u-flex-1">
                                     <div style={{ fontWeight: 600, color: C.textDim }}>{p?.name || '—'} — {fmtDate(t.date)}</div>
                                     <div style={{ color: C.textMuted, fontSize: 12 }}>{t.startTime} - {t.endTime} ({(mins / 60).toFixed(1)}h) {t.description && `• ${t.description.slice(0, 40)}`}</div>
                                 </div>

@@ -188,7 +188,7 @@ export function LeaveTracker() {
                                 <span style={{ fontWeight: 600, color: C.text, fontSize: 13 }}>{w?.name || '—'}</span>{' '}
                                 <span style={{ color: C.textMuted, fontSize: 12 }}>— {fmtDate(r.date)}</span>
                             </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <div className="u-flex-center u-gap-8">
                                 <span style={{ fontSize: 11, color: lt.color, fontWeight: 600 }}>{lt.label}</span>
                                 <span style={{ ...styles.badge(r.status === 'odobren' ? '34,197,94' : r.status === 'odbijen' ? '239,68,68' : '234,179,8'), fontSize: 10 }}>
                                     {r.status === 'odobren' ? 'ODOBREN' : r.status === 'odbijen' ? 'ODBIJEN' : 'ČEKA'}

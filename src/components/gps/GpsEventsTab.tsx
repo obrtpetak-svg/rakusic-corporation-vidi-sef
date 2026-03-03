@@ -77,7 +77,7 @@ export default function GpsEventsTab({ events, getWorkerName, getProjectName, is
                                     }}>
                                         {meta.icon}
                                     </div>
-                                    <div style={{ flex: 1 }}>
+                                    <div className="u-flex-1">
                                         <div style={{ fontSize: 13, fontWeight: 600, color: isAlarm ? '#EF4444' : C.text }}>
                                             {event.workerName || getWorkerName(event.workerId)} — {meta.label}
                                         </div>

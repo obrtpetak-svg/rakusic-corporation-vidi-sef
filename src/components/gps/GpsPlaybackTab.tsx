@@ -306,7 +306,7 @@ export default function GpsPlaybackTab({
                             </div>
 
                             {/* Speed toggle */}
-                            <div style={{ display: 'flex', gap: 4 }}>
+                            <div className="u-flex-gap-4">
                                 {[1, 2, 5].map(s => (
                                     <button key={s} onClick={() => setSpeed(s)} style={{
                                         padding: '6px 10px', borderRadius: 6, border: `1px solid ${C.border}`,
@@ -332,7 +332,7 @@ export default function GpsPlaybackTab({
                                 border: `1px solid ${currentMeta.color}20`,
                             }}>
                                 <div style={{ fontSize: 24 }}>{currentMeta.icon}</div>
-                                <div style={{ flex: 1 }}>
+                                <div className="u-flex-1">
                                     <div style={{ fontWeight: 700, fontSize: 13, color: C.text }}>{currentMeta.label}</div>
                                     <div className="u-fs-12" style={{ color: C.textMuted }}>
                                         {currentEvent.timestamp ? new Date(currentEvent.timestamp).toLocaleTimeString('hr', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : ''}
@@ -371,7 +371,7 @@ export default function GpsPlaybackTab({
                                             transition: 'all 0.15s',
                                         }}>
                                         <div style={{ fontSize: 14, width: 24, textAlign: 'center' }}>{meta.icon}</div>
-                                        <div style={{ flex: 1 }}>
+                                        <div className="u-flex-1">
                                             <div style={{ fontSize: 12, fontWeight: isCurrent ? 700 : 500, color: isCurrent ? C.accent : C.text }}>
                                                 {meta.label}
                                             </div>

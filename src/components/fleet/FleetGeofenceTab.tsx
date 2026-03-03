@@ -31,10 +31,10 @@ export default function FleetGeofenceTab({ vehicles }: { vehicles: FleetVehicle[
     const [showAdd, setShowAdd] = useState(false);
 
     return (
-        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }} className="u-gap-16">
             {/* ── Geofence List ── */}
             <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <div className="u-card-header">
                     <div className="u-section-title">🏗️ Geofence zone ({geofences.length})</div>
                     <button onClick={() => setShowAdd(true)} style={{ ...styles.btn, fontSize: 11, padding: '6px 12px' }}>+ Nova zona</button>
                 </div>
@@ -49,7 +49,7 @@ export default function FleetGeofenceTab({ vehicles }: { vehicles: FleetVehicle[
                                 width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 background: g.active ? 'rgba(99,102,241,0.12)' : 'rgba(107,114,128,0.12)', fontSize: 20,
                             }}>{g.type === 'circle' ? '⭕' : '🔷'}</div>
-                            <div style={{ flex: 1 }}>
+                            <div className="u-flex-1">
                                 <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{g.name}</div>
                                 <div className="u-fs-11" style={{ color: C.textMuted }}>
                                     {g.type === 'circle' ? `Krug · ${g.radius}m` : 'Poligon'} · Alert: {g.alertType === 'both' ? 'ulaz+izlaz' : g.alertType === 'enter' ? 'ulaz' : 'izlaz'}
@@ -80,7 +80,7 @@ export default function FleetGeofenceTab({ vehicles }: { vehicles: FleetVehicle[
                                 <input placeholder="Lng" type="number" step={0.001} style={{ padding: '8px', borderRadius: 8, border: `1px solid ${C.border}`, background: 'var(--bg)', color: C.text, fontSize: 12 }} />
                                 <input placeholder="Radius (m)" type="number" defaultValue={300} style={{ padding: '8px', borderRadius: 8, border: `1px solid ${C.border}`, background: 'var(--bg)', color: C.text, fontSize: 12 }} />
                             </div>
-                            <div style={{ display: 'flex', gap: 8 }}>
+                            <div className="u-flex-gap-8">
                                 <button onClick={() => setShowAdd(false)} style={styles.btnSecondary}>Odustani</button>
                                 <button onClick={() => { setShowAdd(false); setGeofences(prev => [...prev, { id: genId(), name: 'Nova zona', type: 'circle', lat: 45.8, lng: 15.98, radius: 300, alertType: 'both', active: true }]); }}
                                     style={styles.btn}>✅ Spremi</button>
@@ -99,7 +99,7 @@ export default function FleetGeofenceTab({ vehicles }: { vehicles: FleetVehicle[
                             <span style={{ fontSize: 16 }}>
                                 {e.type === 'GEOFENCE_ENTER' ? '📥' : e.type === 'GEOFENCE_EXIT' ? '📤' : '⚡'}
                             </span>
-                            <div style={{ flex: 1 }}>
+                            <div className="u-flex-1">
                                 <div style={{ fontSize: 12, fontWeight: 600, color: C.text }}>
                                     {e.vehicleName} — {e.type === 'GEOFENCE_ENTER' ? 'Ulaz u zonu' : e.type === 'GEOFENCE_EXIT' ? 'Izlaz iz zone' : 'Prekoračenje brzine'}
                                 </div>

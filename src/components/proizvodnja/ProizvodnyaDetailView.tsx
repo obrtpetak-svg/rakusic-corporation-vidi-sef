@@ -43,7 +43,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                             <div style={{ fontSize: 13, color: C.textMuted, marginTop: 4 }}>🏢 {detailOrder.client || '—'} {detailOrder.quantity && `• ${detailOrder.quantity} ${detailOrder.unit}`}</div>
                             {detailOrder.projectId && (() => { const proj = projects.find(p => p.id === detailOrder.projectId); return proj ? <div style={{ fontSize: 12, color: '#7C3AED', fontWeight: 600, marginTop: 2 }}>📁 Projekt: {proj.name}</div> : null; })()}
                         </div>
-                        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                        <div className="u-flex-center u-gap-8">
                             {detailOrder.priority === 'hitno' && <span style={{ fontSize: 11, fontWeight: 700, color: '#EF4444', background: 'rgba(239,68,68,0.1)', padding: '4px 10px', borderRadius: 6 }}>🔴 HITNO</span>}
                             {detailOrder.priority === 'visok' && <span style={{ fontSize: 11, fontWeight: 700, color: '#F59E0B', background: 'rgba(245,158,11,0.1)', padding: '4px 10px', borderRadius: 6 }}>🟡 Visok</span>}
                             <span style={{ fontSize: 12, fontWeight: 700, color: STAGES[stageIdx]?.color, background: `${STAGES[stageIdx]?.color}18`, padding: '4px 12px', borderRadius: 8 }}>
@@ -53,7 +53,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                     </div>
 
                     {/* Progress bar */}
-                    <div style={{ marginBottom: 16 }}>
+                    <div className="u-mb-16">
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: C.textMuted, marginBottom: 6 }}>
                             <span>Napredak</span>
                             <span style={{ fontWeight: 700, color: stageIdx === STAGES.length - 1 ? C.green : C.accent }}>{Math.round(progressPct)}%</span>
@@ -168,7 +168,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                         {detailOrder.notes && <div style={{ marginTop: 12, padding: '10px 14px', borderRadius: 8, background: 'rgba(245,158,11,0.08)', fontSize: 13, color: '#D97706' }}>📝 {detailOrder.notes}</div>}
 
                         {/* Stage timeline */}
-                        <div style={{ marginTop: 20 }}>
+                        <div className="u-mt-20">
                             <div className="u-section-title u-mb-12">Tok narudžbe</div>
                             {STAGES.map((s, i) => {
                                 const record = stageHistory.find(r => r.stage === s.id);
@@ -265,7 +265,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                     const done = subtasks.filter(t => t.status === 'gotovo').length;
                     return (
                         <div style={{ ...styles.card, marginBottom: 20 }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                            <div className="u-flex-between u-mb-16">
                                 <div className="u-section-title">☑️ Radni zadaci ({done}/{subtasks.length})</div>
                                 {canManage && <button onClick={addSubtask} style={styles.btnSmall}><Icon name="plus" size={12} /> Novi zadatak</button>}
                             </div>
@@ -275,7 +275,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                                     {subtasks.map(t => (
                                         <div key={t.id} style={{ padding: '10px 14px', borderRadius: 10, background: t.status === 'gotovo' ? 'rgba(16,185,129,0.04)' : 'var(--bg)', border: `1px solid ${t.status === 'gotovo' ? 'rgba(16,185,129,0.2)' : C.border}`, display: 'flex', alignItems: 'center', gap: 10 }}>
                                             <input type="checkbox" checked={t.status === 'gotovo'} onChange={() => toggleSubtask(t.id)} style={{ width: 18, height: 18, accentColor: '#10B981', flexShrink: 0 }} />
-                                            <div style={{ flex: 1 }}>
+                                            <div className="u-flex-1">
                                                 <div style={{ fontSize: 13, fontWeight: 600, color: t.status === 'gotovo' ? '#10B981' : C.text, textDecoration: t.status === 'gotovo' ? 'line-through' : 'none' }}>{t.title}</div>
                                                 <div style={{ display: 'flex', gap: 8, marginTop: 4, fontSize: 10, color: C.textMuted, flexWrap: 'wrap', alignItems: 'center' }}>
                                                     {canManage ? (
@@ -354,7 +354,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                             </div>
 
                             {/* Materials */}
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                            <div className="u-card-header">
                                 <div className="u-section-title">🧱 Materijali</div>
                                 {canManage && <button onClick={addSpecMaterial} style={styles.btnSmall}><Icon name="plus" size={12} /> Dodaj</button>}
                             </div>
@@ -365,7 +365,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                                         <tbody>
                                             {specs.materials.map(m => (
                                                 <tr key={m.id}>
-                                                    <td style={styles.td}>{canManage ? <Input value={m.name} onChange={e => updateSpecMaterial(m.id, 'name', e.target.value)} placeholder="Stup, Nosač..." style={{ fontSize: 12, padding: '4px 8px' }} /> : <span style={{ fontWeight: 600 }}>{m.name}</span>}</td>
+                                                    <td style={styles.td}>{canManage ? <Input value={m.name} onChange={e => updateSpecMaterial(m.id, 'name', e.target.value)} placeholder="Stup, Nosač..." style={{ fontSize: 12, padding: '4px 8px' }} /> : <span className="u-fw-600">{m.name}</span>}</td>
                                                     <td style={styles.td}>{canManage ? <Input value={m.profile} onChange={e => updateSpecMaterial(m.id, 'profile', e.target.value)} placeholder="HEB 300" style={{ fontSize: 12, padding: '4px 8px' }} /> : m.profile}</td>
                                                     <td style={styles.td}>{canManage ? <Input type="number" value={m.quantity} onChange={e => updateSpecMaterial(m.id, 'quantity', parseFloat(e.target.value) || 0)} style={{ fontSize: 12, padding: '4px 8px', width: 65 }} /> : m.quantity}</td>
                                                     <td style={styles.td}>{canManage ? <Select value={m.unit} onChange={e => updateSpecMaterial(m.id, 'unit', e.target.value)} style={{ fontSize: 11, padding: '4px' }}>{SPEC_UNITS.map(u => <option key={u} value={u}>{u}</option>)}</Select> : m.unit}</td>
@@ -422,7 +422,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                 {/* Troškovnik tab */}
                 {detailTab === 'troskovnik' && (
                     <div style={{ ...styles.card, marginBottom: 20 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                        <div className="u-flex-between u-mb-16">
                             <div className="u-section-title">🧾 Troškovnik ({costItems.length} stavki)</div>
                             {canManage && <button onClick={() => setShowCostForm(true)} style={styles.btnSmall}><Icon name="plus" size={12} /> Nova stavka</button>}
                         </div>
@@ -467,7 +467,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                                     <tbody>
                                         {costItems.map(c => (
                                             <tr key={c.id}>
-                                                <td style={styles.td}><span style={{ fontWeight: 600 }}>{c.name}</span>{c.notes && <div style={{ fontSize: 10, color: C.textMuted }}>{c.notes}</div>}</td>
+                                                <td style={styles.td}><span className="u-fw-600">{c.name}</span>{c.notes && <div style={{ fontSize: 10, color: C.textMuted }}>{c.notes}</div>}</td>
                                                 <td style={styles.td}>{COST_CATEGORIES.find(cat => cat.value === c.category)?.label || c.category}</td>
                                                 <td style={styles.td}>{c.quantity}</td>
                                                 <td style={styles.td}>{(c.unitPrice || 0).toFixed(2)}€</td>
@@ -503,7 +503,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                 {/* Dokumenti tab */}
                 {detailTab === 'dokumenti' && (
                     <div style={{ ...styles.card, marginBottom: 20 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                        <div className="u-flex-between u-mb-16">
                             <div className="u-section-title">📎 Dokumenti ({files.length})</div>
                             {canManage && (
                                 <label style={{ ...styles.btnSmall, cursor: 'pointer', display: 'inline-flex' }}>
@@ -522,7 +522,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                                             </div>
                                         ) : (
                                             <div style={{ height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(128,128,128,0.06)' }}>
-                                                <div style={{ textAlign: 'center' }}><Icon name="file" size={28} /><div style={{ fontSize: 10, color: C.textMuted, marginTop: 4 }}>{f.type || 'File'}</div></div>
+                                                <div className="u-text-center"><Icon name="file" size={28} /><div style={{ fontSize: 10, color: C.textMuted, marginTop: 4 }}>{f.type || 'File'}</div></div>
                                             </div>
                                         )}
                                         <div style={{ padding: '8px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -575,12 +575,12 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                             <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{signOffOrder.orderNumber} — {signOffOrder.name}</div>
                             {nextStage && <div style={{ fontSize: 12, color: C.textMuted, marginTop: 4 }}>Sljedeća faza: <strong style={{ color: nextStage.color }}>{nextStage.emoji} {nextStage.label}</strong></div>}
                         </div>
-                        <div style={{ marginBottom: 12 }}>
+                        <div className="u-mb-12">
                             <div style={{ fontSize: 12, fontWeight: 700, color: C.textMuted, marginBottom: 4, textTransform: 'uppercase' }}>Potpisuje</div>
                             <div style={{ fontSize: 14, fontWeight: 700, color: C.text, padding: '10px 14px', borderRadius: 8, background: C.bgElevated }}>{currentUser?.name || 'Nepoznat'}</div>
                         </div>
                         <Field label="Kontrolna bilješka (opcionalno)"><Textarea value={signOffNote} onChange={e => setSignOffNote(e.target.value)} placeholder="Napomena o fazi, kvaliteta, status kontrole..." rows={2} /></Field>
-                        <div style={{ marginBottom: 12 }}>
+                        <div className="u-mb-12">
                             <div style={{ fontSize: 12, fontWeight: 700, color: C.textMuted, marginBottom: 6, textTransform: 'uppercase' }}>✍️ Potpis</div>
                             <div style={{ position: 'relative', borderRadius: 10, border: `1.5px solid ${C.border}`, overflow: 'hidden', background: '#fff' }}>
                                 <canvas ref={initSigCanvas} width={380} height={120} style={{ width: '100%', height: 120, touchAction: 'none', cursor: 'crosshair' }} />

@@ -18,7 +18,7 @@ function AppContent() {
     if (step === 'loading') {
         return (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg)', transition: 'background 0.4s ease' }}>
-                <div style={{ textAlign: 'center' }}>
+                <div className="u-text-center">
                     <img src="/icon-192.png" alt="Rakušić Corporation" style={{ width: 64, height: 64, borderRadius: 16, marginBottom: 16 }} />
                     <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text)' }}>RAKUŠIĆ corporation</div>
                     <div style={{ color: 'var(--text-muted)', marginTop: 8 }}>Učitavanje...</div>

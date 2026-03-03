@@ -9,7 +9,7 @@ export const LazyFallback = ({ type = 'dashboard' }) => {
                 <SkeletonBlock w={130} h={40} r={12} />
             </div>
             <div className="skel-filter-bar">
-                <SkeletonBlock h={40} r={8} style={{ flex: 1 }} />
+                <SkeletonBlock h={40} r={8} className="u-flex-1" />
                 <SkeletonBlock w={140} h={40} r={8} />
                 <SkeletonBlock w={100} h={40} r={8} />
             </div>
@@ -38,7 +38,7 @@ export const LazyFallback = ({ type = 'dashboard' }) => {
                 <SkeletonBlock w={140} h={40} r={12} />
             </div>
             <div className="skel-filter-bar">
-                <SkeletonBlock h={40} r={8} style={{ flex: 1 }} />
+                <SkeletonBlock h={40} r={8} className="u-flex-1" />
                 <SkeletonBlock w={140} h={40} r={8} />
             </div>
             <div className="skel-card-grid">
@@ -81,11 +81,11 @@ export const LazyFallback = ({ type = 'dashboard' }) => {
             </div>
             <div className="skel-content-grid">
                 <div className="skel-content-card skel-content-main">
-                    <SkeletonBlock w={180} h={16} r={8} style={{ marginBottom: 16 }} />
+                    <SkeletonBlock w={180} h={16} r={8} className="u-mb-16" />
                     <SkeletonBlock h={160} r={10} />
                 </div>
                 <div className="skel-content-card">
-                    <SkeletonBlock w={100} h={16} r={8} style={{ marginBottom: 16 }} />
+                    <SkeletonBlock w={100} h={16} r={8} className="u-mb-16" />
                     {[0, 1, 2, 3].map(i => <SkeletonBlock key={i} h={40} r={10} style={{ marginBottom: 8 }} />)}
                 </div>
             </div>

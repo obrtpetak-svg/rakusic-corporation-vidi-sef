@@ -14,7 +14,7 @@ export const WorkerCheckboxList = ({ allWorkers, selected, onChange }) => {
     const toggle = (id) => selected.includes(id) ? onChange(selected.filter(x => x !== id)) : onChange([...selected, id]);
     const names = allWorkers.filter(w => selected.includes(w.id)).map(w => w.name);
     return (
-        <div ref={ref} style={{ position: 'relative' }}>
+        <div ref={ref} className="u-relative">
             <button type="button" onClick={() => setOpen(v => !v)} style={{ ...styles.input, textAlign: 'left', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ color: names.length > 0 ? C.text : C.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '90%' }}>
                     {names.length > 0 ? names.join(', ') : '— Odaberite radnike —'}

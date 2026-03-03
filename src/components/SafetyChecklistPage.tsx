@@ -273,7 +273,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
                                             <div className="u-section-title">{tpl.name}</div>
                                             {tpl.description && <div className="u-fs-12" style={{ color: C.textMuted, marginTop: 2 }}>{tpl.description}</div>}
                                         </div>
-                                        <div style={{ display: 'flex', gap: 4 }}>
+                                        <div className="u-flex-gap-4">
                                             <button onClick={() => openEditTemplate(tpl)} style={styles.btnSmall}><Icon name="edit" size={12} /></button>
                                             <button onClick={() => deleteTemplate(tpl.id)} style={styles.btnDanger}><Icon name="trash" size={12} /></button>
                                         </div>
@@ -319,9 +319,9 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
                                 {visibleTemplates.map(tpl => (
                                     <div key={tpl.id} role="button" tabIndex={0} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && openFill(tpl)} onClick={() => openFill(tpl)} style={{ ...styles.card, cursor: 'pointer', transition: 'all 0.2s', border: `2px solid transparent` }}
                                         onMouseEnter={e => e.currentTarget.style.borderColor = C.accent} onMouseLeave={e => e.currentTarget.style.borderColor = 'transparent'}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                        <div className="u-flex-center u-gap-12">
                                             <div style={{ width: 48, height: 48, borderRadius: 12, background: `${C.accent}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}></div>
-                                            <div style={{ flex: 1 }}>
+                                            <div className="u-flex-1">
                                                 <div className="u-section-title">{tpl.name}</div>
                                                 <div className="u-fs-11" style={{ color: C.textMuted }}>
                                                     {tpl.projectId && <span style={{ color: C.accent }}>📍 {projects.find(p => p.id === tpl.projectId)?.name || '—'} • </span>}
@@ -370,7 +370,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
                                                 <span>👤 {cl.filledBy}</span>
                                             </div>
                                         </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <div className="u-flex-center u-gap-8">
                                             <div style={{
                                                 width: 44, height: 44, borderRadius: '50%', border: `3px solid ${cl.score >= 80 ? '#10B981' : cl.score >= 50 ? '#F59E0B' : C.red}`,
                                                 display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800,
@@ -392,9 +392,9 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
             {detail && detailTpl && (
                 <Modal title={` ${detail.templateName}`} onClose={() => setDetailId(null)} wide>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
-                        <div><span style={styles.label}>Datum</span><div style={{ fontWeight: 600 }}>{fmtDate(detail.date)}</div></div>
+                        <div><span style={styles.label}>Datum</span><div className="u-fw-600">{fmtDate(detail.date)}</div></div>
                         <div><span style={styles.label}>Projekt</span><div style={{ fontWeight: 600, color: C.accent }}>{projects.find(p => p.id === detail.projectId)?.name || '—'}</div></div>
-                        <div><span style={styles.label}>Ispunio</span><div style={{ fontWeight: 600 }}>{detail.filledBy}</div></div>
+                        <div><span style={styles.label}>Ispunio</span><div className="u-fw-600">{detail.filledBy}</div></div>
                         <div><span style={styles.label}>Rezultat</span>
                             <div style={{ fontWeight: 800, fontSize: 24, color: detail.score >= 80 ? '#10B981' : detail.score >= 50 ? '#F59E0B' : C.red }}>
                                 {detail.score}% <span style={{ fontSize: 12, fontWeight: 500, color: C.textMuted }}>({detail.okCount}/{detail.totalItems})</span>
@@ -402,13 +402,13 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
                         </div>
                     </div>
 
-                    <div style={{ marginBottom: 16 }}>
+                    <div className="u-mb-16">
                         {detailTpl.items.map((item, i) => {
                             const a = detail.answers?.[i];
                             return (
                                 <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '8px 0', borderBottom: `1px solid ${C.border}7A` }}>
                                     <span style={{ fontSize: 18, width: 28, textAlign: 'center', flexShrink: 0 }}>{a?.checked === true ? '✅' : a?.checked === false ? '❌' : '➖'}</span>
-                                    <div style={{ flex: 1 }}>
+                                    <div className="u-flex-1">
                                         <div style={{ fontSize: 13, color: C.text }}>{item.text}</div>
                                         {a?.note && <div style={{ fontSize: 11, color: '#F59E0B', marginTop: 2 }}>📝 {a.note}</div>}
                                     </div>
@@ -418,7 +418,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
                     </div>
 
                     {detail.notes && <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(245,158,11,0.08)', fontSize: 13, marginBottom: 12 }}><strong>Napomene:</strong> {detail.notes}</div>}
-                    {detail.signature && <div style={{ marginBottom: 12 }}><span style={styles.label}>✍️ Potpis</span><img src={detail.signature} alt="Potpis" style={{ maxWidth: 300, height: 'auto', border: `1px solid ${C.border}`, borderRadius: 8, marginTop: 4 }} /></div>}
+                    {detail.signature && <div className="u-mb-12"><span style={styles.label}>✍️ Potpis</span><img src={detail.signature} alt="Potpis" style={{ maxWidth: 300, height: 'auto', border: `1px solid ${C.border}`, borderRadius: 8, marginTop: 4 }} /></div>}
                     <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
                         <button onClick={() => exportPDF(detail)} style={styles.btnSecondary}>📄 PDF</button>
                     </div>
@@ -428,7 +428,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
             {/* ── Template Modal ── */}
             {showTemplateModal && (
                 <Modal title={editTemplateId ? 'Uredi predložak' : 'Novi predložak'} onClose={() => setShowTemplateModal(false)} wide>
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }} className="u-gap-16">
                         <Field label="Naziv predloška" required><Input value={tplForm.name} onChange={e => setTplForm(f => ({ ...f, name: e.target.value }))} placeholder="npr. Dnevna kontrola sigurnosti" /></Field>
                         <Field label="Za koji projekt" required>
                             <Select value={tplForm.projectId} onChange={e => setTplForm(f => ({ ...f, projectId: e.target.value }))}>
@@ -451,7 +451,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
                     </div>
 
                     {/* Quick presets */}
-                    <div style={{ marginTop: 16 }}>
+                    <div className="u-mt-16">
                         <span style={styles.label}>Brzi predlošci — klikni za dodavanje stavki</span>
                         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
                             {Object.entries(CATEGORY_PRESETS).map(([key, preset]) => (
@@ -461,19 +461,19 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
                     </div>
 
                     {/* Items */}
-                    <div style={{ marginTop: 16 }}>
+                    <div className="u-mt-16">
                         <span style={styles.label}>Stavke kontrolne liste</span>
                         {tplForm.items.map((item, i) => (
                             <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 6 }}>
                                 <span style={{ fontSize: 12, color: C.textMuted, width: 20, textAlign: 'center' }}>{i + 1}</span>
-                                <Input value={item.text} onChange={e => updateTemplateItem(i, 'text', e.target.value)} placeholder={`Stavka ${i + 1}...`} style={{ flex: 1 }} />
+                                <Input value={item.text} onChange={e => updateTemplateItem(i, 'text', e.target.value)} placeholder={`Stavka ${i + 1}...`} className="u-flex-1" />
                                 <button onClick={() => removeTemplateItem(i)} style={{ ...styles.btnSmall, color: C.red, padding: '4px 8px' }}>✕</button>
                             </div>
                         ))}
                         <button onClick={addTemplateItem} style={{ ...styles.btnSmall, marginTop: 8, fontSize: 11 }}><Icon name="plus" size={12} /> Dodaj stavku</button>
                     </div>
 
-                    <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 20 }}>
+                    <div className="u-flex-end">
                         <button onClick={() => setShowTemplateModal(false)} style={styles.btnSecondary}>Odustani</button>
                         <button onClick={saveTemplate} style={styles.btn}><Icon name="check" size={14} /> Spremi</button>
                     </div>
@@ -489,7 +489,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
                 return (
                     <Modal title={`✍️ ${tpl.name}`} onClose={() => setShowFillModal(false)} wide>
                         {/* Progress bar */}
-                        <div style={{ marginBottom: 16 }}>
+                        <div className="u-mb-16">
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: C.textMuted, marginBottom: 4 }}>
                                 <span>Napredak</span><span>{answeredCount}/{tpl.items.length} ({progress}%)</span>
                             </div>
@@ -508,7 +508,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
                         )}
 
                         {/* Checklist items */}
-                        <div style={{ marginTop: 12 }}>
+                        <div className="u-mt-12">
                             {tpl.items.map((item, i) => {
                                 const a = fillForm.answers[i] || {};
                                 return (
@@ -516,7 +516,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                             <span style={{ fontSize: 12, color: C.textMuted, width: 22, textAlign: 'center', flexShrink: 0 }}>{i + 1}</span>
                                             <div style={{ flex: 1, fontSize: 13, fontWeight: 500 }}>{item.text}</div>
-                                            <div style={{ display: 'flex', gap: 4 }}>
+                                            <div className="u-flex-gap-4">
                                                 <button onClick={() => toggleAnswer(i, true)} style={{
                                                     width: 36, height: 36, borderRadius: 8, border: `2px solid ${a.checked === true ? '#10B981' : C.border}`,
                                                     background: a.checked === true ? 'rgba(16,185,129,0.1)' : '#fff', cursor: 'pointer', fontSize: 16,
@@ -539,7 +539,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
                             })}
                         </div>
 
-                        <div style={{ marginTop: 12 }}>
+                        <div className="u-mt-12">
                             <Field label="Dodatne napomene">
                                 <Textarea value={fillForm.notes} onChange={e => setFillForm(f => ({ ...f, notes: e.target.value }))} placeholder="Opažanja, upute..." rows={2} />
                             </Field>
@@ -547,7 +547,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
 
                         {/* Signature */}
                         {tpl.requireSignature && (
-                            <div style={{ marginTop: 12 }}>
+                            <div className="u-mt-12">
                                 <span style={styles.label}>✍️ Digitalni potpis {fillForm.signature ? '✅' : '(obvezan)'}</span>
                                 {fillForm.signature ? (
                                     <div style={{ marginTop: 6 }}>
@@ -562,7 +562,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
                             </div>
                         )}
 
-                        <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 20 }}>
+                        <div className="u-flex-end">
                             <button onClick={() => setShowFillModal(false)} style={styles.btnSecondary}>Odustani</button>
                             <button onClick={saveFill} style={styles.btn}><Icon name="check" size={14} /> Spremi kontrolnu listu</button>
                         </div>

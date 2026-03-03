@@ -184,7 +184,7 @@ export default function FleetDashboard() {
                     display: 'flex', alignItems: 'center', gap: 10, animation: 'fadeIn 0.3s ease',
                 }}>
                     <span style={{ fontSize: 20 }}>{cacheDoc.providerStatus === 'ERROR' ? '🔴' : '⚠️'}</span>
-                    <div style={{ flex: 1 }}>
+                    <div className="u-flex-1">
                         <div style={{ fontSize: 13, fontWeight: 700, color: cacheDoc.providerStatus === 'ERROR' ? C.red : '#F59E0B' }}>
                             {cacheDoc.providerStatus === 'ERROR' ? 'GPS sustav nedostupan' : `GPS podaci stari ${staleAge}s`}
                         </div>

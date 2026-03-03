@@ -68,7 +68,7 @@ export default function FleetVehicleList({ vehicles, onSelectVehicle }: {
                         flex: 1, minWidth: 200, padding: '10px 14px', borderRadius: 10,
                         border: `1px solid ${C.border}`, background: 'var(--bg)', color: C.text, fontSize: 13,
                     }} />
-                <div style={{ display: 'flex', gap: 4 }}>
+                <div className="u-flex-gap-4">
                     <button onClick={() => setViewMode('cards')} style={{
                         padding: '8px 12px', borderRadius: 8, border: `1px solid ${viewMode === 'cards' ? C.accent : C.border}`,
                         background: viewMode === 'cards' ? `${C.accent}15` : 'transparent', color: viewMode === 'cards' ? C.accent : C.textDim,

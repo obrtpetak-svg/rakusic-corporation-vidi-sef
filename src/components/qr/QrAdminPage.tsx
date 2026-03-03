@@ -156,7 +156,7 @@ export function QrAdminPage() {
                         <div style={{ fontSize: 15, fontWeight: 700, color: C.text, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
                             <Icon name="project" size={18} /> Odaberi projekt
                         </div>
-                        <Select value={selectedProject} onChange={e => setSelectedProject(e.target.value)} style={{ marginBottom: 16 }}>
+                        <Select value={selectedProject} onChange={e => setSelectedProject(e.target.value)} className="u-mb-16">
                             <option value="">— Odaberi projekt za QR kod —</option>
                             {activeProjects.map((p: any) => (
                                 <option key={p.id} value={p.id}>📁 {p.name}{p.location ? ` (${p.location})` : ''}</option>
@@ -248,7 +248,7 @@ export function QrAdminPage() {
             {/* Poster Preview Modal */}
             {showPoster && project && (
                 <Modal title={`Poster — ${project.name}`} onClose={() => setShowPoster(false)} wide>
-                    <div style={{ textAlign: 'center' }}>
+                    <div className="u-text-center">
                         <canvas ref={posterCanvasRef} style={{ maxWidth: '100%', height: 'auto', borderRadius: 12, border: `1px solid ${C.border}` }} />
                         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 20 }}>
                             <button onClick={downloadPoster} style={styles.btn}><Icon name="download" size={16} /> Preuzmi PNG</button>
@@ -276,7 +276,7 @@ export function QrAdminPage() {
                                         return (
                                             <tr key={t.id}>
                                                 <td style={styles.td}>{fmtDate(t.date)}</td>
-                                                <td style={styles.td}><span style={{ fontWeight: 600 }}>{getWorkerName(t.workerId)}</span></td>
+                                                <td style={styles.td}><span className="u-fw-600">{getWorkerName(t.workerId)}</span></td>
                                                 <td style={styles.td}>{getProjectName(t.projectId)}</td>
                                                 <td style={styles.td}><span style={{ color: C.green, fontWeight: 600 }}>{t.startTime || '—'}</span></td>
                                                 <td style={styles.td}><span style={{ color: t.endTime ? C.red : C.textMuted, fontWeight: 600 }}>{t.endTime || '🟢 aktivno'}</span></td>
@@ -295,7 +295,7 @@ export function QrAdminPage() {
             {/* Batch Download Modal */}
             {showBatch && (
                 <Modal title="📦 Batch preuzimanje QR kodova" onClose={() => setShowBatch(false)} wide>
-                    <div style={{ marginBottom: 20 }}>
+                    <div className="u-mb-20">
                         <div style={{ fontSize: 14, color: C.textDim, marginBottom: 16 }}>Preuzmite QR kodove ili postere za sve aktivne projekte ({activeProjects.length})</div>
                         <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
                             <button onClick={() => { downloadAllQr(); }} style={styles.btn}>

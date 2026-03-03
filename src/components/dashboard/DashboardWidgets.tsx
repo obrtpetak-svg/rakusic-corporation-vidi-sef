@@ -120,7 +120,7 @@ export const EnhancedStat = memo(({ label, value, icon, color, sub, suffix = '',
         }}>
             <Icon name={icon} size={22} />
         </div>
-        <div style={{ flex: 1 }}>
+        <div className="u-flex-1">
             <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
             <div style={{ fontSize: 28, fontWeight: 800, color: 'var(--text)', lineHeight: 1.15, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.5px' }}>
                 {typeof value === 'number' ? <CountUp end={value} suffix={suffix} /> : value}

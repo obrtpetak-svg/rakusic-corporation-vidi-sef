@@ -185,7 +185,7 @@ export function TimesheetsPage() {
                         <div className="u-fs-22 u-fw-800" style={{ color: C.text }}> Radni sati</div>
                         <div className="u-fs-13" style={{ color: C.textMuted }}>Upravljanje evidencijom radnog vremena</div>
                     </div>
-                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <div className="u-flex-center u-gap-8">
                         <button onClick={exportCSV} style={styles.btnSecondary}><Icon name="download" size={14} /> CSV/Excel</button>
                         <button onClick={exportPDF} style={{ ...styles.btnSecondary, color: C.red, borderColor: 'rgba(239,68,68,0.3)' }}><Icon name="file" size={14} /> PDF</button>
                         <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> Dodaj</button>
@@ -219,7 +219,7 @@ export function TimesheetsPage() {
                 {/* Filters */}
                 <div style={{ ...styles.card, marginBottom: 20, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
                     <div style={{ position: 'relative', flex: 1, minWidth: 140 }}>
-                        <Input placeholder="Traži radnika, projekt..." value={search} onChange={e => setSearch(e.target.value)} style={{ paddingLeft: 36 }} />
+                        <Input placeholder="Traži radnika, projekt..." value={search} onChange={e => setSearch(e.target.value)} className="u-pl-36" />
                         <div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: C.textMuted }}><Icon name="search" size={14} /></div>
                     </div>
                     <Select value={filterWorker} onChange={e => setFilterWorker(e.target.value)} style={{ width: 150 }}>
@@ -292,7 +292,7 @@ export function TimesheetsPage() {
                                             </td>
                                             <td style={{ ...styles.td, whiteSpace: 'nowrap' }}>{fmtDate(t.date)}</td>
                                             <td style={styles.td}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                                <div className="u-flex-center u-gap-8">
                                                     <div style={{ width: 28, height: 28, borderRadius: '50%', background: C.accentLight, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: C.accent, flexShrink: 0 }}>{w?.name?.charAt(0)}</div>
                                                     <span style={{ fontWeight: 600, fontSize: 13 }}>{w?.name || '—'}</span>
                                                 </div>
@@ -335,8 +335,8 @@ export function TimesheetsPage() {
                             return (
                                 <div>
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
-                                        <div><span style={styles.label}>Radnik</span><div style={{ fontWeight: 600 }}>{w?.name || '—'}</div></div>
-                                        <div><span style={styles.label}>Projekt</span><div style={{ fontWeight: 600 }}>{p?.name || '—'}</div></div>
+                                        <div><span style={styles.label}>Radnik</span><div className="u-fw-600">{w?.name || '—'}</div></div>
+                                        <div><span style={styles.label}>Projekt</span><div className="u-fw-600">{p?.name || '—'}</div></div>
                                         <div><span style={styles.label}>Datum</span><div>{fmtDate(detailTs.date)}</div></div>
                                         <div><span style={styles.label}>Tip</span><div>{detailTs.type || 'normalan'}</div></div>
                                         <div><span style={styles.label}>Od - Do</span><div>{detailTs.startTime} — {detailTs.endTime}</div></div>
@@ -344,12 +344,12 @@ export function TimesheetsPage() {
                                         <div><span style={styles.label}>Pauza</span><div>{detailTs.breakMins || 0} min</div></div>
                                         <div><span style={styles.label}>Status</span><StatusBadge status={detailTs.status} /></div>
                                     </div>
-                                    {detailTs.description && <div style={{ marginBottom: 12 }}><span style={styles.label}>Opis rada</span><div style={{ padding: '10px 14px', borderRadius: 8, background: C.bgElevated, fontSize: 13 }}>{detailTs.description}</div></div>}
-                                    {detailTs.gpsLocation && <div style={{ marginBottom: 12 }}><span style={styles.label}>GPS Lokacija</span><div style={{ fontSize: 13, color: C.accent }}>📍 {detailTs.gpsLocation}</div></div>}
-                                    {detailTs.notes && <div style={{ marginBottom: 12 }}><span style={styles.label}>Napomene</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(245,158,11,0.08)', fontSize: 13, color: C.yellow }}>{detailTs.notes}</div></div>}
-                                    {detailTs.rejectReason && <div style={{ marginBottom: 12 }}><span style={styles.label}>Razlog odbijanja</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(239,68,68,0.1)', fontSize: 13, color: C.red }}>{detailTs.rejectReason}</div></div>}
+                                    {detailTs.description && <div className="u-mb-12"><span style={styles.label}>Opis rada</span><div style={{ padding: '10px 14px', borderRadius: 8, background: C.bgElevated, fontSize: 13 }}>{detailTs.description}</div></div>}
+                                    {detailTs.gpsLocation && <div className="u-mb-12"><span style={styles.label}>GPS Lokacija</span><div style={{ fontSize: 13, color: C.accent }}>📍 {detailTs.gpsLocation}</div></div>}
+                                    {detailTs.notes && <div className="u-mb-12"><span style={styles.label}>Napomene</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(245,158,11,0.08)', fontSize: 13, color: C.yellow }}>{detailTs.notes}</div></div>}
+                                    {detailTs.rejectReason && <div className="u-mb-12"><span style={styles.label}>Razlog odbijanja</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(239,68,68,0.1)', fontSize: 13, color: C.red }}>{detailTs.rejectReason}</div></div>}
                                     {detailTs.source && <div className="u-fs-12" style={{ color: C.textMuted }}>Izvor: {detailTs.source === 'admin' ? 'Admin unos' : 'Radnički unos'}</div>}
-                                    {detailTs.invoiceFile && <div style={{ marginTop: 12 }}><span style={styles.label}>Priloženi račun</span><div style={{ marginTop: 4 }}><a href={detailTs.invoiceFile.data} download={detailTs.invoiceFile.name} style={styles.btnSmall}><Icon name="download" size={14} /> {detailTs.invoiceFile.name}</a></div></div>}
+                                    {detailTs.invoiceFile && <div className="u-mt-12"><span style={styles.label}>Priloženi račun</span><div style={{ marginTop: 4 }}><a href={detailTs.invoiceFile.data} download={detailTs.invoiceFile.name} style={styles.btnSmall}><Icon name="download" size={14} /> {detailTs.invoiceFile.name}</a></div></div>}
                                     {detailTs.status === 'na čekanju' && (
                                         <div style={{ display: 'flex', gap: 12, marginTop: 20, borderTop: `1px solid ${C.border}`, paddingTop: 16 }}>
                                             <button onClick={() => { approve(detailTs); setDetailId(null); }} style={{ ...styles.btn, background: C.green, flex: 1, justifyContent: 'center' }}><Icon name="check" size={16} /> Odobri</button>
@@ -365,7 +365,7 @@ export function TimesheetsPage() {
                 {/* Add/Edit Modal */}
                 {showForm && (
                     <Modal title={editId ? 'Uredi radne sate' : 'Dodaj radne sate'} onClose={() => setShowForm(false)} wide>
-                        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }} className="u-gap-16">
                             <Field label="Radnik" required>
                                 <Select value={form.workerId} onChange={e => update('workerId', e.target.value)}>
                                     <option value="">— Odaberi radnika —</option>
@@ -399,7 +399,7 @@ export function TimesheetsPage() {
                         </div>
                         <Field label="Opis rada"><Input value={form.description} onChange={e => update('description', e.target.value)} placeholder="Što je radnik radio..." /></Field>
                         <Field label="Napomene"><Input value={form.notes} onChange={e => update('notes', e.target.value)} placeholder="Dodatne napomene..." /></Field>
-                        <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 20 }}>
+                        <div className="u-flex-end">
                             <button onClick={() => setShowForm(false)} style={styles.btnSecondary}>Odustani</button>
                             <button onClick={doSave} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
                         </div>

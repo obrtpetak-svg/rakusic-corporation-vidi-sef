@@ -145,7 +145,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                     <div className="u-fs-24 u-fw-800" style={{ color: C.text }}>Proizvodnja</div>
                     <div className="u-fs-12" style={{ color: C.textMuted, marginTop: 2 }}>{activeOrders.length} narudžbi • Praćenje proizvodnog procesa</div>
                 </div>
-                <div style={{ display: 'flex', gap: 8 }}>
+                <div className="u-flex-gap-8">
                     {canManage && <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> Nova narudžba</button>}
                     <button onClick={() => exportCSV(activeTab === 'archive' ? archivedOrders : filtered)} style={styles.btnSecondary}>📊 CSV</button>
                     <button onClick={() => exportPDF(activeTab === 'archive' ? archivedOrders : filtered)} style={styles.btnSecondary}>📄 PDF</button>
@@ -194,7 +194,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                 <div style={{ ...styles.card, marginBottom: 16, padding: '10px 14px' }}>
                     <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
                         <div style={{ position: 'relative', flex: 1, minWidth: 180 }}>
-                            <Input placeholder="Pretraži narudžbu..." value={search} onChange={e => setSearch(e.target.value)} style={{ paddingLeft: 36 }} />
+                            <Input placeholder="Pretraži narudžbu..." value={search} onChange={e => setSearch(e.target.value)} className="u-pl-36" />
                             <div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: C.textMuted }}><Icon name="search" size={16} /></div>
                         </div>
                         <Select value={filterStage} onChange={e => setFilterStage(e.target.value)} style={{ width: 150 }}>
@@ -263,7 +263,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                                 <td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{(o.totalCost || 0) > 0 ? `${o.totalCost.toFixed(2)}€` : '—'}</td>
                                                 {canManage && (
                                                     <td style={styles.td} onClick={e => e.stopPropagation()}>
-                                                        <div style={{ display: 'flex', gap: 4 }}>
+                                                        <div className="u-flex-gap-4">
                                                             <button onClick={() => openEditWrapped(o)} style={styles.btnSmall}><Icon name="edit" size={10} /></button>
                                                             <button onClick={() => doDelete(o.id)} style={styles.btnDanger}><Icon name="trash" size={10} /></button>
                                                         </div>
@@ -376,7 +376,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                             <div className="u-section-title">{o.name}</div>
                                             <div className="u-fs-11" style={{ color: C.textMuted }}>🏢 {o.client || '—'}</div>
                                         </div>
-                                        <div style={{ display: 'flex', gap: 4 }}>
+                                        <div className="u-flex-gap-4">
                                             <button onClick={() => setDetailId(o.id)} style={styles.btnSmall}>Detalji</button>
                                             {canManage && <button onClick={() => unarchiveOrder(o)} style={styles.btnSmall}>↩️</button>}
                                         </div>
@@ -392,7 +392,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
             {/* Add/Edit Modal */}
             {showForm && (
                 <Modal title={editId ? 'Uredi narudžbu' : 'Nova narudžba za proizvodnju'} onClose={() => setShowForm(false)} wide>
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }} className="u-gap-16">
                         <Field label="Broj narudžbe" required><Input value={form.orderNumber} onChange={e => upd('orderNumber', e.target.value)} /></Field>
                         <Field label="Naziv proizvoda / projekta" required><Input value={form.name} onChange={e => upd('name', e.target.value)} placeholder="Čelična konstrukcija XY" autoFocus /></Field>
                         <Field label="Naručitelj"><Input value={form.client} onChange={e => upd('client', e.target.value)} placeholder="Ime klijenta" /></Field>
@@ -406,7 +406,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                     </div>
                     <Field label="Opis"><Textarea value={form.description} onChange={e => upd('description', e.target.value)} placeholder="Tehnički opis, specifikacije..." rows={3} /></Field>
                     <Field label="Napomene"><Textarea value={form.notes} onChange={e => upd('notes', e.target.value)} placeholder="Interne napomene..." rows={2} /></Field>
-                    <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 20 }}>
+                    <div className="u-flex-end">
                         <button onClick={() => setShowForm(false)} style={styles.btnSecondary}>Odustani</button>
                         <button onClick={doSave} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
                     </div>
