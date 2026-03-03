@@ -216,7 +216,7 @@ export function SettingsPage({ workerFilterId }) {
 
 
                 {/* Password change (Firebase Auth) */}
-                <div style={styles.card} className="settings__section">
+                <div className="s-card" className="settings__section">
                     <div className="settings__section-title">🔐 Promjena lozinke (Firebase Auth)</div>
                     <div className="settings__section-desc">Lozinka za prijavu u sustav. Pravila: najmanje 8 znakova, 1 veliko slovo, 1 broj.</div>
                     <div className={`settings__grid-3 ${isMobile ? 'settings__grid-3--mobile' : 'settings__grid-3--desktop'}`}>
@@ -225,17 +225,17 @@ export function SettingsPage({ workerFilterId }) {
                         <Field label="Potvrdi novu" required><Input type="password" value={pwForm.confirmPw} onChange={e => setPwForm(f => ({ ...f, confirmPw: e.target.value }))} placeholder="Ponovi novu lozinku" /></Field>
                     </div>
                     {pwMsg && <div className={`settings__status ${pwMsg.startsWith('✅') ? 'settings__status--success' : 'settings__status--error'}`} style={{ marginTop: 12 }}>{pwMsg}</div>}
-                    <button onClick={doChangePassword} disabled={pwLoading || !pwForm.currentPw || !pwForm.newPw} style={{ ...styles.btn, marginTop: 16, opacity: pwLoading ? 0.5 : 1 }}>
+                    <button onClick={doChangePassword} disabled={pwLoading || !pwForm.currentPw || !pwForm.newPw} className="s-btn" style={{ marginTop: 16, opacity: pwLoading ? 0.5 : 1 }}>
                         {pwLoading ? '⏳ Mijenjam...' : '🔐 Promijeni lozinku'}
                     </button>
                 </div>
 
                 {/* GDPR Data Export */}
-                <div style={styles.card} className="settings__section">
+                <div className="s-card" className="settings__section">
                     <div className="settings__section-title">📦 Preuzmi moje podatke</div>
                     <div className="settings__section-desc">GDPR — preuzmite sve svoje osobne podatke u JSON formatu (evidencija sati, dnevni logovi, zahtjevi za dopust).</div>
                     <div className="u-flex-center u-gap-12">
-                        <button onClick={doExportData} disabled={exportLoading} style={{ ...styles.btn, opacity: exportLoading ? 0.5 : 1 }}>
+                        <button onClick={doExportData} disabled={exportLoading} className="s-btn" style={{ opacity: exportLoading ? 0.5 : 1 }}>
                             {exportLoading ? '⏳ Pripremam...' : '📦 Preuzmi moje podatke'}
                         </button>
                         {exportMsg && <span className={`settings__status ${exportMsg.startsWith('✅') ? 'settings__status--success' : 'settings__status--error'}`}>{exportMsg}</span>}
@@ -243,13 +243,13 @@ export function SettingsPage({ workerFilterId }) {
                 </div>
 
                 {/* App info */}
-                <div style={styles.card} className="settings__section">
+                <div className="s-card" className="settings__section">
                     <div className="u-section-title u-mb-12">ℹ️ Aplikacija</div>
                     <div className="settings__grid-2--static">
-                        <div><span style={styles.label}>Verzija</span><div className="settings__field-value settings__field-value--accent">3.0.0</div></div>
-                        <div><span style={styles.label}>Korisnik</span><div className="settings__field-value">{currentUser?.name}</div></div>
-                        <div><span style={styles.label}>Uloga</span><div className="settings__field-value">Radnik</div></div>
-                        <div><span style={styles.label}>Korisničko ime</span><div className="settings__field-value settings__field-value--mono">{currentUser?.username || '—'}</div></div>
+                        <div><span className="s-label">Verzija</span><div className="settings__field-value settings__field-value--accent">3.0.0</div></div>
+                        <div><span className="s-label">Korisnik</span><div className="settings__field-value">{currentUser?.name}</div></div>
+                        <div><span className="s-label">Uloga</span><div className="settings__field-value">Radnik</div></div>
+                        <div><span className="s-label">Korisničko ime</span><div className="settings__field-value settings__field-value--mono">{currentUser?.username || '—'}</div></div>
                     </div>
                 </div>
             </div>
@@ -262,10 +262,10 @@ export function SettingsPage({ workerFilterId }) {
             <div className="settings__title"> Postavke</div>
 
             {/* Company info */}
-            <div style={styles.card}>
+            <div className="s-card">
                 <div className="u-flex-between u-mb-16">
                     <div className="u-section-title">🏢 Podaci tvrtke</div>
-                    <button onClick={startEdit} style={styles.btnSmall}><Icon name="edit" size={12} /> Uredi</button>
+                    <button onClick={startEdit} className="s-btn-sm"><Icon name="edit" size={12} /> Uredi</button>
                 </div>
                 <div className={`settings__grid-2 ${isMobile ? 'settings__grid-2--mobile' : 'settings__grid-2--desktop'}`}>
                     {[
@@ -279,27 +279,27 @@ export function SettingsPage({ workerFilterId }) {
                         ['Valuta', companyProfile?.currency || 'EUR'],
                         ['Default pauza', `${companyProfile?.defaultBreak || 30} min`],
                     ].map(([label, value]) => (
-                        <div key={label}><span style={styles.label}>{label}</span><div className="settings__field-value">{value || '—'}</div></div>
+                        <div key={label}><span className="s-label">{label}</span><div className="settings__field-value">{value || '—'}</div></div>
                     ))}
                 </div>
             </div>
 
             {/* Firebase */}
-            <div style={styles.card} className="settings__section">
+            <div className="s-card" className="settings__section">
                 <div className="u-section-title u-mb-12">🔥 Firebase konfiguracija</div>
                 <div className={`settings__grid-2 ${isMobile ? 'settings__grid-2--mobile' : 'settings__grid-2--desktop'}`}>
                     {(() => {
                         const cfg = JSON.parse(localStorage.getItem('vidime-firebase-config-v9') || '{}');
                         return [['Project ID', cfg.projectId], ['API Key', cfg.apiKey ? cfg.apiKey.slice(0, 8) + '...' : '—']].map(([l, v]) => (
-                            <div key={l}><span style={styles.label}>{l}</span><div className="settings__field-mono">{v || '—'}</div></div>
+                            <div key={l}><span className="s-label">{l}</span><div className="settings__field-mono">{v || '—'}</div></div>
                         ));
                     })()}
                 </div>
-                <button onClick={resetFirebase} style={{ ...styles.btnSecondary, marginTop: 12, color: C.yellow }}>🔄 Resetiraj Firebase</button>
+                <button onClick={resetFirebase} className="s-btn-sec" style={{ marginTop: 12, color: C.yellow }}>🔄 Resetiraj Firebase</button>
             </div>
 
             {/* ── BACKUP / RESTORE ────────────────────────── */}
-            <div style={styles.card} className="settings__section settings__section--backup">
+            <div className="s-card" className="settings__section settings__section--backup">
                 <div className="u-section-title u-mb-16">💾 Backup i Restore</div>
 
                 {/* Full Backup */}
@@ -309,7 +309,7 @@ export function SettingsPage({ workerFilterId }) {
                         Preuzmi kompletni backup koji uključuje: Firebase konfiguraciju, podatke o tvrtki, sve projekte, radnike, sate, račune, otpremnice, vozila, smještaj, obaveze
                     </div>
                     <div className="settings__action-row">
-                        <button onClick={doFullBackup} style={{ ...styles.btn, background: C.green }}>
+                        <button onClick={doFullBackup} className="s-btn" style={{ background: C.green }}>
                             💾 Preuzmi Full Backup
                         </button>
                         {backupStatus && <span className={`settings__status ${backupStatus.startsWith('❌') ? 'settings__status--error' : 'settings__status--success'}`}>{backupStatus}</span>}
@@ -324,7 +324,7 @@ export function SettingsPage({ workerFilterId }) {
                     </div>
                     <div className="settings__action-row">
                         <input ref={fileRef} type="file" accept=".json" onChange={doRestore} style={{ display: 'none' }} />
-                        <button onClick={() => fileRef.current?.click()} style={{ ...styles.btn, background: C.yellow }}>
+                        <button onClick={() => fileRef.current?.click()} className="s-btn" style={{ background: C.yellow }}>
                             📥 Vrati SVE iz Backupa
                         </button>
                         {restoreStatus && <span className={`settings__status ${restoreStatus.startsWith('❌') ? 'settings__status--error' : 'settings__status--success'}`}>{restoreStatus}</span>}
@@ -333,12 +333,12 @@ export function SettingsPage({ workerFilterId }) {
             </div>
 
             {/* Audit Log */}
-            <div style={{ ...styles.card, marginTop: 16 }}>
+            <div className="s-card" style={{ marginTop: 16 }}>
                 <div className="u-card-header">
                     <div className="u-section-title">📝 Audit log ({auditLog.length})</div>
                     <div className="u-flex-gap-8">
-                        <button onClick={() => setShowAudit(!showAudit)} style={styles.btnSmall}>{showAudit ? 'Sakrij' : 'Prikaži'}</button>
-                        <button onClick={clearAuditLog} style={styles.btnDanger}><Icon name="trash" size={12} /> Obriši</button>
+                        <button onClick={() => setShowAudit(!showAudit)} className="s-btn-sm">{showAudit ? 'Sakrij' : 'Prikaži'}</button>
+                        <button onClick={clearAuditLog} className="s-btn-danger"><Icon name="trash" size={12} /> Obriši</button>
                     </div>
                 </div>
                 {showAudit && (
@@ -358,18 +358,18 @@ export function SettingsPage({ workerFilterId }) {
             </div>
 
             {/* App info */}
-            <div style={styles.card} className="settings__section">
+            <div className="s-card" className="settings__section">
                 <div className="u-section-title u-mb-12"> Aplikacija</div>
                 <div className="settings__grid-2--static">
-                    <div><span style={styles.label}>Verzija</span><div className="settings__field-value settings__field-value--accent">3.0.0</div></div>
-                    <div><span style={styles.label}>Korisnik</span><div className="settings__field-value">{currentUser?.name}</div></div>
-                    <div><span style={styles.label}>Uloga</span><div className="settings__field-value">{currentUser?.role === 'admin' ? 'Administrator' : 'Radnik'}</div></div>
+                    <div><span className="s-label">Verzija</span><div className="settings__field-value settings__field-value--accent">3.0.0</div></div>
+                    <div><span className="s-label">Korisnik</span><div className="settings__field-value">{currentUser?.name}</div></div>
+                    <div><span className="s-label">Uloga</span><div className="settings__field-value">{currentUser?.role === 'admin' ? 'Administrator' : 'Radnik'}</div></div>
                 </div>
             </div>
 
             {/* Session & Security */}
             {!isWorker && (
-                <div style={styles.card} className="settings__section settings__section--bordered">
+                <div className="s-card" className="settings__section settings__section--bordered">
                     <div className="settings__section-title">🔐 Sesija i sigurnost</div>
                     <div className="settings__section-desc">Trajanje sesije određuje koliko dugo korisnici ostaju prijavljeni bez ponovnog unosa PIN-a.</div>
                     <div className="settings__toggle-wrap">
@@ -384,7 +384,7 @@ export function SettingsPage({ workerFilterId }) {
                             <div className="settings__section-sub">🚪 Odjavi sve korisnike</div>
                             <div className="u-fs-11 u-text-muted">Svi aktivni korisnici bit će odmah odjavljeni iz aplikacije.</div>
                         </div>
-                        <button onClick={async () => { if (await confirm('Sigurno želite odjaviti SVE korisnike?')) { await forceLogoutAll(); await addAuditLog('FORCE_LOGOUT_ALL', 'Admin je odijavio sve korisnike'); } }} style={{ ...styles.btnSmall, color: C.red, borderColor: 'rgba(239,68,68,0.3)', padding: '8px 14px', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                        <button onClick={async () => { if (await confirm('Sigurno želite odjaviti SVE korisnike?')) { await forceLogoutAll(); await addAuditLog('FORCE_LOGOUT_ALL', 'Admin je odijavio sve korisnike'); } }} className="s-btn-sm" style={{ color: C.red, borderColor: 'rgba(239,68,68,0.3)', padding: '8px 14px', fontWeight: 700, whiteSpace: 'nowrap' }}>
                             Odjavi sve
                         </button>
                     </div>
@@ -419,7 +419,7 @@ export function SettingsPage({ workerFilterId }) {
                                 setProvisionStatus(`❌ ${e.message}`);
                             }
                             setProvisionLoading(false);
-                        }} disabled={provisionLoading} style={{ ...styles.btnSmall, color: C.green, borderColor: 'rgba(16,185,129,0.3)', padding: '8px 14px', fontWeight: 700, whiteSpace: 'nowrap', opacity: provisionLoading ? 0.5 : 1 }}>
+                        }} disabled={provisionLoading} className="s-btn-sm" style={{ color: C.green, borderColor: 'rgba(16,185,129,0.3)', padding: '8px 14px', fontWeight: 700, whiteSpace: 'nowrap', opacity: provisionLoading ? 0.5 : 1 }}>
                             {provisionLoading ? '⏳ Kreiram...' : '🔑 Aktiviraj sve'}
                         </button>
                     </div>
@@ -453,20 +453,20 @@ export function SettingsPage({ workerFilterId }) {
             )}
 
             {/* Danger zone */}
-            <div style={styles.card} className="settings__section settings__section--danger">
+            <div className="s-card" className="settings__section settings__section--danger">
                 <div className="settings__danger-title">⚠️ Opasna zona</div>
                 <div className="settings__danger-desc">Potpuni reset aplikacije: briše sve lokalne podatke i resetira Firebase konfiguraciju.</div>
-                <button onClick={resetApp} style={{ ...styles.btn, background: C.red }}>🗑️ Potpuni reset aplikacije</button>
+                <button onClick={resetApp} className="s-btn" style={{ background: C.red }}>🗑️ Potpuni reset aplikacije</button>
             </div>
 
             {/* ── KORISNICI (User Management) ──────────────── */}
-            <div style={styles.card} className="settings__section settings__section--users">
+            <div className="s-card" className="settings__section settings__section--users">
                 <div className="u-flex-between u-mb-16">
                     <div>
                         <div className="u-section-title">👥 Korisnici sustava</div>
                         <div className="u-fs-12 u-text-muted" style={{ marginTop: 2 }}>Upravljanje korisnicima koji se mogu prijaviti u aplikaciju ({users?.length || 0})</div>
                     </div>
-                    <button onClick={() => { setShowAddUser(true); setUserForm({ name: '', username: '', role: 'radnik', password: '' }); setUserMsg(''); setEditingUser(null); }} style={{ ...styles.btn, fontSize: 12, padding: '8px 16px' }}>+ Dodaj korisnika</button>
+                    <button onClick={() => { setShowAddUser(true); setUserForm({ name: '', username: '', role: 'radnik', password: '' }); setUserMsg(''); setEditingUser(null); }} className="s-btn" style={{ fontSize: 12, padding: '8px 16px' }}>+ Dodaj korisnika</button>
                 </div>
 
                 {/* User list */}
@@ -483,13 +483,13 @@ export function SettingsPage({ workerFilterId }) {
                                 </div>
                             </div>
                             <div className="settings__user-actions">
-                                <button onClick={() => { setEditingUser(u); setUserForm({ name: u.name || '', username: u.username || '', role: u.role || 'radnik', password: '' }); setShowAddUser(true); setUserMsg(''); }} style={{ ...styles.btnSecondary, fontSize: 11, padding: '6px 10px' }}>✏️</button>
+                                <button onClick={() => { setEditingUser(u); setUserForm({ name: u.name || '', username: u.username || '', role: u.role || 'radnik', password: '' }); setShowAddUser(true); setUserMsg(''); }} className="s-btn-sec" style={{ fontSize: 11, padding: '6px 10px' }}>✏️</button>
                                 {u.id !== currentUser?.id && <button onClick={async () => {
                                     if (await confirm('Obrisati korisnika ' + (u.name || u.username) + '?')) {
                                         await remove('users', u.id);
                                         await addAuditLog('USER_DELETED', `${currentUser?.name} obrisao korisnika ${u.name}`);
                                     }
-                                }} style={{ ...styles.btnSecondary, fontSize: 11, padding: '6px 10px', color: C.red }}>🗑️</button>}
+                                }} className="s-btn-sec" style={{ fontSize: 11, padding: '6px 10px', color: C.red }}>🗑️</button>}
                             </div>
                         </div>
                     ))}
@@ -515,7 +515,7 @@ export function SettingsPage({ workerFilterId }) {
                     </div>
                     {userMsg && <div className={`settings__status ${userMsg.startsWith('✅') ? 'settings__status--success' : 'settings__status--error'}`} style={{ marginTop: 12 }}>{userMsg}</div>}
                     <div className="settings__form-footer">
-                        <button onClick={() => setShowAddUser(false)} style={styles.btnSecondary}>Odustani</button>
+                        <button onClick={() => setShowAddUser(false)} className="s-btn-sec">Odustani</button>
                         <button onClick={async () => {
                             setUserMsg('');
                             if (!userForm.name.trim() || !userForm.username.trim()) { setUserMsg('❌ Ime i korisničko ime su obavezni'); return; }
@@ -556,13 +556,13 @@ export function SettingsPage({ workerFilterId }) {
                             } catch (e: any) {
                                 setUserMsg('❌ ' + (e.message || 'Greška'));
                             }
-                        }} style={{ ...styles.btn, minWidth: 140 }} disabled={!userForm.name.trim() || !userForm.username.trim()}>{editingUser ? '💾 Spremi' : '✅ Kreiraj'}</button>
+                        }} className="s-btn" style={{ minWidth: 140 }} disabled={!userForm.name.trim() || !userForm.username.trim()}>{editingUser ? '💾 Spremi' : '✅ Kreiraj'}</button>
                     </div>
                 </Modal>
             )}
 
             {/* Password change (Firebase Auth) — Admin */}
-            <div style={styles.card} className="settings__section">
+            <div className="s-card" className="settings__section">
                 <div className="settings__section-title">🔐 Promjena lozinke (Firebase Auth)</div>
                 <div className="settings__section-desc">Lozinka za prijavu u sustav. Pravila: najmanje 8 znakova, 1 veliko slovo, 1 broj.</div>
                 <div className={`settings__grid-3 ${isMobile ? 'settings__grid-3--mobile' : 'settings__grid-3--desktop'}`}>
@@ -571,7 +571,7 @@ export function SettingsPage({ workerFilterId }) {
                     <Field label="Potvrdi novu" required><Input type="password" value={pwForm.confirmPw} onChange={e => setPwForm(f => ({ ...f, confirmPw: e.target.value }))} placeholder="Ponovi novu lozinku" /></Field>
                 </div>
                 {pwMsg && <div className={`settings__status ${pwMsg.startsWith('✅') ? 'settings__status--success' : 'settings__status--error'}`} style={{ marginTop: 12 }}>{pwMsg}</div>}
-                <button onClick={doChangePassword} disabled={pwLoading || !pwForm.currentPw || !pwForm.newPw} style={{ ...styles.btn, marginTop: 16, opacity: pwLoading ? 0.5 : 1 }}>
+                <button onClick={doChangePassword} disabled={pwLoading || !pwForm.currentPw || !pwForm.newPw} className="s-btn" style={{ marginTop: 16, opacity: pwLoading ? 0.5 : 1 }}>
                     {pwLoading ? '⏳ Mijenjam...' : '🔐 Promijeni lozinku'}
                 </button>
             </div>
@@ -592,21 +592,21 @@ export function SettingsPage({ workerFilterId }) {
                     </div>
                     <Field label="Napomene"><Textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={2} /></Field>
                     <div className="u-flex-end">
-                        <button onClick={() => setEditing(false)} style={styles.btnSecondary}>Odustani</button>
-                        <button onClick={doSave} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
+                        <button onClick={() => setEditing(false)} className="s-btn-sec">Odustani</button>
+                        <button onClick={doSave} className="s-btn"><Icon name="check" size={16} /> Spremi</button>
                     </div>
                 </Modal>
             )}
             {/* Trash / Koš za smeće */}
             {!isWorker && (
-                <div style={styles.card}>
+                <div className="s-card">
                     <div className="settings__trash-header">
                         <div className="settings__trash-title">🗑️ Koš za smeće</div>
                         <div className="u-flex-gap-8">
-                            <button onClick={async () => { setTrashLoading(true); setTrashItems(await loadDeletedItems()); setTrashLoading(false); }} style={styles.btnSmall}>
+                            <button onClick={async () => { setTrashLoading(true); setTrashItems(await loadDeletedItems()); setTrashLoading(false); }} className="s-btn-sm">
                                 {trashLoading ? '⏳' : '🔄'} Učitaj
                             </button>
-                            <button onClick={async () => { const n = await cleanupOldDeleted(); alert(`Obrisano ${n} stavki starijih od 30 dana`); setTrashItems(await loadDeletedItems()); }} style={{ ...styles.btnSmall, color: C.red, borderColor: 'rgba(239,68,68,0.3)' }}>
+                            <button onClick={async () => { const n = await cleanupOldDeleted(); alert(`Obrisano ${n} stavki starijih od 30 dana`); setTrashItems(await loadDeletedItems()); }} className="s-btn-sm" style={{ color: C.red, borderColor: 'rgba(239,68,68,0.3)' }}>
                                 🧹 Očisti stare (30d+)
                             </button>
                         </div>
@@ -620,8 +620,8 @@ export function SettingsPage({ workerFilterId }) {
                                     <span className="settings__trash-item-name">{item.name || item.title || item.description || item.id}</span>
                                     <span className="settings__trash-item-meta">{item._collection}</span>
                                     <span className="settings__trash-item-meta">{item.deletedAt?.slice(0, 10)}</span>
-                                    <button onClick={async () => { await restoreItem(item._collection, item.id); setTrashItems(prev => prev.filter(t => t.id !== item.id)); }} style={{ ...styles.btnSmall, padding: '4px 10px' }}>↩ Vrati</button>
-                                    <button onClick={async () => { if (!(await confirm('Trajno obrisati?'))) return; await permanentDelete(item._collection, item.id); setTrashItems(prev => prev.filter(t => t.id !== item.id)); }} style={{ ...styles.btnSmall, color: C.red, borderColor: 'rgba(239,68,68,0.3)', padding: '4px 10px' }}>✕</button>
+                                    <button onClick={async () => { await restoreItem(item._collection, item.id); setTrashItems(prev => prev.filter(t => t.id !== item.id)); }} className="s-btn-sm" style={{ padding: '4px 10px' }}>↩ Vrati</button>
+                                    <button onClick={async () => { if (!(await confirm('Trajno obrisati?'))) return; await permanentDelete(item._collection, item.id); setTrashItems(prev => prev.filter(t => t.id !== item.id)); }} className="s-btn-sm" style={{ color: C.red, borderColor: 'rgba(239,68,68,0.3)', padding: '4px 10px' }}>✕</button>
                                 </div>
                             ))}
                         </div>

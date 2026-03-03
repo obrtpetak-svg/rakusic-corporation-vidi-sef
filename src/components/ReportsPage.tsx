@@ -210,7 +210,7 @@ export function ReportsPage() {
     });
 
     const StatCard = ({ label, value, color, sub }) => (
-        <div style={styles.card} className="u-text-center">
+        <div className="s-card" className="u-text-center">
             <div className="u-stat-label">{label}</div>
             <div className="reports__stat-value" style={{ color: color || C.accent }}>{value}</div>
             {sub && <div className="u-fs-11 u-text-muted">{sub}</div>}
@@ -223,13 +223,13 @@ export function ReportsPage() {
             <div className="reports__header">
                 <div className="u-fs-24 u-fw-800 u-color-text"> Izvještaji</div>
                 <div className="reports__header-actions">
-                    <button onClick={exportCSV} style={styles.btnSecondary}><Icon name="download" size={14} /> CSV</button>
-                    <button onClick={exportPDF} style={styles.btn}><Icon name="file" size={14} /> PDF</button>
+                    <button onClick={exportCSV} className="s-btn-sec"><Icon name="download" size={14} /> CSV</button>
+                    <button onClick={exportPDF} className="s-btn"><Icon name="file" size={14} /> PDF</button>
                 </div>
             </div>
 
             {/* Filters */}
-            <div style={styles.card} className="reports__filters">
+            <div className="s-card" className="reports__filters">
                 <Input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="reports__date-input" />
                 <span className="u-text-muted">—</span>
                 <Input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="reports__date-input" />
@@ -264,23 +264,23 @@ export function ReportsPage() {
             {tab === 'radnici' && (
                 <div>
                     <div className="reports__tab-actions">
-                        <button onClick={exportWorkersPDF} style={styles.btn}><Icon name="file" size={14} /> PDF Radnici</button>
+                        <button onClick={exportWorkersPDF} className="s-btn"><Icon name="file" size={14} /> PDF Radnici</button>
                     </div>
                     <div className={`reports__grid-2 ${isMobile ? 'reports__grid-2--mobile' : 'reports__grid-2--desktop'}`}>
-                        <div style={styles.card}><div className="u-section-title u-mb-12">Sati po radnicima</div><SvgHBarChart data={hoursByWorker} dataKey="sati" height={Math.max(150, hoursByWorker.length * 36)} /></div>
-                        <div style={styles.card}><div className="u-section-title u-mb-12">Dnevni trend</div><SvgLineChart data={dailyTrend} dataKey="sati" height={200} /></div>
+                        <div className="s-card"><div className="u-section-title u-mb-12">Sati po radnicima</div><SvgHBarChart data={hoursByWorker} dataKey="sati" height={Math.max(150, hoursByWorker.length * 36)} /></div>
+                        <div className="s-card"><div className="u-section-title u-mb-12">Dnevni trend</div><SvgLineChart data={dailyTrend} dataKey="sati" height={200} /></div>
                     </div>
                     <div className={`reports__grid-2 ${isMobile ? 'reports__grid-2--mobile' : 'reports__grid-2--desktop'}`}>
-                        <div style={styles.card}><div className="u-section-title u-mb-12">Tip rada raspodjela</div><SvgDonutChart data={typeDistribution} height={160} /></div>
-                        <div style={styles.card}><div className="u-section-title u-mb-12">Po danima u tjednu</div><SvgBarChart data={weeklyDist} dataKey="sati" label="name" height={160} color="#047857" /></div>
+                        <div className="s-card"><div className="u-section-title u-mb-12">Tip rada raspodjela</div><SvgDonutChart data={typeDistribution} height={160} /></div>
+                        <div className="s-card"><div className="u-section-title u-mb-12">Po danima u tjednu</div><SvgBarChart data={weeklyDist} dataKey="sati" label="name" height={160} color="#047857" /></div>
                     </div>
-                    <div style={styles.card}>
+                    <div className="s-card">
                         <div className="u-card-header">
                             <div className="u-section-title">Detaljna tablica po radnicima</div>
                             <div className="u-fs-12 u-text-muted">{hoursByWorker.length} radnika | {filterWorker !== 'sve' ? workers.find(w => w.id === filterWorker)?.name : 'Svi'}{filterProject !== 'sve' ? ` • ${projects.find(p => p.id === filterProject)?.name}` : ''}</div>
                         </div>
-                        <div className="u-overflow-x"><table aria-label="Podaci" style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}><thead><tr><th style={styles.th}>Radnik</th><th style={styles.th}>Sati</th><th style={styles.th}>Normalan</th><th style={styles.th}>Prekovrm.</th><th style={styles.th}>Noćni</th><th style={styles.th}>Vikend</th><th style={styles.th}>Unosa</th><th style={styles.th}>Prosj/dan</th></tr></thead><tbody>
-                            {hoursByWorker.map(w => <tr key={w.name}><td style={{ ...styles.td, fontWeight: 600 }}>{w.name}</td><td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{w.sati}h</td><td style={styles.td}>{w.normalan}h</td><td style={styles.td}>{w.prekovremeni}h</td><td style={styles.td}>{w.nocni}h</td><td style={styles.td}>{w.vikend}h</td><td style={styles.td}>{w.unosa}</td><td style={styles.td}>{w.unosa > 0 ? (w.sati / w.unosa).toFixed(1) : 0}h</td></tr>)}
+                        <div className="u-overflow-x"><table aria-label="Podaci" style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}><thead><tr><th className="s-th">Radnik</th><th className="s-th">Sati</th><th className="s-th">Normalan</th><th className="s-th">Prekovrm.</th><th className="s-th">Noćni</th><th className="s-th">Vikend</th><th className="s-th">Unosa</th><th className="s-th">Prosj/dan</th></tr></thead><tbody>
+                            {hoursByWorker.map(w => <tr key={w.name}><td className="s-td" style={{ fontWeight: 600 }}>{w.name}</td><td className="s-td" style={{ fontWeight: 700, color: C.accent }}>{w.sati}h</td><td className="s-td">{w.normalan}h</td><td className="s-td">{w.prekovremeni}h</td><td className="s-td">{w.nocni}h</td><td className="s-td">{w.vikend}h</td><td className="s-td">{w.unosa}</td><td className="s-td">{w.unosa > 0 ? (w.sati / w.unosa).toFixed(1) : 0}h</td></tr>)}
                         </tbody></table></div>
                     </div>
                 </div>
@@ -290,21 +290,21 @@ export function ReportsPage() {
             {tab === 'projekti' && (
                 <div>
                     <div className="reports__tab-actions">
-                        <button onClick={exportProjectsPDF} style={{ ...styles.btn, background: '#047857' }}><Icon name="file" size={14} /> PDF Projekti</button>
+                        <button onClick={exportProjectsPDF} className="s-btn" style={{ background: '#047857' }}><Icon name="file" size={14} /> PDF Projekti</button>
                     </div>
                     <div className={`reports__grid-2 ${isMobile ? 'reports__grid-2--mobile' : 'reports__grid-2--desktop'}`}>
-                        <div style={styles.card}><div className="u-section-title u-mb-12">Raspodjela sati</div><SvgDonutChart data={hoursByProject} height={200} /></div>
-                        <div style={styles.card}><div className="u-section-title u-mb-12">Usporedba projekata</div><SvgBarChart data={hoursByProject} dataKey="sati" label="name" height={200} /></div>
+                        <div className="s-card"><div className="u-section-title u-mb-12">Raspodjela sati</div><SvgDonutChart data={hoursByProject} height={200} /></div>
+                        <div className="s-card"><div className="u-section-title u-mb-12">Usporedba projekata</div><SvgBarChart data={hoursByProject} dataKey="sati" label="name" height={200} /></div>
                     </div>
-                    <div style={styles.card}>
+                    <div className="s-card">
                         <div className="u-card-header">
                             <div className="u-section-title">Projekti - detalji</div>
                             <div className="u-fs-12 u-text-muted">{hoursByProject.length} projekata | {filterProject !== 'sve' ? projects.find(p => p.id === filterProject)?.name : 'Svi'}{filterWorker !== 'sve' ? ` • ${workers.find(w => w.id === filterWorker)?.name}` : ''}</div>
                         </div>
-                        <div className="u-overflow-x"><table aria-label="Podaci" style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}><thead><tr><th style={styles.th}>Projekt</th><th style={styles.th}>Sati</th><th style={styles.th}>Radnika</th><th style={styles.th}>Troškovi</th><th style={styles.th}>Status</th><th style={styles.th}>% vremena</th></tr></thead><tbody>
+                        <div className="u-overflow-x"><table aria-label="Podaci" style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}><thead><tr><th className="s-th">Projekt</th><th className="s-th">Sati</th><th className="s-th">Radnika</th><th className="s-th">Troškovi</th><th className="s-th">Status</th><th className="s-th">% vremena</th></tr></thead><tbody>
                             {hoursByProject.map(p => {
                                 const proj = projects.find(x => x.id === p.id);
-                                return <tr key={p.name}><td style={{ ...styles.td, fontWeight: 600 }}>{p.fullName || p.name}</td><td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{p.sati}h</td><td style={styles.td}>{p.radnika}</td><td style={styles.td}>{p.trošak.toFixed(0)}€</td><td style={styles.td}><span className={`reports__status-badge ${proj?.status === 'aktivan' ? 'reports__status-badge--approved' : 'reports__status-badge--pending'}`}>{proj?.status || 'aktivan'}</span></td><td style={styles.td}>{totalHours > 0 ? ((p.sati / (totalHours / 60)) * 100).toFixed(1) : 0}%</td></tr>;
+                                return <tr key={p.name}><td className="s-td" style={{ fontWeight: 600 }}>{p.fullName || p.name}</td><td className="s-td" style={{ fontWeight: 700, color: C.accent }}>{p.sati}h</td><td className="s-td">{p.radnika}</td><td className="s-td">{p.trošak.toFixed(0)}€</td><td className="s-td"><span className={`reports__status-badge ${proj?.status === 'aktivan' ? 'reports__status-badge--approved' : 'reports__status-badge--pending'}`}>{proj?.status || 'aktivan'}</span></td><td className="s-td">{totalHours > 0 ? ((p.sati / (totalHours / 60)) * 100).toFixed(1) : 0}%</td></tr>;
                             })}
                         </tbody></table></div>
                     </div>
@@ -321,10 +321,10 @@ export function ReportsPage() {
                         const workerList = Object.entries(projectWorkers).sort((a, b) => b[1].total - a[1].total);
                         if (workerList.length === 0) return null;
                         return (
-                            <div key={p.id} style={{ ...styles.card, marginTop: 12 }}>
+                            <div key={p.id} className="s-card" style={{ marginTop: 12 }}>
                                 <div className="u-section-title" style={{ fontSize: 13, marginBottom: 8 }}>🏗️ {p.fullName || p.name} — Radnici ({workerList.length})</div>
-                                <div className="u-overflow-x"><table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th style={styles.th}>Radnik</th><th style={styles.th}>Sati</th><th style={styles.th}>Unosa</th><th style={styles.th}>% od projekta</th></tr></thead><tbody>
-                                    {workerList.map(([name, d]) => <tr key={name}><td style={{ ...styles.td, fontWeight: 600 }}>{name}</td><td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{d.total.toFixed(1)}h</td><td style={styles.td}>{d.entries}</td><td style={styles.td}>{p.sati > 0 ? ((d.total / p.sati) * 100).toFixed(1) : 0}%</td></tr>)}
+                                <div className="u-overflow-x"><table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th className="s-th">Radnik</th><th className="s-th">Sati</th><th className="s-th">Unosa</th><th className="s-th">% od projekta</th></tr></thead><tbody>
+                                    {workerList.map(([name, d]) => <tr key={name}><td className="s-td" style={{ fontWeight: 600 }}>{name}</td><td className="s-td" style={{ fontWeight: 700, color: C.accent }}>{d.total.toFixed(1)}h</td><td className="s-td">{d.entries}</td><td className="s-td">{p.sati > 0 ? ((d.total / p.sati) * 100).toFixed(1) : 0}%</td></tr>)}
                                 </tbody></table></div>
                             </div>
                         );
@@ -336,7 +336,7 @@ export function ReportsPage() {
             {tab === 'troskovi' && (
                 <div>
                     <div className="reports__tab-actions">
-                        <button onClick={exportCostsPDF} style={{ ...styles.btn, background: '#B91C1C' }}><Icon name="file" size={14} /> PDF Troškovi</button>
+                        <button onClick={exportCostsPDF} className="s-btn" style={{ background: '#B91C1C' }}><Icon name="file" size={14} /> PDF Troškovi</button>
                     </div>
                     <div className={`reports__stats-3 ${isMobile ? 'reports__stats-3--mobile' : 'reports__stats-3--desktop'}`}>
                         <StatCard label="Ukupni troškovi" value={`${totalCosts.toFixed(2)}€`} color={C.red} sub={`${periodInvoices.length} računa`} />
@@ -344,20 +344,20 @@ export function ReportsPage() {
                         <StatCard label="Prosj. po računu" value={periodInvoices.length > 0 ? `${(totalCosts / periodInvoices.length).toFixed(2)}€` : '—'} color="#7C3AED" />
                     </div>
                     <div className={`reports__grid-2 ${isMobile ? 'reports__grid-2--mobile' : 'reports__grid-2--desktop'}`}>
-                        <div style={styles.card}>
+                        <div className="s-card">
                             <div className="u-section-title u-mb-12">Troškovi po projektima</div>
                             {costsByProject.length > 0 ? <SvgBarChart data={costsByProject.map(c => ({ ...c, sati: c.iznos }))} dataKey="sati" label="name" height={220} color="#B91C1C" /> : <div className="reports__empty">Nema podataka</div>}
                         </div>
-                        <div style={styles.card}>
+                        <div className="s-card">
                             <div className="u-section-title u-mb-12">Po kategorijama</div>
                             {costsByCategory.length > 0 ? <SvgHBarChart data={costsByCategory.map(c => ({ name: c.name, sati: c.iznos }))} dataKey="sati" height={Math.max(120, costsByCategory.length * 36)} /> : <div className="reports__empty">Nema podataka</div>}
                         </div>
                     </div>
-                    <div style={styles.card}>
+                    <div className="s-card">
                         <div className="u-section-title u-mb-12">Troškovi po projektima - tablica</div>
-                        <div className="u-overflow-x"><table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th style={styles.th}>Projekt</th><th style={styles.th}>Troškovi €</th><th style={styles.th}>% ukupnog</th></tr></thead><tbody>
-                            {costsByProject.map(c => <tr key={c.name}><td style={{ ...styles.td, fontWeight: 600 }}>{c.fullName || c.name}</td><td style={{ ...styles.td, fontWeight: 700, color: C.red }}>{c.iznos.toFixed(2)}€</td><td style={styles.td}>{totalCosts > 0 ? ((c.iznos / totalCosts) * 100).toFixed(1) : 0}%</td></tr>)}
-                            {costsByProject.length === 0 && <tr><td colSpan={3} style={{ ...styles.td, textAlign: 'center', color: C.textMuted }}>Nema podataka</td></tr>}
+                        <div className="u-overflow-x"><table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th className="s-th">Projekt</th><th className="s-th">Troškovi €</th><th className="s-th">% ukupnog</th></tr></thead><tbody>
+                            {costsByProject.map(c => <tr key={c.name}><td className="s-td" style={{ fontWeight: 600 }}>{c.fullName || c.name}</td><td className="s-td" style={{ fontWeight: 700, color: C.red }}>{c.iznos.toFixed(2)}€</td><td className="s-td">{totalCosts > 0 ? ((c.iznos / totalCosts) * 100).toFixed(1) : 0}%</td></tr>)}
+                            {costsByProject.length === 0 && <tr><td colSpan={3} className="s-td" style={{ textAlign: 'center', color: C.textMuted }}>Nema podataka</td></tr>}
                         </tbody></table></div>
                     </div>
                 </div>
@@ -367,17 +367,17 @@ export function ReportsPage() {
             {tab === 'izvjesca' && (
                 <div>
                     <div className={`reports__grid-2 ${isMobile ? 'reports__grid-2--mobile' : 'reports__grid-2--desktop'}`}>
-                        <div style={styles.card}><div className="u-section-title u-mb-12">Dnevni trend (zadnjih 30 dana)</div><SvgLineChart data={dailyTrend} dataKey="sati" height={250} /></div>
-                        <div style={styles.card}><div className="u-section-title u-mb-12">Raspodjela po danima</div><SvgBarChart data={weeklyDist} dataKey="sati" label="name" height={250} color="#047857" /></div>
+                        <div className="s-card"><div className="u-section-title u-mb-12">Dnevni trend (zadnjih 30 dana)</div><SvgLineChart data={dailyTrend} dataKey="sati" height={250} /></div>
+                        <div className="s-card"><div className="u-section-title u-mb-12">Raspodjela po danima</div><SvgBarChart data={weeklyDist} dataKey="sati" label="name" height={250} color="#047857" /></div>
                     </div>
                     <div className={`reports__grid-2 ${isMobile ? 'reports__grid-2--mobile' : 'reports__grid-2--desktop'}`}>
-                        <div style={styles.card}><div className="u-section-title u-mb-12">Tip rada</div><SvgDonutChart data={typeDistribution} height={180} /></div>
-                        <div style={styles.card}><div className="u-section-title u-mb-12">Troškovi vs Sati</div><SvgBarChart data={hoursByProject.slice(0, 8).map(p => ({ name: p.name, sati: p.trošak }))} dataKey="sati" label="name" height={180} color="#B91C1C" /></div>
+                        <div className="s-card"><div className="u-section-title u-mb-12">Tip rada</div><SvgDonutChart data={typeDistribution} height={180} /></div>
+                        <div className="s-card"><div className="u-section-title u-mb-12">Troškovi vs Sati</div><SvgBarChart data={hoursByProject.slice(0, 8).map(p => ({ name: p.name, sati: p.trošak }))} dataKey="sati" label="name" height={180} color="#B91C1C" /></div>
                     </div>
-                    <div style={styles.card}>
+                    <div className="s-card">
                         <div className="u-section-title u-mb-12">Dnevna tablica</div>
-                        <div className="u-overflow-x"><table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th style={styles.th}>Dan</th><th style={styles.th}>Sati</th></tr></thead><tbody>
-                            {dailyTrend.map(d => <tr key={d.dan}><td style={styles.td}>{d.dan}</td><td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{d.sati}h</td></tr>)}
+                        <div className="u-overflow-x"><table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th className="s-th">Dan</th><th className="s-th">Sati</th></tr></thead><tbody>
+                            {dailyTrend.map(d => <tr key={d.dan}><td className="s-td">{d.dan}</td><td className="s-td" style={{ fontWeight: 700, color: C.accent }}>{d.sati}h</td></tr>)}
                         </tbody></table></div>
                     </div>
                 </div>
@@ -391,7 +391,7 @@ export function ReportsPage() {
                             <option value="sve">Sva vozila ({(vehicles || []).length})</option>
                             {(vehicles || []).map(v => <option key={v.id} value={v.id}>{v.name || v.regNumber}</option>)}
                         </Select>
-                        <button onClick={exportVehiclesPDF} style={{ ...styles.btn, background: '#B45309' }}><Icon name="file" size={14} /> PDF Vozila</button>
+                        <button onClick={exportVehiclesPDF} className="s-btn" style={{ background: '#B45309' }}><Icon name="file" size={14} /> PDF Vozila</button>
                     </div>
                     <div className={`reports__stats-3 ${isMobile ? 'reports__stats-3--mobile' : 'reports__stats-3--desktop'}`}>
                         <StatCard label="Ukupno gorivo" value={`${vehicleData.reduce((s, v) => s + v.trošak, 0).toFixed(2)}€`} color={C.red} />
@@ -399,19 +399,19 @@ export function ReportsPage() {
                         <StatCard label="Vozila" value={vehicleData.length} color={C.blue} />
                     </div>
                     <div className={`reports__grid-2 ${isMobile ? 'reports__grid-2--mobile' : 'reports__grid-2--desktop'}`}>
-                        <div style={styles.card}>
+                        <div className="s-card">
                             <div className="u-section-title u-mb-12">Troškovi goriva</div>
                             {vehicleData.length > 0 ? <SvgBarChart data={vehicleData.map(v => ({ ...v, sati: v.trošak }))} dataKey="sati" label="name" height={200} color="#B91C1C" /> : <div className="reports__empty">Nema podataka</div>}
                         </div>
-                        <div style={styles.card}>
+                        <div className="s-card">
                             <div className="u-section-title u-mb-12">Litara po vozilu</div>
                             {vehicleData.length > 0 ? <SvgHBarChart data={vehicleData.map(v => ({ name: v.name, sati: v.litara }))} dataKey="sati" height={Math.max(120, vehicleData.length * 36)} /> : <div className="reports__empty">Nema podataka</div>}
                         </div>
                     </div>
-                    <div style={styles.card}>
-                        <div className="u-overflow-x"><table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th style={styles.th}>Vozilo</th><th style={styles.th}>Litara</th><th style={styles.th}>Trošak €</th><th style={styles.th}>Km</th><th style={styles.th}>Unosa</th></tr></thead><tbody>
-                            {vehicleData.map(v => <tr key={v.name}><td style={{ ...styles.td, fontWeight: 600 }}>{v.name}</td><td style={styles.td}>{v.litara.toFixed(1)}</td><td style={{ ...styles.td, fontWeight: 700, color: C.red }}>{v.trošak.toFixed(2)}€</td><td style={styles.td}>{v.km.toFixed(0)}</td><td style={styles.td}>{v.unosa}</td></tr>)}
-                            {vehicleData.length === 0 && <tr><td colSpan={5} style={{ ...styles.td, textAlign: 'center', color: C.textMuted }}>Nema podataka</td></tr>}
+                    <div className="s-card">
+                        <div className="u-overflow-x"><table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th className="s-th">Vozilo</th><th className="s-th">Litara</th><th className="s-th">Trošak €</th><th className="s-th">Km</th><th className="s-th">Unosa</th></tr></thead><tbody>
+                            {vehicleData.map(v => <tr key={v.name}><td className="s-td" style={{ fontWeight: 600 }}>{v.name}</td><td className="s-td">{v.litara.toFixed(1)}</td><td className="s-td" style={{ fontWeight: 700, color: C.red }}>{v.trošak.toFixed(2)}€</td><td className="s-td">{v.km.toFixed(0)}</td><td className="s-td">{v.unosa}</td></tr>)}
+                            {vehicleData.length === 0 && <tr><td colSpan={5} className="s-td" style={{ textAlign: 'center', color: C.textMuted }}>Nema podataka</td></tr>}
                         </tbody></table></div>
                     </div>
                 </div>
@@ -425,15 +425,15 @@ export function ReportsPage() {
                         <StatCard label="Prosj. sati/dan" value={`${productivity.length > 0 ? (productivity.reduce((s, p) => s + p.avgH, 0) / productivity.length).toFixed(1) : 0}h`} color={C.blue} />
                         <StatCard label="Ukupno prekovremenih" value={`${productivity.reduce((s, p) => s + p.overtime, 0).toFixed(1)}h`} color="#F59E0B" />
                     </div>
-                    <div style={styles.card}>
+                    <div className="s-card">
                         <div className="u-section-title u-mb-16"> Produktivnost po radnicima</div>
                         <div className="u-overflow-x"><table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}>
-                            <thead><tr><th style={styles.th}>Radnik</th><th style={styles.th}>Ukupno h</th><th style={styles.th}>Radnih dana</th><th style={styles.th}>Prosj./dan</th><th style={styles.th}>Projekata</th><th style={styles.th}>Prekov.</th><th style={styles.th}>Efikasnost</th></tr></thead>
+                            <thead><tr><th className="s-th">Radnik</th><th className="s-th">Ukupno h</th><th className="s-th">Radnih dana</th><th className="s-th">Prosj./dan</th><th className="s-th">Projekata</th><th className="s-th">Prekov.</th><th className="s-th">Efikasnost</th></tr></thead>
                             <tbody>{productivity.map(w => (
-                                <tr key={w.name}><td style={{ ...styles.td, fontWeight: 600 }}>{w.name}</td><td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{w.totalH}h</td><td style={styles.td}>{w.days}</td><td style={styles.td}>{w.avgH}h</td><td style={styles.td}>{w.projects}</td><td style={{ ...styles.td, color: w.overtime > 0 ? '#F59E0B' : C.textMuted }}>{w.overtime}h</td>
-                                    <td style={styles.td}><div className="reports__progress-cell"><div className="reports__progress-track"><div className="reports__progress-fill" style={{ width: `${w.efficiency}%`, background: w.efficiency >= 80 ? '#10B981' : w.efficiency >= 50 ? '#F59E0B' : '#EF4444' }} /></div><span className="reports__progress-label" style={{ color: w.efficiency >= 80 ? '#10B981' : '#F59E0B' }}>{w.efficiency}%</span></div></td></tr>
+                                <tr key={w.name}><td className="s-td" style={{ fontWeight: 600 }}>{w.name}</td><td className="s-td" style={{ fontWeight: 700, color: C.accent }}>{w.totalH}h</td><td className="s-td">{w.days}</td><td className="s-td">{w.avgH}h</td><td className="s-td">{w.projects}</td><td className="s-td" style={{ color: w.overtime > 0 ? '#F59E0B' : C.textMuted }}>{w.overtime}h</td>
+                                    <td className="s-td"><div className="reports__progress-cell"><div className="reports__progress-track"><div className="reports__progress-fill" style={{ width: `${w.efficiency}%`, background: w.efficiency >= 80 ? '#10B981' : w.efficiency >= 50 ? '#F59E0B' : '#EF4444' }} /></div><span className="reports__progress-label" style={{ color: w.efficiency >= 80 ? '#10B981' : '#F59E0B' }}>{w.efficiency}%</span></div></td></tr>
                             ))}
-                                {productivity.length === 0 && <tr><td colSpan={7} style={{ ...styles.td, textAlign: 'center', color: C.textMuted }}>Nema podataka</td></tr>}
+                                {productivity.length === 0 && <tr><td colSpan={7} className="s-td" style={{ textAlign: 'center', color: C.textMuted }}>Nema podataka</td></tr>}
                             </tbody></table></div>
                     </div>
                 </div>
@@ -447,13 +447,13 @@ export function ReportsPage() {
                         <StatCard label="Ukupno kašnjenja" value={attendance.reduce((s, a) => s + a.late, 0)} color="#F59E0B" />
                         <StatCard label="Radnih dana u periodu" value={attendance[0]?.totalDays || 0} color={C.blue} />
                     </div>
-                    <div style={styles.card}>
+                    <div className="s-card">
                         <div className="u-section-title u-mb-16">📋 Prisutnost radnika</div>
                         <div className="u-overflow-x"><table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}>
-                            <thead><tr><th style={styles.th}>Radnik</th><th style={styles.th}>Prisutan (dana)</th><th style={styles.th}>Odsutan</th><th style={styles.th}>Kašnjenja</th><th style={styles.th}>Stopa prisutnosti</th></tr></thead>
+                            <thead><tr><th className="s-th">Radnik</th><th className="s-th">Prisutan (dana)</th><th className="s-th">Odsutan</th><th className="s-th">Kašnjenja</th><th className="s-th">Stopa prisutnosti</th></tr></thead>
                             <tbody>{attendance.map(a => (
-                                <tr key={a.name}><td style={{ ...styles.td, fontWeight: 600 }}>{a.name}</td><td style={{ ...styles.td, fontWeight: 700, color: C.green }}>{a.present}</td><td style={{ ...styles.td, color: a.absent > 3 ? C.red : C.textMuted }}>{a.absent}</td><td style={{ ...styles.td, color: a.late > 0 ? '#F59E0B' : C.textMuted }}>{a.late}</td>
-                                    <td style={styles.td}><div className="reports__progress-cell"><div className="reports__progress-track"><div className="reports__progress-fill" style={{ width: `${a.rate}%`, background: a.rate >= 80 ? '#10B981' : a.rate >= 50 ? '#F59E0B' : '#EF4444' }} /></div><span className="reports__progress-label">{a.rate}%</span></div></td></tr>
+                                <tr key={a.name}><td className="s-td" style={{ fontWeight: 600 }}>{a.name}</td><td className="s-td" style={{ fontWeight: 700, color: C.green }}>{a.present}</td><td className="s-td" style={{ color: a.absent > 3 ? C.red : C.textMuted }}>{a.absent}</td><td className="s-td" style={{ color: a.late > 0 ? '#F59E0B' : C.textMuted }}>{a.late}</td>
+                                    <td className="s-td"><div className="reports__progress-cell"><div className="reports__progress-track"><div className="reports__progress-fill" style={{ width: `${a.rate}%`, background: a.rate >= 80 ? '#10B981' : a.rate >= 50 ? '#F59E0B' : '#EF4444' }} /></div><span className="reports__progress-label">{a.rate}%</span></div></td></tr>
                             ))}
                             </tbody></table></div>
                     </div>
@@ -464,7 +464,7 @@ export function ReportsPage() {
             {tab === 'otpremnice' && (
                 <div>
                     <div className="reports__tab-actions">
-                        <button onClick={exportOtpremnicePDF} style={{ ...styles.btn, background: '#3B82F6' }}><Icon name="file" size={14} /> PDF Otpremnice</button>
+                        <button onClick={exportOtpremnicePDF} className="s-btn" style={{ background: '#3B82F6' }}><Icon name="file" size={14} /> PDF Otpremnice</button>
                     </div>
                     <div className={`reports__stats-5 ${isMobile ? 'reports__stats-5--mobile' : 'reports__stats-5--desktop'}`}>
                         <StatCard label="Ukupni iznos" value={`${otpStats.totalAmount}€`} color={C.accent} />
@@ -474,24 +474,24 @@ export function ReportsPage() {
                         <StatCard label="Prosj. iznos" value={`${otpStats.avgAmount}€`} color="#6366F1" />
                     </div>
                     <div className={`reports__grid-3 ${isMobile ? 'reports__grid-3--mobile' : 'reports__grid-3--desktop'}`}>
-                        {otpStats.statusChart?.length > 0 && <div style={styles.card}><div className="u-section-title u-fs-13 u-mb-12 u-mb-12" style={{ marginBottom: 10 }}>Status otpremnica</div><SvgDonutChart data={otpStats.statusChart} height={160} /></div>}
-                        {otpStats.projectChart?.length > 0 && <div style={styles.card}><div className="u-section-title u-fs-13 u-mb-12 u-mb-12" style={{ marginBottom: 10 }}>Po projektu (iznos)</div><SvgHBarChart data={otpStats.projectChart} dataKey="iznos" height={180} /></div>}
-                        {otpStats.supplierChart?.length > 0 && <div style={styles.card}><div className="u-section-title u-fs-13 u-mb-12 u-mb-12" style={{ marginBottom: 10 }}>Po dobavljaču</div><SvgHBarChart data={otpStats.supplierChart} dataKey="iznos" color="#10B981" height={180} /></div>}
+                        {otpStats.statusChart?.length > 0 && <div className="s-card"><div className="u-section-title u-fs-13 u-mb-12 u-mb-12" style={{ marginBottom: 10 }}>Status otpremnica</div><SvgDonutChart data={otpStats.statusChart} height={160} /></div>}
+                        {otpStats.projectChart?.length > 0 && <div className="s-card"><div className="u-section-title u-fs-13 u-mb-12 u-mb-12" style={{ marginBottom: 10 }}>Po projektu (iznos)</div><SvgHBarChart data={otpStats.projectChart} dataKey="iznos" height={180} /></div>}
+                        {otpStats.supplierChart?.length > 0 && <div className="s-card"><div className="u-section-title u-fs-13 u-mb-12 u-mb-12" style={{ marginBottom: 10 }}>Po dobavljaču</div><SvgHBarChart data={otpStats.supplierChart} dataKey="iznos" color="#10B981" height={180} /></div>}
                     </div>
-                    <div style={styles.card}>
+                    <div className="s-card">
                         <div className="u-section-title u-mb-16">📦 Sve otpremnice u periodu ({otpremnicePeriod.length})</div>
                         <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}>
-                            <thead><tr><th style={styles.th}>Br.</th><th style={styles.th}>Datum</th><th style={styles.th}>Dobavljač</th><th style={styles.th}>Projekt</th><th style={styles.th}>Iznos</th><th style={styles.th}>Status</th><th style={styles.th}>Napomena</th></tr></thead>
+                            <thead><tr><th className="s-th">Br.</th><th className="s-th">Datum</th><th className="s-th">Dobavljač</th><th className="s-th">Projekt</th><th className="s-th">Iznos</th><th className="s-th">Status</th><th className="s-th">Napomena</th></tr></thead>
                             <tbody>{otpremnicePeriod.sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 100).map(o => {
                                 const proj = projects.find(p => p.id === o.projectId);
                                 return <tr key={o.id} style={{ background: String(o.status).includes('čekanju') ? 'rgba(245,158,11,0.05)' : 'transparent' }}>
-                                    <td style={{ ...styles.td, fontWeight: 600 }}>{o.deliveryNumber || '—'}</td>
-                                    <td style={styles.td}>{fmtDate(o.date)}</td>
-                                    <td style={styles.td}>{o.supplier || '—'}</td>
-                                    <td style={styles.td}>{proj?.name || '—'}</td>
-                                    <td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{o.amount ? `${parseFloat(o.amount).toFixed(2)}€` : '—'}</td>
-                                    <td style={styles.td}><span className={`reports__status-badge ${String(o.status).includes('odobren') ? 'reports__status-badge--approved' : 'reports__status-badge--pending'}`}>{o.status || '—'}</span></td>
-                                    <td style={styles.td} className="reports__note-cell">{o.note || '—'}</td>
+                                    <td className="s-td" style={{ fontWeight: 600 }}>{o.deliveryNumber || '—'}</td>
+                                    <td className="s-td">{fmtDate(o.date)}</td>
+                                    <td className="s-td">{o.supplier || '—'}</td>
+                                    <td className="s-td">{proj?.name || '—'}</td>
+                                    <td className="s-td" style={{ fontWeight: 700, color: C.accent }}>{o.amount ? `${parseFloat(o.amount).toFixed(2)}€` : '—'}</td>
+                                    <td className="s-td"><span className={`reports__status-badge ${String(o.status).includes('odobren') ? 'reports__status-badge--approved' : 'reports__status-badge--pending'}`}>{o.status || '—'}</span></td>
+                                    <td className="s-td" className="reports__note-cell">{o.note || '—'}</td>
                                 </tr>;
                             })}
                             </tbody></table></div>
@@ -502,14 +502,14 @@ export function ReportsPage() {
 
             {/* Tab: Sve podatke */}
             {tab === 'sve' && (
-                <div style={styles.card}>
+                <div className="s-card">
                     <div className="u-section-title u-mb-12">Svi radni sati ({periodTs.length} unosa)</div>
-                    <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}><thead><tr><th style={styles.th}>Datum</th><th style={styles.th}>Radnik</th><th style={styles.th}>Projekt</th><th style={styles.th}>Od</th><th style={styles.th}>Do</th><th style={styles.th}>Sati</th><th style={styles.th}>Tip</th><th style={styles.th}>Status</th></tr></thead><tbody>
+                    <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}><thead><tr><th className="s-th">Datum</th><th className="s-th">Radnik</th><th className="s-th">Projekt</th><th className="s-th">Od</th><th className="s-th">Do</th><th className="s-th">Sati</th><th className="s-th">Tip</th><th className="s-th">Status</th></tr></thead><tbody>
                         {periodTs.sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 200).map(t => {
                             const w = workers.find(x => x.id === t.workerId);
                             const p = projects.find(x => x.id === t.projectId);
                             const h = ((t.durationMins || diffMins(t.startTime, t.endTime)) / 60).toFixed(1);
-                            return <tr key={t.id}><td style={styles.td}>{fmtDate(t.date)}</td><td style={styles.td}>{w?.name || '—'}</td><td style={styles.td}>{p?.name || '—'}</td><td style={styles.td}>{t.startTime}</td><td style={styles.td}>{t.endTime}</td><td style={{ ...styles.td, fontWeight: 700 }}>{h}h</td><td style={styles.td}>{t.type || 'normalan'}</td><td style={styles.td}>{t.status || '—'}</td></tr>;
+                            return <tr key={t.id}><td className="s-td">{fmtDate(t.date)}</td><td className="s-td">{w?.name || '—'}</td><td className="s-td">{p?.name || '—'}</td><td className="s-td">{t.startTime}</td><td className="s-td">{t.endTime}</td><td className="s-td" style={{ fontWeight: 700 }}>{h}h</td><td className="s-td">{t.type || 'normalan'}</td><td className="s-td">{t.status || '—'}</td></tr>;
                         })}
                     </tbody></table></div>
                     {periodTs.length > 200 && <div className="reports__truncated">Prikazano prvih 200 od {periodTs.length}</div>}

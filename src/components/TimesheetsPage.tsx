@@ -187,38 +187,38 @@ export function TimesheetsPage() {
                         <div className="u-fs-13 u-text-muted">Upravljanje evidencijom radnog vremena</div>
                     </div>
                     <div className="u-flex-center u-gap-8">
-                        <button onClick={exportCSV} style={styles.btnSecondary}><Icon name="download" size={14} /> CSV/Excel</button>
-                        <button onClick={exportPDF} style={{ ...styles.btnSecondary, color: C.red, borderColor: 'rgba(239,68,68,0.3)' }}><Icon name="file" size={14} /> PDF</button>
-                        <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> Dodaj</button>
+                        <button onClick={exportCSV} className="s-btn-sec"><Icon name="download" size={14} /> CSV/Excel</button>
+                        <button onClick={exportPDF} className="s-btn-sec" style={{ color: C.red, borderColor: 'rgba(239,68,68,0.3)' }}><Icon name="file" size={14} /> PDF</button>
+                        <button onClick={openAdd} className="s-btn"><Icon name="plus" size={16} /> Dodaj</button>
                     </div>
                 </div>
 
                 {/* Stats */}
                 <div className={`ts__stats ${isMobile ? 'ts__stats--mobile' : 'ts__stats--desktop'}`}>
-                    <div style={{ ...styles.card, textAlign: 'center', padding: '14px 12px' }}>
+                    <div className="s-card" style={{ textAlign: 'center', padding: '14px 12px' }}>
                         <div className="u-stat-label">Ukupno sati</div>
                         <div className="ts__stat-value" style={{ color: C.accent }}>{(totalFiltered / 60).toFixed(1)}h</div>
                     </div>
-                    <div style={{ ...styles.card, textAlign: 'center', padding: '14px 12px' }}>
+                    <div className="s-card" style={{ textAlign: 'center', padding: '14px 12px' }}>
                         <div className="u-stat-label">Unosa</div>
                         <div className="ts__stat-value" style={{ color: C.blue }}>{filtered.length}</div>
                     </div>
-                    <div style={{ ...styles.card, textAlign: 'center', padding: '14px 12px' }}>
+                    <div className="s-card" style={{ textAlign: 'center', padding: '14px 12px' }}>
                         <div className="u-stat-label">Odobreno</div>
                         <div className="ts__stat-value" style={{ color: C.green }}>{approvedCount}</div>
                     </div>
-                    <div style={{ ...styles.card, textAlign: 'center', padding: '14px 12px' }}>
+                    <div className="s-card" style={{ textAlign: 'center', padding: '14px 12px' }}>
                         <div className="u-stat-label">Na čekanju</div>
                         <div className="ts__stat-value" style={{ color: C.yellow }}>{pendingCount}</div>
                     </div>
-                    <div style={{ ...styles.card, textAlign: 'center', padding: '14px 12px' }}>
+                    <div className="s-card" style={{ textAlign: 'center', padding: '14px 12px' }}>
                         <div className="u-stat-label">Prosj./dan</div>
                         <div className="ts__stat-value" style={{ color: 'var(--purple)' }}>{avgPerDay}h</div>
                     </div>
                 </div>
 
                 {/* Filters */}
-                <div style={styles.card} className="ts__filters">
+                <div className="s-card" className="ts__filters">
                     <div className="ts__search-wrap">
                         <Input placeholder="Traži radnika, projekt..." value={search} onChange={e => setSearch(e.target.value)} className="u-pl-36" />
                         <div className="ts__search-icon"><Icon name="search" size={14} /></div>
@@ -246,18 +246,18 @@ export function TimesheetsPage() {
 
                 {/* Pending banner */}
                 {pendingCount > 0 && (
-                    <div style={styles.card} className="ts__pending-banner">
+                    <div className="s-card" className="ts__pending-banner">
                         <div className="ts__pending-icon">⏳</div>
                         <div>
                             <div className="ts__pending-title">{pendingCount} unos{pendingCount > 1 ? 'a' : ''} čeka odobrenje</div>
                             <div className="u-fs-12 u-text-muted">Pregledajte i odobrite/odbijte unose radnika</div>
                         </div>
-                        <button onClick={() => { setFilterStatus('na čekanju'); }} style={{ ...styles.btnSmall, marginLeft: 'auto', color: C.yellow, borderColor: 'rgba(180,83,9,0.3)' }}>Prikaži sve</button>
+                        <button onClick={() => { setFilterStatus('na čekanju'); }} className="s-btn-sm" style={{ marginLeft: 'auto', color: C.yellow, borderColor: 'rgba(180,83,9,0.3)' }}>Prikaži sve</button>
                     </div>
                 )}
 
                 {/* Table */}
-                <div style={styles.card} className="ts__table-card">
+                <div className="s-card" className="ts__table-card">
                     <div className="ts__table-header">
                         <div className="u-section-title">Pregled ({filtered.length})</div>
                         <div className="u-fs-12 u-text-muted">{(totalFiltered / 60).toFixed(1)}h ukupno</div>
@@ -288,32 +288,32 @@ export function TimesheetsPage() {
                                     const typeLabel = { normalan: '', prekovremeni: '', noćni: '🌙', vikend: '📅' };
                                     return (
                                         <tr key={t.id} style={{ background: selectedIds.has(t.id) ? 'var(--accent-light)' : isPending ? 'var(--yellow-light)' : 'var(--card)' }}>
-                                            <td style={{ ...styles.td, width: 36, textAlign: 'center' }}>
+                                            <td className="s-td" style={{ width: 36, textAlign: 'center' }}>
                                                 <input type="checkbox" checked={selectedIds.has(t.id)} onChange={() => toggleSelect(t.id)} style={{ accentColor: 'var(--accent)', cursor: 'pointer', width: 16, height: 16 }} />
                                             </td>
-                                            <td style={{ ...styles.td, whiteSpace: 'nowrap' }}>{fmtDate(t.date)}</td>
-                                            <td style={styles.td}>
+                                            <td className="s-td" style={{ whiteSpace: 'nowrap' }}>{fmtDate(t.date)}</td>
+                                            <td className="s-td">
                                                 <div className="u-flex-center u-gap-8">
                                                     <div className="ts__avatar">{w?.name?.charAt(0)}</div>
                                                     <span className="ts__worker-name">{w?.name || '—'}</span>
                                                 </div>
                                             </td>
-                                            <td style={styles.td} className="ts__project-cell">{p?.name || '—'}</td>
-                                            <td style={{ ...styles.td, fontSize: 13 }}>{t.startTime}</td>
-                                            <td style={{ ...styles.td, fontSize: 13 }}>{t.endTime}</td>
-                                            <td style={{ ...styles.td, fontSize: 12, color: C.textMuted }}>{t.breakMins || 0}m</td>
-                                            <td style={{ ...styles.td, fontWeight: 700, color: C.accent, fontSize: 13 }}>{(mins / 60).toFixed(1)}h</td>
-                                            <td style={{ ...styles.td, fontSize: 12 }}>{typeLabel[t.type] || ''} {t.type || 'normalan'}</td>
-                                            <td style={styles.td}><StatusBadge status={t.status} /></td>
-                                            <td style={styles.td}>
+                                            <td className="s-td" className="ts__project-cell">{p?.name || '—'}</td>
+                                            <td className="s-td" style={{ fontSize: 13 }}>{t.startTime}</td>
+                                            <td className="s-td" style={{ fontSize: 13 }}>{t.endTime}</td>
+                                            <td className="s-td" style={{ fontSize: 12, color: C.textMuted }}>{t.breakMins || 0}m</td>
+                                            <td className="s-td" style={{ fontWeight: 700, color: C.accent, fontSize: 13 }}>{(mins / 60).toFixed(1)}h</td>
+                                            <td className="s-td" style={{ fontSize: 12 }}>{typeLabel[t.type] || ''} {t.type || 'normalan'}</td>
+                                            <td className="s-td"><StatusBadge status={t.status} /></td>
+                                            <td className="s-td">
                                                 <div className="ts__actions">
                                                     {isPending && <>
-                                                        <button onClick={() => approve(t)} style={{ ...styles.btnSmall, background: 'rgba(34,197,94,0.12)', color: C.green, border: '1px solid rgba(34,197,94,0.25)', padding: '4px 8px' }} title="Odobri"><Icon name="check" size={13} /></button>
-                                                        <button onClick={() => reject(t)} style={{ ...styles.btnSmall, background: 'rgba(239,68,68,0.1)', color: C.red, border: '1px solid rgba(239,68,68,0.2)', padding: '4px 8px' }} title="Odbij"><Icon name="close" size={13} /></button>
+                                                        <button onClick={() => approve(t)} className="s-btn-sm" style={{ background: 'rgba(34,197,94,0.12)', color: C.green, border: '1px solid rgba(34,197,94,0.25)', padding: '4px 8px' }} title="Odobri"><Icon name="check" size={13} /></button>
+                                                        <button onClick={() => reject(t)} className="s-btn-sm" style={{ background: 'rgba(239,68,68,0.1)', color: C.red, border: '1px solid rgba(239,68,68,0.2)', padding: '4px 8px' }} title="Odbij"><Icon name="close" size={13} /></button>
                                                     </>}
-                                                    <button onClick={() => setDetailId(t.id)} style={{ ...styles.btnSmall, padding: '4px 8px' }} title="Detalji"><Icon name="eye" size={13} /></button>
-                                                    <button onClick={() => openEdit(t)} style={{ ...styles.btnSmall, padding: '4px 8px' }} title="Uredi"><Icon name="edit" size={12} /></button>
-                                                    <button onClick={() => doDelete(t.id)} style={{ ...styles.btnSmall, background: 'rgba(239,68,68,0.08)', color: C.red, border: '1px solid rgba(239,68,68,0.15)', padding: '4px 8px' }} title="Obriši"><Icon name="trash" size={12} /></button>
+                                                    <button onClick={() => setDetailId(t.id)} className="s-btn-sm" style={{ padding: '4px 8px' }} title="Detalji"><Icon name="eye" size={13} /></button>
+                                                    <button onClick={() => openEdit(t)} className="s-btn-sm" style={{ padding: '4px 8px' }} title="Uredi"><Icon name="edit" size={12} /></button>
+                                                    <button onClick={() => doDelete(t.id)} className="s-btn-sm" style={{ background: 'rgba(239,68,68,0.08)', color: C.red, border: '1px solid rgba(239,68,68,0.15)', padding: '4px 8px' }} title="Obriši"><Icon name="trash" size={12} /></button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -336,25 +336,25 @@ export function TimesheetsPage() {
                             return (
                                 <div>
                                     <div className="ts__detail-grid">
-                                        <div><span style={styles.label}>Radnik</span><div className="u-fw-600">{w?.name || '—'}</div></div>
-                                        <div><span style={styles.label}>Projekt</span><div className="u-fw-600">{p?.name || '—'}</div></div>
-                                        <div><span style={styles.label}>Datum</span><div>{fmtDate(detailTs.date)}</div></div>
-                                        <div><span style={styles.label}>Tip</span><div>{detailTs.type || 'normalan'}</div></div>
-                                        <div><span style={styles.label}>Od - Do</span><div>{detailTs.startTime} — {detailTs.endTime}</div></div>
-                                        <div><span style={styles.label}>Neto sati</span><div style={{ fontWeight: 700, color: C.accent }}>{(mins / 60).toFixed(1)}h</div></div>
-                                        <div><span style={styles.label}>Pauza</span><div>{detailTs.breakMins || 0} min</div></div>
-                                        <div><span style={styles.label}>Status</span><StatusBadge status={detailTs.status} /></div>
+                                        <div><span className="s-label">Radnik</span><div className="u-fw-600">{w?.name || '—'}</div></div>
+                                        <div><span className="s-label">Projekt</span><div className="u-fw-600">{p?.name || '—'}</div></div>
+                                        <div><span className="s-label">Datum</span><div>{fmtDate(detailTs.date)}</div></div>
+                                        <div><span className="s-label">Tip</span><div>{detailTs.type || 'normalan'}</div></div>
+                                        <div><span className="s-label">Od - Do</span><div>{detailTs.startTime} — {detailTs.endTime}</div></div>
+                                        <div><span className="s-label">Neto sati</span><div style={{ fontWeight: 700, color: C.accent }}>{(mins / 60).toFixed(1)}h</div></div>
+                                        <div><span className="s-label">Pauza</span><div>{detailTs.breakMins || 0} min</div></div>
+                                        <div><span className="s-label">Status</span><StatusBadge status={detailTs.status} /></div>
                                     </div>
-                                    {detailTs.description && <div className="u-mb-12"><span style={styles.label}>Opis rada</span><div className="ts__detail-desc">{detailTs.description}</div></div>}
-                                    {detailTs.gpsLocation && <div className="u-mb-12"><span style={styles.label}>GPS Lokacija</span><div className="ts__detail-gps">📍 {detailTs.gpsLocation}</div></div>}
-                                    {detailTs.notes && <div className="u-mb-12"><span style={styles.label}>Napomene</span><div className="ts__detail-notes">{detailTs.notes}</div></div>}
-                                    {detailTs.rejectReason && <div className="u-mb-12"><span style={styles.label}>Razlog odbijanja</span><div className="ts__detail-reject">{detailTs.rejectReason}</div></div>}
+                                    {detailTs.description && <div className="u-mb-12"><span className="s-label">Opis rada</span><div className="ts__detail-desc">{detailTs.description}</div></div>}
+                                    {detailTs.gpsLocation && <div className="u-mb-12"><span className="s-label">GPS Lokacija</span><div className="ts__detail-gps">📍 {detailTs.gpsLocation}</div></div>}
+                                    {detailTs.notes && <div className="u-mb-12"><span className="s-label">Napomene</span><div className="ts__detail-notes">{detailTs.notes}</div></div>}
+                                    {detailTs.rejectReason && <div className="u-mb-12"><span className="s-label">Razlog odbijanja</span><div className="ts__detail-reject">{detailTs.rejectReason}</div></div>}
                                     {detailTs.source && <div className="u-fs-12 u-text-muted">Izvor: {detailTs.source === 'admin' ? 'Admin unos' : 'Radnički unos'}</div>}
-                                    {detailTs.invoiceFile && <div className="u-mt-12"><span style={styles.label}>Priloženi račun</span><div style={{ marginTop: 4 }}><a href={detailTs.invoiceFile.data} download={detailTs.invoiceFile.name} style={styles.btnSmall}><Icon name="download" size={14} /> {detailTs.invoiceFile.name}</a></div></div>}
+                                    {detailTs.invoiceFile && <div className="u-mt-12"><span className="s-label">Priloženi račun</span><div style={{ marginTop: 4 }}><a href={detailTs.invoiceFile.data} download={detailTs.invoiceFile.name} className="s-btn-sm"><Icon name="download" size={14} /> {detailTs.invoiceFile.name}</a></div></div>}
                                     {detailTs.status === 'na čekanju' && (
                                         <div className="ts__detail-actions">
-                                            <button onClick={() => { approve(detailTs); setDetailId(null); }} style={{ ...styles.btn, background: C.green, flex: 1, justifyContent: 'center' }}><Icon name="check" size={16} /> Odobri</button>
-                                            <button onClick={() => { reject(detailTs); setDetailId(null); }} style={{ ...styles.btn, background: C.red, flex: 1, justifyContent: 'center' }}><Icon name="close" size={16} /> Odbij</button>
+                                            <button onClick={() => { approve(detailTs); setDetailId(null); }} className="s-btn" style={{ background: C.green, flex: 1, justifyContent: 'center' }}><Icon name="check" size={16} /> Odobri</button>
+                                            <button onClick={() => { reject(detailTs); setDetailId(null); }} className="s-btn" style={{ background: C.red, flex: 1, justifyContent: 'center' }}><Icon name="close" size={16} /> Odbij</button>
                                         </div>
                                     )}
                                 </div>
@@ -401,8 +401,8 @@ export function TimesheetsPage() {
                         <Field label="Opis rada"><Input value={form.description} onChange={e => update('description', e.target.value)} placeholder="Što je radnik radio..." /></Field>
                         <Field label="Napomene"><Input value={form.notes} onChange={e => update('notes', e.target.value)} placeholder="Dodatne napomene..." /></Field>
                         <div className="u-flex-end">
-                            <button onClick={() => setShowForm(false)} style={styles.btnSecondary}>Odustani</button>
-                            <button onClick={doSave} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
+                            <button onClick={() => setShowForm(false)} className="s-btn-sec">Odustani</button>
+                            <button onClick={doSave} className="s-btn"><Icon name="check" size={16} /> Spremi</button>
                         </div>
                     </Modal>
                 )}

@@ -156,8 +156,8 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
 
         return (
             <div>
-                <button onClick={() => setDetailId(null)} style={{ ...styles.btnSecondary, marginBottom: 20, display: 'inline-flex' }}><Icon name="back" size={16} /> Natrag</button>
-                <div style={styles.card} className="u-mb-20">
+                <button onClick={() => setDetailId(null)} className="s-btn-sec" style={{ marginBottom: 20, display: 'inline-flex' }}><Icon name="back" size={16} /> Natrag</button>
+                <div className="s-card" className="u-mb-20">
                     <div className="workers__detail-header">
                         <div className="workers__avatar workers__avatar--active workers__avatar--large">{detailWorker.name?.charAt(0)}</div>
                         <div>
@@ -187,7 +187,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
 
                 {/* Hours by day chart */}
                 {hoursByDay.length > 1 && (
-                    <div style={styles.card} className="u-mb-20">
+                    <div className="s-card" className="u-mb-20">
                         <div className="workers__section-title"><Icon name="clock" size={16} /> Sati po danu (zadnjih {hoursByDay.length} dana)</div>
                         <div className="workers__chart">
                             {hoursByDay.map((d, i) => (
@@ -202,7 +202,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                 )}
 
                 {/* Projects with hours */}
-                {wProjects.length > 0 && <div style={styles.card} className="u-mb-20">
+                {wProjects.length > 0 && <div className="s-card" className="u-mb-20">
                     <div className="workers__section-title"><Icon name="project" size={16} /> Projekti ({wProjects.length})</div>
                     {projectHours.map(p => (
                         <div key={p.name} className="workers__project-row">
@@ -227,7 +227,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
         <div>
             <div className="workers__header">
                 <div className="u-fs-22 u-fw-800 u-color-text">Radnici</div>
-                <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> Novi radnik</button>
+                <button onClick={openAdd} className="s-btn"><Icon name="plus" size={16} /> Novi radnik</button>
             </div>
             <div className="workers__toolbar">
                 <div className="workers__search-wrap">
@@ -246,7 +246,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                     const wProjects = projects.filter(p => (p.workers || []).includes(w.id));
                     const wHours = timesheets.filter(t => t.workerId === w.id).reduce((s, t) => s + diffMins(t.startTime, t.endTime), 0);
                     return (
-                        <div key={w.id} role="button" tabIndex={0} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && e.currentTarget.click()} style={styles.card} className="workers__card" onClick={() => setDetailId(w.id)}>
+                        <div key={w.id} role="button" tabIndex={0} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && e.currentTarget.click()} className="s-card" className="workers__card" onClick={() => setDetailId(w.id)}>
                             <div className="workers__card-top">
                                 <div className={`workers__avatar ${w.active !== false ? 'workers__avatar--active' : 'workers__avatar--inactive'}`}>{w.name?.charAt(0)}</div>
                                 <div className="workers__card-info">
@@ -261,9 +261,9 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                             <div className="workers__card-footer" onClick={e => e.stopPropagation()}>
                                 <span className="workers__card-status" style={{ color: w.active !== false ? C.green : C.red }}>{w.active !== false ? '🟢 Aktivan' : '🔴 Neaktivan'}</span>
                                 <div className="workers__card-actions">
-                                    <button onClick={() => toggleActive(w)} style={{ ...styles.btnSmall, fontSize: 11 }}>{w.active !== false ? 'Deaktiviraj' : 'Aktiviraj'}</button>
-                                    <button onClick={() => openEdit(w)} style={styles.btnSmall}><Icon name="edit" size={12} /></button>
-                                    <button onClick={() => doDelete(w.id)} style={styles.btnDanger}><Icon name="trash" size={12} /></button>
+                                    <button onClick={() => toggleActive(w)} className="s-btn-sm" style={{ fontSize: 11 }}>{w.active !== false ? 'Deaktiviraj' : 'Aktiviraj'}</button>
+                                    <button onClick={() => openEdit(w)} className="s-btn-sm"><Icon name="edit" size={12} /></button>
+                                    <button onClick={() => doDelete(w.id)} className="s-btn-danger"><Icon name="trash" size={12} /></button>
                                 </div>
                             </div>
                         </div>
@@ -326,8 +326,8 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                         </label>
                     </div>
                     <div className="u-flex-end">
-                        <button onClick={() => setShowForm(false)} style={styles.btnSecondary}>Odustani</button>
-                        <button onClick={doSave} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
+                        <button onClick={() => setShowForm(false)} className="s-btn-sec">Odustani</button>
+                        <button onClick={doSave} className="s-btn"><Icon name="check" size={16} /> Spremi</button>
                     </div>
                 </Modal>
             )

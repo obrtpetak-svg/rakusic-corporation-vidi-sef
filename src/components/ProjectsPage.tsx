@@ -172,8 +172,8 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
         const projectFiles = detailProject.files || [];
         return (
             <div>
-                <button onClick={() => setDetailId(null)} style={{ ...styles.btnSecondary, marginBottom: 20, display: 'inline-flex' }}><Icon name="back" size={16} /> Natrag</button>
-                <div style={styles.card} className="u-mb-20">
+                <button onClick={() => setDetailId(null)} className="s-btn-sec" style={{ marginBottom: 20, display: 'inline-flex' }}><Icon name="back" size={16} /> Natrag</button>
+                <div className="s-card" className="u-mb-20">
                     <div className="proj__detail-header">
                         <div>
                             <div className="u-fs-22 u-fw-800 u-color-text">{detailProject.name}</div>
@@ -235,7 +235,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
 
                 {/* Files / Documents */}
                 {projectFiles.length > 0 && (
-                    <div style={styles.card} className="u-mb-20">
+                    <div className="s-card" className="u-mb-20">
                         <div className="proj__section-title proj__section-title--mb"><Icon name="file" size={16} /> Dokumenti i slike ({projectFiles.length})</div>
                         <div className={`proj__files-grid ${isMobile ? 'proj__files-grid--mobile' : 'proj__files-grid--desktop'}`}>
                             {projectFiles.map(f => (
@@ -260,7 +260,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                 )}
 
                 {/* Workers on project */}
-                <div style={styles.card} className="u-mb-20">
+                <div className="s-card" className="u-mb-20">
                     <div className="proj__section-title proj__section-title--mb"><Icon name="workers" size={16} /> Radnici na projektu ({detailWorkers.length})</div>
                     {detailWorkers.length === 0 ? <div className="proj__empty">Nema dodijeljenih radnika</div> : (
                         <div className={`proj__worker-grid ${isMobile ? 'proj__worker-grid--mobile' : 'proj__worker-grid--desktop'}`}>
@@ -285,17 +285,17 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
 
                 {/* Timesheets on project */}
                 {detailTimesheets.length > 0 && (
-                    <div style={styles.card} className="u-mb-20">
+                    <div className="s-card" className="u-mb-20">
                         <div className="u-section-title u-mb-12">Radni sati ({detailTimesheets.length})</div>
                         <div className="u-overflow-x">
                             <table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                <thead><tr><th style={styles.th}>Datum</th><th style={styles.th}>Radnik</th><th style={styles.th}>Od</th><th style={styles.th}>Do</th><th style={styles.th}>Sati</th><th style={styles.th}>Status</th></tr></thead>
+                                <thead><tr><th className="s-th">Datum</th><th className="s-th">Radnik</th><th className="s-th">Od</th><th className="s-th">Do</th><th className="s-th">Sati</th><th className="s-th">Status</th></tr></thead>
                                 <tbody>
                                     {detailTimesheets.sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 20).map(t => {
                                         const w = workers.find(x => x.id === t.workerId);
                                         const mins = diffMins(t.startTime, t.endTime);
                                         return (
-                                            <tr key={t.id}><td style={styles.td}>{fmtDate(t.date)}</td><td style={styles.td}>{w?.name || '—'}</td><td style={styles.td}>{t.startTime}</td><td style={styles.td}>{t.endTime}</td><td style={styles.td}>{(mins / 60).toFixed(1)}h</td><td style={styles.td}><StatusBadge status={t.status} /></td></tr>
+                                            <tr key={t.id}><td className="s-td">{fmtDate(t.date)}</td><td className="s-td">{w?.name || '—'}</td><td className="s-td">{t.startTime}</td><td className="s-td">{t.endTime}</td><td className="s-td">{(mins / 60).toFixed(1)}h</td><td className="s-td"><StatusBadge status={t.status} /></td></tr>
                                         );
                                     })}
                                 </tbody>
@@ -305,10 +305,10 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                 )}
 
                 {/* Project Obligations */}
-                <div style={styles.card} className="u-mb-20">
+                <div className="s-card" className="u-mb-20">
                     <div className="u-flex-between u-mb-16">
                         <div className="proj__section-title"><Icon name="warning" size={16} /> Obaveze ({detailObaveze.filter(o => o.active).length} aktivnih)</div>
-                        {!isWorker && <button onClick={openObAdd} style={styles.btnSmall}><Icon name="plus" size={12} /> Nova obaveza</button>}
+                        {!isWorker && <button onClick={openObAdd} className="s-btn-sm"><Icon name="plus" size={12} /> Nova obaveza</button>}
                     </div>
                     {detailObaveze.length === 0 ? <div className="proj__empty">Nema obaveza za ovaj projekt</div> : (
                         <div>
@@ -338,7 +338,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                 </div>
 
                 {/* Faze rada (Work Phases) */}
-                <div style={styles.card} className="u-mb-20">
+                <div className="s-card" className="u-mb-20">
                     <div className="u-flex-between u-mb-16">
                         <div className="proj__section-title"><Icon name="check" size={16} /> Faze rada ({detailPhases.filter(p => p.status === 'done').length}/{detailPhases.length})</div>
                     </div>
@@ -380,7 +380,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                     {canManagePhases && (
                         <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
                             <input value={newPhaseName} onChange={e => setNewPhaseName(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && newPhaseName.trim()) { addPhase(newPhaseName); setNewPhaseName(''); } }} placeholder="Nova faza rada..." style={{ ...styles.input, flex: 1, marginBottom: 0, fontSize: 13 }} />
-                            <button onClick={() => { if (newPhaseName.trim()) { addPhase(newPhaseName); setNewPhaseName(''); } }} disabled={!newPhaseName.trim()} style={{ ...styles.btnSmall, opacity: newPhaseName.trim() ? 1 : 0.4 }}><Icon name="plus" size={12} /> Dodaj</button>
+                            <button onClick={() => { if (newPhaseName.trim()) { addPhase(newPhaseName); setNewPhaseName(''); } }} disabled={!newPhaseName.trim()} className="s-btn-sm" style={{ opacity: newPhaseName.trim() ? 1 : 0.4 }}><Icon name="plus" size={12} /> Dodaj</button>
                         </div>
                     )}
                 </div>
@@ -389,13 +389,13 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                 {detailTimesheets.length > 0 && (
                     <div className={`proj__charts-grid ${isMobile ? 'proj__charts-grid--mobile' : 'proj__charts-grid--desktop'}`}>
                         {hoursByWorker.length > 0 && (
-                            <div style={styles.card}>
+                            <div className="s-card">
                                 <div className="proj__chart-title"><Icon name="workers" size={16} /> Sati po radniku</div>
                                 <SvgHBarChart data={hoursByWorker} dataKey="hours" color={C.accent} height={Math.max(150, hoursByWorker.length * 32)} />
                             </div>
                         )}
                         {hoursByDay.length > 1 && (
-                            <div style={styles.card}>
+                            <div className="s-card">
                                 <div className="proj__chart-title"><Icon name="clock" size={16} /> Sati po danu (zadnjih {hoursByDay.length} dana)</div>
                                 <SvgLineChart data={hoursByDay} dataKey="hours" color="#3B82F6" height={200} />
                             </div>
@@ -418,8 +418,8 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                         </div>
                         <Field label="Dodijeli radnicima"><WorkerCheckboxList allWorkers={detailWorkers.length > 0 ? detailWorkers : activeWorkers} selected={obForm.workerIds} onChange={v => setObForm(f => ({ ...f, workerIds: v }))} /></Field>
                         <div className="u-flex-end u-mt-16">
-                            <button onClick={() => setShowObForm(false)} style={styles.btnSecondary}>Odustani</button>
-                            <button onClick={saveObligation} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
+                            <button onClick={() => setShowObForm(false)} className="s-btn-sec">Odustani</button>
+                            <button onClick={saveObligation} className="s-btn"><Icon name="check" size={16} /> Spremi</button>
                         </div>
                     </Modal>
                 )}
@@ -434,33 +434,33 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                     <div className="u-fs-24 u-fw-800 u-color-text">{isWorker ? 'Moji projekti' : '📁 Projekti'}</div>
                     <div className="u-fs-12 u-text-muted" style={{ marginTop: 2 }}>{isWorker ? `${filtered.length} dodijeljenih projekata` : `${projects.length} projekata • ${activeWorkers.length} radnika • Evidencija gradilišta`}</div>
                 </div>
-                {!isWorker && <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> Novi projekt</button>}
+                {!isWorker && <button onClick={openAdd} className="s-btn"><Icon name="plus" size={16} /> Novi projekt</button>}
             </div>
 
             {/* Stats overview */}
             <div className={`proj__stats ${isMobile ? 'proj__stats--2' : isWorker ? 'proj__stats--3' : 'proj__stats--6'}`}>
-                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
+                <div className="s-card" style={{ textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
                     <div className="proj__stat-label">Projekata</div>
                     <div className="proj__stat-value" style={{ color: C.accent }}>{projectStats.total}</div>
                 </div>
-                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
+                <div className="s-card" style={{ textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
                     <div className="proj__stat-label">Aktivni</div>
                     <div className="proj__stat-value" style={{ color: '#10B981' }}>{projectStats.active}</div>
                 </div>
-                {!isWorker && <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
+                {!isWorker && <div className="s-card" style={{ textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
                     <div className="proj__stat-label">Završeni</div>
                     <div className="proj__stat-value" style={{ color: '#6366F1' }}>{projectStats.finished}</div>
                 </div>}
-                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
+                <div className="s-card" style={{ textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
                     <div className="proj__stat-label">Ukupno sati</div>
                     <div className="proj__stat-value" style={{ color: C.blue }}>{projectStats.totalHours}h</div>
                 </div>
                 {!isWorker && <>
-                    <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
+                    <div className="s-card" style={{ textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
                         <div className="proj__stat-label">Troškovi</div>
                         <div className="proj__stat-value" style={{ color: '#EF4444' }}>{parseFloat(projectStats.totalCosts) > 0 ? `${projectStats.totalCosts}€` : '0€'}</div>
                     </div>
-                    <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
+                    <div className="s-card" style={{ textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
                         <div className="proj__stat-label">Radnika</div>
                         <div className="proj__stat-value" style={{ color: '#F59E0B' }}>{projectStats.uniqueWorkers}</div>
                     </div>
@@ -468,7 +468,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
             </div>
 
             {/* Advanced Filters */}
-            <div style={styles.card} className="proj__filters">
+            <div className="s-card" className="proj__filters">
                 <div className="proj__filter-row">
                     <div className="proj__filter-search">
                         <Input placeholder="Pretraži projekt, lokaciju, klijenta..." value={search} onChange={e => setSearch(e.target.value)} className="u-pl-36" />
@@ -503,7 +503,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                         </Select>
                     )}
                     {hasActiveFilters && (
-                        <button onClick={() => { setSearch(''); setFilterStatus('all'); setFilterWorker('all'); setFilterLocation('all'); }} style={{ ...styles.btnSmall, color: C.red, borderColor: 'rgba(239,68,68,0.2)', fontSize: 11 }}>✕ Očisti</button>
+                        <button onClick={() => { setSearch(''); setFilterStatus('all'); setFilterWorker('all'); setFilterLocation('all'); }} className="s-btn-sm" style={{ color: C.red, borderColor: 'rgba(239,68,68,0.2)', fontSize: 11 }}>✕ Očisti</button>
                     )}
                 </div>
                 {hasActiveFilters && <div className="proj__filter-info">Filtrirano: {filtered.length} od {isWorker ? filtered.length : projects.length} projekata</div>}
@@ -519,7 +519,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                     const pOtpremnice = otpremnice.filter(o => o.projectId === p.id);
                     const leader = p.teamLeader ? workers.find(w => w.id === p.teamLeader) : null;
                     return (
-                        <div key={p.id} role="button" tabIndex={0} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setDetailId(p.id)} style={{ ...styles.card, cursor: 'pointer', transition: 'all 0.2s', borderLeft: `4px solid ${p.status === 'aktivan' ? '#10B981' : p.status === 'završen' ? '#6366F1' : p.status === 'pausa' ? '#F59E0B' : '#3B82F6'}` }} onClick={() => setDetailId(p.id)} onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,0,0,0.1)'; e.currentTarget.style.transform = 'translateY(-2px)'; }} onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'none'; }}>
+                        <div key={p.id} role="button" tabIndex={0} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setDetailId(p.id)} className="s-card" style={{ cursor: 'pointer', transition: 'all 0.2s', borderLeft: `4px solid ${p.status === 'aktivan' ? '#10B981' : p.status === 'završen' ? '#6366F1' : p.status === 'pausa' ? '#F59E0B' : '#3B82F6'}` }} onClick={() => setDetailId(p.id)} onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,0,0,0.1)'; e.currentTarget.style.transform = 'translateY(-2px)'; }} onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'none'; }}>
                             <div className="proj__card-header">
                                 <div className="u-flex-1">
                                     <div className="proj__card-title">{p.name}</div>
@@ -554,8 +554,8 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                                 <span>📅 {fmtDate(p.startDate)}{p.endDate ? ' → ' + fmtDate(p.endDate) : ''}</span>
                                 {!isWorker && (
                                     <div className="proj__card-actions" onClick={e => e.stopPropagation()}>
-                                        <button onClick={() => openEdit(p)} style={styles.btnSmall}><Icon name="edit" size={12} /></button>
-                                        <button onClick={() => doDelete(p.id)} style={styles.btnDanger}><Icon name="trash" size={12} /></button>
+                                        <button onClick={() => openEdit(p)} className="s-btn-sm"><Icon name="edit" size={12} /></button>
+                                        <button onClick={() => doDelete(p.id)} className="s-btn-danger"><Icon name="trash" size={12} /></button>
                                     </div>
                                 )}
                             </div>
@@ -563,7 +563,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                     );
                 })}
             </div>
-            {filtered.length === 0 && <div style={styles.card} className="proj__no-results"><div className="proj__no-results-icon">📭</div>Nema projekata za odabrane filtre</div>}
+            {filtered.length === 0 && <div className="s-card" className="proj__no-results"><div className="proj__no-results-icon">📭</div>Nema projekata za odabrane filtre</div>}
 
             {/* Add/Edit Modal */}
             {showForm && (
@@ -584,7 +584,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                                         } else { alert('Lokacija nije pronađena. Pokušajte precizniju adresu.'); }
                                     } catch { alert('Greška pri geocodingu.'); }
                                     setGeocoding(false);
-                                }} style={{ ...styles.btnSmall, whiteSpace: 'nowrap', padding: '8px 12px', background: form.siteLat ? 'rgba(16,185,129,0.1)' : 'rgba(249,115,22,0.1)', color: form.siteLat ? '#10B981' : C.accent, borderColor: form.siteLat ? 'rgba(16,185,129,0.3)' : 'rgba(249,115,22,0.3)' }}>
+                                }} className="s-btn-sm" style={{ whiteSpace: 'nowrap', padding: '8px 12px', background: form.siteLat ? 'rgba(16,185,129,0.1)' : 'rgba(249,115,22,0.1)', color: form.siteLat ? '#10B981' : C.accent, borderColor: form.siteLat ? 'rgba(16,185,129,0.3)' : 'rgba(249,115,22,0.3)' }}>
                                     {geocoding ? '⏳' : '📍'} {form.siteLat ? 'GPS ✓' : 'Odredi GPS'}
                                 </button>
                                 <button type="button" onClick={() => {
@@ -592,7 +592,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                                     navigator.geolocation.getCurrentPosition(pos => {
                                         setForm(f => ({ ...f, siteLat: +pos.coords.latitude.toFixed(6), siteLng: +pos.coords.longitude.toFixed(6) }));
                                     }, () => alert('Nije moguće dohvatiti lokaciju'));
-                                }} style={{ ...styles.btnSmall, padding: '8px 10px', whiteSpace: 'nowrap' }} title="Koristi moju lokaciju">📌</button>
+                                }} className="s-btn-sm" style={{ padding: '8px 10px', whiteSpace: 'nowrap' }} title="Koristi moju lokaciju">📌</button>
                             </div>
                             {form.siteLat && form.siteLng && (
                                 <div className="proj__gps-confirm">
@@ -626,14 +626,14 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                                 </div>
                             ))}
                         </div>
-                        <label style={{ ...styles.btnSmall, cursor: 'pointer', display: 'inline-flex' }}>
+                        <label className="s-btn-sm" style={{ cursor: 'pointer', display: 'inline-flex' }}>
                             <Icon name="upload" size={14} /> Dodaj datoteku
                             <input type="file" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx" onChange={handleFileUpload} style={{ display: 'none' }} />
                         </label>
                     </Field>
                     <div className="u-flex-end">
-                        <button onClick={() => setShowForm(false)} style={styles.btnSecondary}>Odustani</button>
-                        <button onClick={doSave} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
+                        <button onClick={() => setShowForm(false)} className="s-btn-sec">Odustani</button>
+                        <button onClick={doSave} className="s-btn"><Icon name="check" size={16} /> Spremi</button>
                     </div>
                 </Modal>
             )}

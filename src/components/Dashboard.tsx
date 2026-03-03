@@ -139,7 +139,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                     <div className="dash__goal-note">{Math.round(((totalHoursMonth / 60) / monthlyGoal) * 100)}% ostvareno — klikni za promjenu cilja</div>
                 </div>
                 {/* Comparison toggle */}
-                <button onClick={() => setShowComparison(!showComparison)} style={{ ...styles.btn, background: showComparison ? 'var(--accent)' : 'var(--card)', color: showComparison ? 'var(--text-on-accent)' : 'var(--text)', border: `1px solid ${showComparison ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 10, fontSize: 12, padding: '8px 14px', gap: 6 }}>
+                <button onClick={() => setShowComparison(!showComparison)} className="s-btn" style={{ background: showComparison ? 'var(--accent)' : 'var(--card)', color: showComparison ? 'var(--text-on-accent)' : 'var(--text)', border: `1px solid ${showComparison ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 10, fontSize: 12, padding: '8px 14px', gap: 6 }}>
                     {showComparison ? 'Sakrij usporedbu' : 'vs prošli mjesec'}
                 </button>
             </div>
@@ -196,7 +196,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                             {pendingTimesheets > 0 && `${pendingTimesheets} sati · `}{pendingInvoices > 0 && `${pendingInvoices} računa · `}{pendingOtpremnice > 0 && `${pendingOtpremnice} otpremnica`}
                         </div>
                     </div>
-                    <button onClick={onGoToNotifications} style={{ ...styles.btnSmall, borderRadius: 10, padding: '8px 16px' }}>Pregledaj →</button>
+                    <button onClick={onGoToNotifications} className="s-btn-sm" style={{ borderRadius: 10, padding: '8px 16px' }}>Pregledaj →</button>
                 </div>
             )}
 
