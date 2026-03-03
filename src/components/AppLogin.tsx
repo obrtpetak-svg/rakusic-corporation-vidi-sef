@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { C, styles } from '../utils/helpers';
 
 const MODULES = ['Projekti', 'Radnici', 'Evidencija sati', 'Vozila', 'Otpremnice', 'Računi', 'Izvještaji', 'Obavijesti'];
+const MAX_ATTEMPTS = 5;
+const BASE_LOCKOUT = 30; // seconds, doubles each lockout
 
 export function AppLogin() {
     const { handleFirebaseLogin } = useApp();
@@ -11,6 +13,10 @@ export function AppLogin() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [bootedCount, setBootedCount] = useState(0);
+    const [lockoutEnd, setLockoutEnd] = useState(0);
+    const [lockoutDisplay, setLockoutDisplay] = useState(0);
+    const attemptsRef = useRef(0);
+    const lockoutCountRef = useRef(0);
 
     // Staggered module boot animation
     useEffect(() => {
@@ -19,25 +25,65 @@ export function AppLogin() {
         return () => clearTimeout(t);
     }, [bootedCount]);
 
+    // Lockout countdown timer
+    useEffect(() => {
+        if (lockoutEnd <= Date.now()) { setLockoutDisplay(0); return; }
+        const tick = setInterval(() => {
+            const remaining = Math.ceil((lockoutEnd - Date.now()) / 1000);
+            if (remaining <= 0) { setLockoutDisplay(0); setLockoutEnd(0); clearInterval(tick); }
+            else setLockoutDisplay(remaining);
+        }, 500);
+        return () => clearInterval(tick);
+    }, [lockoutEnd]);
+
     const submit = async () => {
+        // Rate limiting check
+        if (lockoutEnd > Date.now()) {
+            setError(`🔒 Zaključano na ${lockoutDisplay}s zbog previše neuspjelih pokušaja.`);
+            return;
+        }
         if (!username.trim() || !password.trim()) { setError('Unesite korisničko ime i lozinku.'); return; }
         if (password.trim().length < 6) { setError('Lozinka mora imati najmanje 6 znakova.'); return; }
         setLoading(true); setError('');
         try {
             const result = await handleFirebaseLogin(username.trim(), password.trim());
-            if (!result) setError('Pogrešno korisničko ime ili lozinka.');
+            if (result) {
+                attemptsRef.current = 0; // Reset on success
+            } else {
+                attemptsRef.current += 1;
+                if (attemptsRef.current >= MAX_ATTEMPTS) {
+                    lockoutCountRef.current += 1;
+                    const lockSecs = BASE_LOCKOUT * Math.pow(2, lockoutCountRef.current - 1);
+                    setLockoutEnd(Date.now() + lockSecs * 1000);
+                    attemptsRef.current = 0;
+                    setError(`🔒 Zaključano na ${lockSecs}s nakon ${MAX_ATTEMPTS} neuspjelih pokušaja.`);
+                } else {
+                    setError(`Pogrešno korisničko ime ili lozinka. (${attemptsRef.current}/${MAX_ATTEMPTS})`);
+                }
+            }
         } catch (err: unknown) {
             const code = (err as { code?: string })?.code || '';
             const msg = (err as { message?: string })?.message || '';
             console.error('[Login] Error:', code, msg);
-            if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
-                setError('Pogrešno korisničko ime ili lozinka.');
+
+            // Track attempts for credential errors
+            const isCredentialError = code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential';
+            if (isCredentialError) {
+                attemptsRef.current += 1;
+                if (attemptsRef.current >= MAX_ATTEMPTS) {
+                    lockoutCountRef.current += 1;
+                    const lockSecs = BASE_LOCKOUT * Math.pow(2, lockoutCountRef.current - 1);
+                    setLockoutEnd(Date.now() + lockSecs * 1000);
+                    attemptsRef.current = 0;
+                    setError(`🔒 Zaključano na ${lockSecs}s nakon ${MAX_ATTEMPTS} neuspjelih pokušaja.`);
+                } else {
+                    setError(`Pogrešno korisničko ime ili lozinka. (${attemptsRef.current}/${MAX_ATTEMPTS})`);
+                }
             } else if (code === 'auth/too-many-requests') {
                 setError('Previše pokušaja prijave. Pričekajte 5 minuta pa pokušajte ponovno.');
             } else if (code === 'auth/network-request-failed') {
                 setError('Nema internetske veze. Provjerite mrežu.');
             } else {
-                // Show actual error for debugging
                 setError(`Firebase greška: ${code || msg || 'Nepoznata greška'}`);
             }
             // 🔒 Audit: failed login attempt (modular SDK)
@@ -99,8 +145,8 @@ export function AppLogin() {
                             style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: '1px solid #334155', background: '#0F172A', color: '#F1F5F9', fontSize: 14, outline: 'none', boxSizing: 'border-box' }} />
                     </div>
                     {error && <div style={{ color: '#EF4444', fontSize: 13, marginBottom: 16, background: 'rgba(239,68,68,0.15)', padding: '10px 14px', borderRadius: 8 }}>{error}</div>}
-                    <button onClick={submit} disabled={loading} style={{ ...styles.btn, width: '100%', justifyContent: 'center', opacity: loading ? 0.6 : 1 }}>
-                        {loading ? 'Prijava...' : '🔐 Prijavi se'}
+                    <button onClick={submit} disabled={loading || lockoutEnd > Date.now()} style={{ ...styles.btn, width: '100%', justifyContent: 'center', opacity: (loading || lockoutEnd > Date.now()) ? 0.6 : 1 }}>
+                        {loading ? 'Prijava...' : lockoutDisplay > 0 ? `🔒 Zaključano (${lockoutDisplay}s)` : '🔐 Prijavi se'}
                     </button>
                 </div>
                 <div style={{ textAlign: 'center', marginTop: 16 }}>

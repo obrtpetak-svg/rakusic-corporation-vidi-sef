@@ -5,7 +5,6 @@ import { AppLogin } from './components/AppLogin';
 import { FirebaseConfigScreen } from './components/FirebaseConfig';
 import { CompanySetup } from './components/CompanySetup';
 import { AdminCreateScreen } from './components/AdminCreate';
-import { AuthScreen } from './components/UserLogin';
 import { Layout } from './components/Layout';
 import { CookieConsent, PrivacyPolicyPage } from './components/CookieConsent';
 import { initTheme } from './utils/helpers';
@@ -37,7 +36,6 @@ function AppContent() {
     if (step === 'firebaseConfig') return <FirebaseConfigScreen />;
     if (step === 'companySetup') return <CompanySetup />;
     if (step === 'adminCreate') return <AdminCreateScreen />;
-    if (step === 'userLogin') return <AuthScreen />;
     return <><Layout /><CookieConsent /></>;
 }
 
