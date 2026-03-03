@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useConfirm } from './ui/ConfirmModal';
 import { useApp, add as addDoc, update as updateDoc, remove as removeDoc } from '../context/AppContext';
 import { Icon, Modal, Field, Input, Textarea, Select, StatusBadge, Pagination, usePagination, useIsMobile } from './ui/SharedComponents';
@@ -17,7 +17,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
     const isMobile = useIsMobile();
 
     // Deep-link: auto-open worker detail when navigated from another page
-    React.useEffect(() => {
+    useEffect(() => {
         if (defaultDetailId) {
             setDetailId(defaultDetailId);
             if (onDetailConsumed) onDetailConsumed();
