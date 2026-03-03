@@ -142,8 +142,8 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
                 <div>
-                    <div className="u-fs-24 u-fw-800" className="u-color-text">Proizvodnja</div>
-                    <div className="u-fs-12" className="u-text-muted" style={{ marginTop: 2 }}>{activeOrders.length} narudžbi • Praćenje proizvodnog procesa</div>
+                    <div className="u-fs-24 u-fw-800 u-color-text">Proizvodnja</div>
+                    <div className="u-fs-12 u-text-muted" style={{ marginTop: 2 }}>{activeOrders.length} narudžbi • Praćenje proizvodnog procesa</div>
                 </div>
                 <div className="u-flex-gap-8">
                     {canManage && <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> Nova narudžba</button>}
@@ -374,14 +374,14 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                         <div>
                                             <div style={{ fontSize: 10, color: C.accent, fontWeight: 700 }}>{o.orderNumber}</div>
                                             <div className="u-section-title">{o.name}</div>
-                                            <div className="u-fs-11" className="u-text-muted">🏢 {o.client || '—'}</div>
+                                            <div className="u-fs-11 u-text-muted">🏢 {o.client || '—'}</div>
                                         </div>
                                         <div className="u-flex-gap-4">
                                             <button onClick={() => setDetailId(o.id)} style={styles.btnSmall}>Detalji</button>
                                             {canManage && <button onClick={() => unarchiveOrder(o)} style={styles.btnSmall}>↩️</button>}
                                         </div>
                                     </div>
-                                    <div className="u-fs-12" className="u-text-muted">💰 {(o.totalCost || 0).toFixed(2)}€ • 📅 {fmtDate(o.deadline)}</div>
+                                    <div className="u-fs-12 u-text-muted">💰 {(o.totalCost || 0).toFixed(2)}€ • 📅 {fmtDate(o.deadline)}</div>
                                 </div>
                             ))}
                         </div>
@@ -425,7 +425,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                 onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}>
                                 <div style={{ fontSize: 32, marginBottom: 8 }}>{tpl.name.split(' ')[0]}</div>
                                 <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 4 }}>{tpl.name.replace(/^[^\s]+\s/, '')}</div>
-                                <div className="u-fs-11" className="u-text-muted">{tpl.desc}</div>
+                                <div className="u-fs-11 u-text-muted">{tpl.desc}</div>
                                 {tpl.specDefaults?.materials?.length > 0 && (
                                     <div style={{ marginTop: 8, fontSize: 10, color: C.accent, fontWeight: 600 }}>{tpl.specDefaults.materials.length} materijala • {tpl.specDefaults.dimensions?.length || 0} dimenzija</div>
                                 )}

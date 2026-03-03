@@ -119,7 +119,7 @@ export function VozilaPage({ workerFilterId }) {
                 <button onClick={() => setDetailId(null)} style={{ ...styles.btnSecondary, marginBottom: 20, display: 'inline-flex' }}><Icon name="back" size={16} /> Natrag</button>
                 <div style={styles.card} className="u-mb-20">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
-                        <div><div className="u-fs-22 u-fw-800" className="u-color-text">{detailVehicle.name || detailVehicle.regNumber}</div><div style={{ color: C.textMuted, fontSize: 13 }}>{detailVehicle.brand} {detailVehicle.model} {detailVehicle.year}</div></div>
+                        <div><div className="u-fs-22 u-fw-800 u-color-text">{detailVehicle.name || detailVehicle.regNumber}</div><div style={{ color: C.textMuted, fontSize: 13 }}>{detailVehicle.brand} {detailVehicle.model} {detailVehicle.year}</div></div>
                         <div style={{ ...styles.badge('249,115,22'), fontSize: 12 }}>{detailVehicle.regNumber}</div>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(5, 1fr)', gap: 12, marginBottom: 16 }}>
@@ -195,7 +195,7 @@ export function VozilaPage({ workerFilterId }) {
                                                 <span style={{ marginLeft: 8, fontSize: 14, fontWeight: 700, color: C.text }}>{d.title}</span>
                                             </div>
                                             <div className="u-flex-center u-gap-8">
-                                                <span className="u-fs-11" className="u-text-muted">{fmtDate(d.date)}</span>
+                                                <span className="u-fs-11 u-text-muted">{fmtDate(d.date)}</span>
                                                 {!isWorker && <button onClick={() => deleteDiaryEntry(detailVehicle.id, d.id)} style={styles.btnDanger}><Icon name="trash" size={12} /></button>}
                                             </div>
                                         </div>
@@ -265,7 +265,7 @@ export function VozilaPage({ workerFilterId }) {
     return (
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
-                <div className="u-fs-22 u-fw-800" className="u-color-text">{isWorker ? 'Moje vozilo' : 'Vozila'}</div>
+                <div className="u-fs-22 u-fw-800 u-color-text">{isWorker ? 'Moje vozilo' : 'Vozila'}</div>
                 {!isWorker && <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> Novo vozilo</button>}
             </div>
             <div style={{ position: 'relative', marginBottom: 20 }}><Input placeholder="Traži vozilo..." value={search} onChange={e => setSearch(e.target.value)} className="u-pl-36" /><div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: C.textMuted }}><Icon name="search" size={16} /></div></div>
@@ -277,7 +277,7 @@ export function VozilaPage({ workerFilterId }) {
                     return (
                         <div key={v.id} role="button" tabIndex={0} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && e.currentTarget.click()} style={{ ...styles.card, cursor: 'pointer' }} onClick={() => setDetailId(v.id)}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-                                <div><div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{v.name || v.regNumber}</div><div className="u-fs-12" className="u-text-muted">{v.brand} {v.model} {v.year && `(${v.year})`}</div></div>
+                                <div><div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{v.name || v.regNumber}</div><div className="u-fs-12 u-text-muted">{v.brand} {v.model} {v.year && `(${v.year})`}</div></div>
                                 <div style={{ ...styles.badge('249,115,22'), fontSize: 12 }}>{v.regNumber || '—'}</div>
                             </div>
                             <div style={{ display: 'flex', gap: 12, fontSize: 12, color: C.textMuted, marginBottom: 12, flexWrap: 'wrap' }}>

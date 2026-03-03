@@ -107,7 +107,7 @@ export function LeaveTracker() {
     return (
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
-                <div className="u-fs-22 u-fw-800" className="u-color-text">🏖️ Godišnji odmori & odsutnosti</div>
+                <div className="u-fs-22 u-fw-800 u-color-text">🏖️ Godišnji odmori & odsutnosti</div>
                 <button onClick={() => setShowAdd(true)} style={styles.btn}><Icon name="plus" size={16} /> Novi zahtjev</button>
             </div>
 

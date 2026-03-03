@@ -424,12 +424,12 @@ export default function GpsReportTab({
                             }}>
                                 <div>
                                     <div style={{ fontWeight: 600, fontSize: 13, color: C.text }}>{w.name}</div>
-                                    <div className="u-fs-11" className="u-text-muted">{w.projects} proj.</div>
+                                    <div className="u-fs-11 u-text-muted">{w.projects} proj.</div>
                                 </div>
                                 <div style={{ fontSize: 14, fontWeight: 600, color: C.text }}>{w.days}</div>
                                 <div style={{ fontSize: 14, fontWeight: 600, color: C.text }}>{(w.totalMins / 60).toFixed(1)}h</div>
                                 {!isMobile && <div style={{ fontSize: 13, color: w.avgDist != null && w.avgDist > 300 ? '#EF4444' : C.text }}>{w.avgDist != null ? `${w.avgDist}m` : '—'}</div>}
-                                {!isMobile && <div className="u-fs-13" className="u-text-muted">{w.gpsEntries}</div>}
+                                {!isMobile && <div className="u-fs-13 u-text-muted">{w.gpsEntries}</div>}
                                 <PresenceBar pct={w.presencePct} />
                             </div>
                         ))}
@@ -462,11 +462,11 @@ export default function GpsReportTab({
                             }}>
                                 <div>
                                     <div style={{ fontWeight: 600, fontSize: 13, color: C.text }}>{p.name}</div>
-                                    <div className="u-fs-11" className="u-text-muted">{p.days} dana</div>
+                                    <div className="u-fs-11 u-text-muted">{p.days} dana</div>
                                 </div>
                                 <div style={{ fontSize: 14, fontWeight: 600, color: C.text }}>{p.workerCount}</div>
                                 <div style={{ fontSize: 14, fontWeight: 600, color: C.text }}>{(p.totalMins / 60).toFixed(1)}h</div>
-                                {!isMobile && <div className="u-fs-13" className="u-text-muted">{p.gpsEntries}</div>}
+                                {!isMobile && <div className="u-fs-13 u-text-muted">{p.gpsEntries}</div>}
                                 <PresenceBar pct={p.presencePct} />
                             </div>
                         ))}
@@ -501,7 +501,7 @@ export default function GpsReportTab({
                                 <div style={{ fontWeight: 600, fontSize: 13, color: C.text }}>{d.date}</div>
                                 <div style={{ fontSize: 14, fontWeight: 600, color: C.text }}>{d.workerCount}</div>
                                 <div style={{ fontSize: 14, fontWeight: 600, color: C.text }}>{(d.totalMins / 60).toFixed(1)}h</div>
-                                {!isMobile && <div className="u-fs-13" className="u-text-muted">{d.entries}</div>}
+                                {!isMobile && <div className="u-fs-13 u-text-muted">{d.entries}</div>}
                                 {!isMobile && <div style={{ fontSize: 13, color: '#059669' }}>{d.inZone}</div>}
                                 <PresenceBar pct={d.presencePct} />
                             </div>

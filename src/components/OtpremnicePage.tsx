@@ -168,7 +168,7 @@ export function OtpremnicePage({ workerFilterId }) {
                             <div style={{ background: `${s.color}18`, borderRadius: 12, padding: 12, color: s.color }}><Icon name={s.icon} size={22} /></div>
                             <div>
                                 <div className="u-stat-label">{s.label}</div>
-                                <div className="u-fs-24 u-fw-800" className="u-color-text">{s.value}</div>
+                                <div className="u-fs-24 u-fw-800 u-color-text">{s.value}</div>
                             </div>
                         </div>
                     ))}

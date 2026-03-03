@@ -386,7 +386,7 @@ export function SettingsPage({ workerFilterId }) {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 10, background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.12)' }}>
                         <div className="u-flex-1">
                             <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>🚪 Odjavi sve korisnike</div>
-                            <div className="u-fs-11" className="u-text-muted">Svi aktivni korisnici bit će odmah odjavljeni iz aplikacije.</div>
+                            <div className="u-fs-11 u-text-muted">Svi aktivni korisnici bit će odmah odjavljeni iz aplikacije.</div>
                         </div>
                         <button onClick={async () => { if (await confirm('Sigurno želite odjaviti SVE korisnike?')) { await forceLogoutAll(); await addAuditLog('FORCE_LOGOUT_ALL', 'Admin je odijavio sve korisnike'); } }} style={{ ...styles.btnSmall, color: C.red, borderColor: 'rgba(239,68,68,0.3)', padding: '8px 14px', fontWeight: 700, whiteSpace: 'nowrap' }}>
                             Odjavi sve
@@ -397,7 +397,7 @@ export function SettingsPage({ workerFilterId }) {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 10, background: 'rgba(16,185,129,0.04)', border: '1px solid rgba(16,185,129,0.12)', marginTop: 12 }}>
                         <div className="u-flex-1">
                             <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>👥 Aktiviraj prijavu za sve radnike</div>
-                            <div className="u-fs-11" className="u-text-muted">Kreira Firebase Auth račune za sve radnike koji ih nemaju (ista lozinka za sve).</div>
+                            <div className="u-fs-11 u-text-muted">Kreira Firebase Auth račune za sve radnike koji ih nemaju (ista lozinka za sve).</div>
                         </div>
                         <button onClick={async () => {
                             if (!(await confirm('Kreirati Firebase Auth račune za sve radnike s lozinkom RakusicCorp2026.! ?'))) return;
@@ -475,7 +475,7 @@ export function SettingsPage({ workerFilterId }) {
                 <div className="u-flex-between u-mb-16">
                     <div>
                         <div className="u-section-title">👥 Korisnici sustava</div>
-                        <div className="u-fs-12" className="u-text-muted" style={{ marginTop: 2 }}>Upravljanje korisnicima koji se mogu prijaviti u aplikaciju ({users?.length || 0})</div>
+                        <div className="u-fs-12 u-text-muted" style={{ marginTop: 2 }}>Upravljanje korisnicima koji se mogu prijaviti u aplikaciju ({users?.length || 0})</div>
                     </div>
                     <button onClick={() => { setShowAddUser(true); setUserForm({ name: '', username: '', role: 'radnik', password: '' }); setUserMsg(''); setEditingUser(null); }} style={{ ...styles.btn, fontSize: 12, padding: '8px 16px' }}>+ Dodaj korisnika</button>
                 </div>
@@ -490,7 +490,7 @@ export function SettingsPage({ workerFilterId }) {
                                 </div>
                                 <div>
                                     <div style={{ fontWeight: 600, fontSize: 13, color: C.text }}>{u.name || u.username}</div>
-                                    <div className="u-fs-11" className="u-text-muted">{u.username} · <span style={{ fontWeight: 600, color: u.role === 'admin' ? C.red : u.role === 'leader' ? '#F59E0B' : '#6366F1' }}>{u.role || 'radnik'}</span></div>
+                                    <div className="u-fs-11 u-text-muted">{u.username} · <span style={{ fontWeight: 600, color: u.role === 'admin' ? C.red : u.role === 'leader' ? '#F59E0B' : '#6366F1' }}>{u.role || 'radnik'}</span></div>
                                 </div>
                             </div>
                             <div style={{ display: 'flex', gap: 6 }}>
@@ -622,7 +622,7 @@ export function SettingsPage({ workerFilterId }) {
                             </button>
                         </div>
                     </div>
-                    {trashItems === null && <div className="u-fs-13" className="u-text-muted">Klikni "Učitaj" za prikaz obrisanih stavki</div>}
+                    {trashItems === null && <div className="u-fs-13 u-text-muted">Klikni "Učitaj" za prikaz obrisanih stavki</div>}
                     {trashItems && trashItems.length === 0 && <div style={{ fontSize: 13, color: C.green }}>✅ Koš je prazan</div>}
                     {trashItems && trashItems.length > 0 && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 300, overflowY: 'auto' }}>

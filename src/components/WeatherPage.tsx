@@ -308,9 +308,9 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                         <span style={{ fontSize: 20 }}>⚠️</span>
                         <div className="u-flex-1">
                             <div style={{ fontSize: 13, fontWeight: 700, color: C.red }}>{alerts.length} vremensko upozorenje{alerts.length !== 1 ? 'a' : ''}</div>
-                            <div className="u-fs-12" className="u-text-muted">{alerts[0].issues[0]} — klikni za detalje</div>
+                            <div className="u-fs-12 u-text-muted">{alerts[0].issues[0]} — klikni za detalje</div>
                         </div>
-                        <span className="u-fs-11" className="u-text-muted">▶</span>
+                        <span className="u-fs-11 u-text-muted">▶</span>
                     </div>
                 </div>
             )}
@@ -541,7 +541,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                                         <div>
                                             <div className="u-section-title">{a.project.name}</div>
-                                            <div className="u-fs-11" className="u-text-muted">{a.daysAhead === 1 ? '⏰ Sutra' : '📅 Za 2 dana'} — {a.day.label}</div>
+                                            <div className="u-fs-11 u-text-muted">{a.daysAhead === 1 ? '⏰ Sutra' : '📅 Za 2 dana'} — {a.day.label}</div>
                                         </div>
                                         <ScoreRing score={a.score} size={52} />
                                     </div>
@@ -568,7 +568,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                     <div className="u-flex-between u-mb-16">
                         <div>
                             <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>⚙️ Pravila upozorenja</div>
-                            <div className="u-fs-12" className="u-text-muted">Definirajte pragove za svaki projekt i tip radova</div>
+                            <div className="u-fs-12 u-text-muted">Definirajte pragove za svaki projekt i tip radova</div>
                         </div>
                         <button onClick={() => { setRuleForm({ projectId: '', activities: [], customThresholds: {} }); setShowRuleModal(true); }} style={styles.btn}>
                             <Icon name="plus" size={14} /> Novo pravilo
@@ -581,7 +581,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                         if (!pRules.length) return null;
                         return (
                             <div key={p.id} style={{ ...styles.card, marginBottom: 12 }}>
-                                <div className="u-section-title" className="u-fs-13 u-mb-12" className="u-mb-12" style={{ marginBottom: 10 }}>{p.name} <span className="u-fs-11" className="u-text-muted">— {pRules.length} pravilo{pRules.length !== 1 ? 'a' : ''}</span></div>
+                                <div className="u-section-title u-fs-13 u-mb-12 u-mb-12" style={{ marginBottom: 10 }}>{p.name} <span className="u-fs-11 u-text-muted">— {pRules.length} pravilo{pRules.length !== 1 ? 'a' : ''}</span></div>
                                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill,minmax(220px,1fr))', gap: 8 }}>
                                     {pRules.map(r => {
                                         const preset = ACTIVITY_PRESETS[r.activity];

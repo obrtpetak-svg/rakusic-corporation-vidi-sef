@@ -184,7 +184,7 @@ export default function GpsWorkerWidget({ currentUser, projects, timesheets, isM
                     <span style={{ fontSize: 24 }}>{statusConfig.icon}</span>
                     <div>
                         <div style={{ fontWeight: 700, fontSize: 14, color: statusConfig.color }}>{statusConfig.text}</div>
-                        {activeProject && <div className="u-fs-11" className="u-text-muted">Projekt: {activeProject.name}</div>}
+                        {activeProject && <div className="u-fs-11 u-text-muted">Projekt: {activeProject.name}</div>}
                     </div>
                 </div>
 

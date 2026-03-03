@@ -48,7 +48,7 @@ export function SmjestajPage({ workerFilterId }) {
     return (
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
-                <div className="u-fs-22 u-fw-800" className="u-color-text">{isWorker ? 'Moj smještaj' : 'Smještaj'}</div>
+                <div className="u-fs-22 u-fw-800 u-color-text">{isWorker ? 'Moj smještaj' : 'Smještaj'}</div>
                 {!isWorker && <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> Novi smještaj</button>}
             </div>
             <div style={{ position: 'relative', marginBottom: 20 }}><Input placeholder="Traži smještaj..." value={search} onChange={e => setSearch(e.target.value)} className="u-pl-36" /><div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: C.textMuted }}><Icon name="search" size={16} /></div></div>
@@ -60,7 +60,7 @@ export function SmjestajPage({ workerFilterId }) {
                     return (
                         <div key={s.id} style={styles.card}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-                                <div><div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{s.name}</div><div className="u-fs-12" className="u-text-muted">{s.address && `📍 ${s.address}`}{s.city && `, ${s.city}`}</div></div>
+                                <div><div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{s.name}</div><div className="u-fs-12 u-text-muted">{s.address && `📍 ${s.address}`}{s.city && `, ${s.city}`}</div></div>
                                 {s.pricePerNight && <div style={{ ...styles.badge('249,115,22'), fontSize: 12 }}>{s.pricePerNight}€/noć</div>}
                             </div>
                             <div style={{ display: 'flex', gap: 12, fontSize: 12, color: C.textMuted, marginBottom: 10 }}>

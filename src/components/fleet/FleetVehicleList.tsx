@@ -131,7 +131,7 @@ export default function FleetVehicleList({ vehicles, onSelectVehicle }: {
                                         }}>🚛</div>
                                         <div>
                                             <div className="u-section-title">{v.name}</div>
-                                            <div className="u-fs-11" className="u-text-muted">🔖 {v.plate}</div>
+                                            <div className="u-fs-11 u-text-muted">🔖 {v.plate}</div>
                                         </div>
                                     </div>
                                     <div style={{

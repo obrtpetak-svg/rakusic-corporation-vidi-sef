@@ -464,7 +464,7 @@ export function Layout() {
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
                                 <div style={{ fontSize: 13, fontWeight: 700, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{currentUser?.name}</div>
-                                <div className="u-fs-11" className="u-text-muted">{isAdmin ? 'Administrator' : isLeader ? 'Voditelj' : 'Radnik'}</div>
+                                <div className="u-fs-11 u-text-muted">{isAdmin ? 'Administrator' : isLeader ? 'Voditelj' : 'Radnik'}</div>
                             </div>
                             <button onClick={handleLogout} title="Odjava" style={{ background: 'none', border: 'none', color: C.textMuted, cursor: 'pointer', padding: 4 }}>
                                 <Icon name="logout" size={16} />
@@ -626,7 +626,7 @@ export function Layout() {
                             aria-selected={page === tab.id}
                             aria-label={tab.label}
                         >
-                            <span className="tab-icon" className="u-relative">
+                            <span className="tab-icon u-relative">
                                 {tab.icon}
                                 {tab.badge > 0 && <span style={{ position: 'absolute', top: -4, right: -8, background: 'var(--red)', color: '#fff', borderRadius: 10, fontSize: 9, fontWeight: 800, padding: '1px 5px', minWidth: 14, textAlign: 'center', animation: 'badgePop 0.3s cubic-bezier(0.34,1.56,0.64,1)' }}>{tab.badge}</span>}
                             </span>

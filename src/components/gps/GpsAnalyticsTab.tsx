@@ -325,7 +325,7 @@ export default function GpsAnalyticsTab({
                         <span style={{ fontSize: 18 }}>⚠️</span>
                         <div>
                             <div style={{ fontSize: 14, fontWeight: 700, color: '#DC2626' }}>Anomalije — izvan zone (&gt;500m)</div>
-                            <div className="u-fs-12" className="u-text-muted">Radnici koji su česti bili daleko od gradilišta</div>
+                            <div className="u-fs-12 u-text-muted">Radnici koji su česti bili daleko od gradilišta</div>
                         </div>
                     </div>
                     <div style={{

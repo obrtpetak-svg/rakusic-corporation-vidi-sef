@@ -331,15 +331,15 @@ export function DailyLogPage({ workerFilterId, leaderProjectIds }) {
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
                     <div style={{ ...styles.card, display: 'flex', alignItems: 'center', gap: 14 }}>
                         <div style={{ background: `${C.accent}18`, borderRadius: 12, padding: 12, color: C.accent }}><Icon name="file" size={22} /></div>
-                        <div><div className="u-stat-label">Ukupno</div><div className="u-fs-24 u-fw-800" className="u-color-text">{totalLogs}</div></div>
+                        <div><div className="u-stat-label">Ukupno</div><div className="u-fs-24 u-fw-800 u-color-text">{totalLogs}</div></div>
                     </div>
                     <div style={{ ...styles.card, display: 'flex', alignItems: 'center', gap: 14 }}>
                         <div style={{ background: 'rgba(59,130,246,0.12)', borderRadius: 12, padding: 12, color: '#2563EB' }}><Icon name="calendar" size={22} /></div>
-                        <div><div className="u-stat-label">Ovaj tjedan</div><div className="u-fs-24 u-fw-800" className="u-color-text">{logsThisWeek}</div></div>
+                        <div><div className="u-stat-label">Ovaj tjedan</div><div className="u-fs-24 u-fw-800 u-color-text">{logsThisWeek}</div></div>
                     </div>
                     <div style={{ ...styles.card, display: 'flex', alignItems: 'center', gap: 14 }}>
                         <div style={{ background: 'rgba(34,197,94,0.12)', borderRadius: 12, padding: 12, color: C.green }}><Icon name="eye" size={22} /></div>
-                        <div><div className="u-stat-label">S fotografijama</div><div className="u-fs-24 u-fw-800" className="u-color-text">{logsWithPhotos}</div></div>
+                        <div><div className="u-stat-label">S fotografijama</div><div className="u-fs-24 u-fw-800 u-color-text">{logsWithPhotos}</div></div>
                     </div>
                     <div style={{ ...styles.card, display: 'flex', alignItems: 'center', gap: 14 }}>
                         <div style={{ background: 'rgba(234,179,8,0.12)', borderRadius: 12, padding: 12, color: C.yellow }}>☀️</div>
@@ -371,7 +371,7 @@ export function DailyLogPage({ workerFilterId, leaderProjectIds }) {
                                 <div style={{ flex: 1, minWidth: 200 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                                         <span style={{ fontWeight: 700, fontSize: 14, color: C.text }}>{fmtDate(log.date)}</span>
-                                        <span className="u-fs-12" className="u-text-muted">•</span>
+                                        <span className="u-fs-12 u-text-muted">•</span>
                                         <span style={{ fontSize: 13, fontWeight: 600, color: C.accent }}>{p?.name || '—'}</span>
                                         {(() => { const si = statusInfo(log.status); return <span style={{ padding: '2px 8px', borderRadius: 6, background: si.bg, fontSize: 11, fontWeight: 700, color: si.color }}>{si.label}</span>; })()}
                                     </div>
@@ -379,8 +379,8 @@ export function DailyLogPage({ workerFilterId, leaderProjectIds }) {
                                         <span style={{ padding: '2px 8px', borderRadius: 6, background: 'rgba(59,130,246,0.08)', fontSize: 12, fontWeight: 600 }}>
                                             {weatherIcons[log.weather]} {log.weather} {log.temperature ? `${log.temperature}°C` : ''}
                                         </span>
-                                        {log.workersPresent && <span className="u-fs-12" className="u-text-muted">👷 {log.workersPresent} radnika</span>}
-                                        {photoCount > 0 && <span className="u-fs-12" className="u-text-muted">📷 {photoCount} foto</span>}
+                                        {log.workersPresent && <span className="u-fs-12 u-text-muted">👷 {log.workersPresent} radnika</span>}
+                                        {photoCount > 0 && <span className="u-fs-12 u-text-muted">📷 {photoCount} foto</span>}
                                         {log.issues && <span style={{ padding: '2px 8px', borderRadius: 6, background: 'rgba(239,68,68,0.1)', fontSize: 11, fontWeight: 600, color: C.red }}>⚠️ Problem</span>}
                                     </div>
                                     {log.workDescription && (
@@ -390,7 +390,7 @@ export function DailyLogPage({ workerFilterId, leaderProjectIds }) {
                                     )}
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                    <span className="u-fs-11" className="u-text-muted">{log.createdBy}</span>
+                                    <span className="u-fs-11 u-text-muted">{log.createdBy}</span>
                                     <div className="u-flex-gap-4" onClick={e => e.stopPropagation()}>
                                         {canApprove(log) && <>
                                             <button onClick={() => approveLog(log)} style={{ ...styles.btnSmall, background: C.green, color: '#fff', borderColor: C.green }}>✓ Odobri</button>
@@ -480,7 +480,7 @@ export function DailyLogPage({ workerFilterId, leaderProjectIds }) {
                     {(weatherSuggestion || weatherLoading) && (
                         <div style={{ margin: '12px 0', padding: '12px 16px', borderRadius: 12, background: 'linear-gradient(135deg, rgba(59,130,246,0.06), rgba(249,115,22,0.06))', border: '1px solid rgba(59,130,246,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
                             {weatherLoading ? (
-                                <span className="u-fs-13" className="u-text-muted">⏳ Učitavam vremenske uvjete...</span>
+                                <span className="u-fs-13 u-text-muted">⏳ Učitavam vremenske uvjete...</span>
                             ) : weatherSuggestion && (
                                 <>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -489,7 +489,7 @@ export function DailyLogPage({ workerFilterId, leaderProjectIds }) {
                                             <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>
                                                 {weatherSuggestion.temperature}°C — {weatherSuggestion.weather}
                                             </div>
-                                            <div className="u-fs-11" className="u-text-muted">
+                                            <div className="u-fs-11 u-text-muted">
                                                 💨 {weatherSuggestion.wind} km/h &nbsp; 💧 {weatherSuggestion.humidity}%
                                             </div>
                                         </div>

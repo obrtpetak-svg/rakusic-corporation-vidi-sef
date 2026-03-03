@@ -81,7 +81,7 @@ export default function GpsEventsTab({ events, getWorkerName, getProjectName, is
                                         <div style={{ fontSize: 13, fontWeight: 600, color: isAlarm ? '#EF4444' : C.text }}>
                                             {event.workerName || getWorkerName(event.workerId)} — {meta.label}
                                         </div>
-                                        <div className="u-fs-12" className="u-text-muted" style={{ marginTop: 2 }}>
+                                        <div className="u-fs-12 u-text-muted" style={{ marginTop: 2 }}>
                                             {event.projectName || getProjectName(event.projectId)}
                                             {event.distance != null && ` • ${formatDistance(event.distance)}`}
                                             {event.accuracy && ` • ±${event.accuracy}m`}

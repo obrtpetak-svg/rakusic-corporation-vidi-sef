@@ -47,8 +47,8 @@ export function KalendarPage() {
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
                 <div>
-                    <div className="u-fs-22 u-fw-800" className="u-color-text"> Kalendar</div>
-                    <div className="u-fs-12" className="u-text-muted">{monthTs.length} unosa • {totalMonthHours.toFixed(1)}h • {uniqueWorkers} radnika • {uniqueProjects} projekata</div>
+                    <div className="u-fs-22 u-fw-800 u-color-text"> Kalendar</div>
+                    <div className="u-fs-12 u-text-muted">{monthTs.length} unosa • {totalMonthHours.toFixed(1)}h • {uniqueWorkers} radnika • {uniqueProjects} projekata</div>
                 </div>
                 <button onClick={goToday} style={styles.btnSmall}>Danas</button>
             </div>
@@ -125,7 +125,7 @@ export function KalendarPage() {
                 <div style={{ ...styles.card, marginTop: 20 }}>
                     <div className="u-card-header">
                         <div className="u-section-title">{fmtDate(selectedDay)} — {selectedTs.length} unos{selectedTs.length > 1 ? 'a' : ''} ({(selectedTs.reduce((s, t) => s + diffMins(t.startTime, t.endTime), 0) / 60).toFixed(1)}h)</div>
-                        <div className="u-fs-12" className="u-text-muted">{new Set(selectedTs.map(t => t.workerId)).size} radnika</div>
+                        <div className="u-fs-12 u-text-muted">{new Set(selectedTs.map(t => t.workerId)).size} radnika</div>
                     </div>
                     {selectedTs.map(t => {
                         const w = workers.find(x => x.id === t.workerId);
@@ -135,7 +135,7 @@ export function KalendarPage() {
                             <div key={t.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: `1px solid ${C.border}7A`, fontSize: 13 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                     <div style={{ width: 28, height: 28, borderRadius: '50%', background: C.accentLight, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: C.accent }}>{w?.name?.charAt(0)}</div>
-                                    <div><div className="u-fw-600">{w?.name || '—'}</div><div className="u-fs-11" className="u-text-muted">{p?.name || '—'} • {t.startTime}–{t.endTime}</div></div>
+                                    <div><div className="u-fw-600">{w?.name || '—'}</div><div className="u-fs-11 u-text-muted">{p?.name || '—'} • {t.startTime}–{t.endTime}</div></div>
                                 </div>
                                 <div className="u-flex-center u-gap-8">
                                     <span style={{ fontWeight: 700, color: C.accent }}>{(mins / 60).toFixed(1)}h</span>

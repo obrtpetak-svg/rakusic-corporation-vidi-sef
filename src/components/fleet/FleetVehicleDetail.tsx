@@ -142,7 +142,7 @@ export default function FleetVehicleDetail({ vehicle, onBack }: {
                         <div style={{ width: 56, height: 56, borderRadius: 16, background: `${meta.color}12`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>🚛</div>
                         <div className="u-flex-1">
                             <div style={{ fontSize: 18, fontWeight: 800, color: C.text }}>{vehicle.name}</div>
-                            <div className="u-fs-13" className="u-text-muted">🔖 {vehicle.plate} · {vehicle.group || '—'}</div>
+                            <div className="u-fs-13 u-text-muted">🔖 {vehicle.plate} · {vehicle.group || '—'}</div>
                         </div>
                         <div style={{ padding: '5px 12px', borderRadius: 8, background: `${meta.color}15`, color: meta.color, fontSize: 11, fontWeight: 700 }}>
                             {meta.icon} {meta.label}
@@ -223,7 +223,7 @@ export default function FleetVehicleDetail({ vehicle, onBack }: {
                 <div>
                     {/* Engine hours */}
                     <div style={{ background: 'var(--card)', border: `1px solid ${C.border}`, borderRadius: 14, padding: 16, marginBottom: 12 }}>
-                        <div className="u-section-title" className="u-fs-13 u-mb-12" className="u-mb-12" style={{ marginBottom: 10 }}>🔑 Rad motora (zadnja 3 dana)</div>
+                        <div className="u-section-title u-fs-13 u-mb-12 u-mb-12" style={{ marginBottom: 10 }}>🔑 Rad motora (zadnja 3 dana)</div>
                         <div style={{ display: 'grid', gap: 6 }}>
                             {ignLoading ? (
                                 <div style={{ padding: 20, textAlign: 'center', color: C.textMuted, fontSize: 12 }}>⏳ Učitavam podatke o radu motora...</div>
@@ -262,7 +262,7 @@ export default function FleetVehicleDetail({ vehicle, onBack }: {
                                     }}>{m.status === 'done' ? '✅' : '📅'}</div>
                                     <div className="u-flex-1">
                                         <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{m.type}: {m.desc}</div>
-                                        <div className="u-fs-11" className="u-text-muted">
+                                        <div className="u-fs-11 u-text-muted">
                                             {m.date} {m.km ? `· ${m.km.toLocaleString()} km` : ''} · {m.cost}€
                                         </div>
                                     </div>
@@ -285,7 +285,7 @@ function InfoRow({ icon, label, value }: { icon: string; label: string; value: s
     return (
         <div className="u-flex-center u-gap-8">
             <span style={{ fontSize: 14 }}>{icon}</span>
-            <span className="u-fs-12" className="u-text-muted">{label}:</span>
+            <span className="u-fs-12 u-text-muted">{label}:</span>
             <span style={{ fontSize: 12, fontWeight: 600, color: C.text }}>{value}</span>
         </div>
     );

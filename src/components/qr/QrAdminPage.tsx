@@ -168,7 +168,7 @@ export function QrAdminPage() {
                                 <div style={{ padding: '14px 16px', borderRadius: 10, background: 'rgba(217,93,8,0.06)', border: '1px solid rgba(217,93,8,0.15)', marginBottom: 16 }}>
                                     <div style={{ fontSize: 16, fontWeight: 700, color: C.text }}>{project.name}</div>
                                     {project.location && <div style={{ fontSize: 12, color: C.textMuted, marginTop: 4 }}>📍 {project.location}</div>}
-                                    {project.client && <div className="u-fs-12" className="u-text-muted" style={{ marginTop: 2 }}>🏢 {project.client}</div>}
+                                    {project.client && <div className="u-fs-12 u-text-muted" style={{ marginTop: 2 }}>🏢 {project.client}</div>}
                                     <div style={{ fontSize: 11, color: C.accent, marginTop: 6, fontFamily: 'monospace' }}>VIDISEF:{project.id}</div>
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

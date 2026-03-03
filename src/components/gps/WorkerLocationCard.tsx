@@ -51,7 +51,7 @@ export default function WorkerLocationCard({ worker: w, getProjectName }) {
 
                 <div className="u-flex-1">
                     <div style={{ fontWeight: 700, fontSize: 14, color: C.text }}>{w.name}</div>
-                    <div className="u-fs-12" className="u-text-muted">{w.position || w.role || 'Radnik'}</div>
+                    <div className="u-fs-12 u-text-muted">{w.position || w.role || 'Radnik'}</div>
                 </div>
 
                 <div style={{
