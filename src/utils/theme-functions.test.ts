@@ -1,5 +1,24 @@
-import { describe, it, expect } from 'vitest';
-import { C, styles, genId, fmtDate, fmtDateTime, fmtHours, diffMins, hexToRgb, nowTime } from './helpers';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
+// jsdom doesn't have matchMedia — polyfill before importing helpers
+Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: vi.fn().mockImplementation(query => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+    })),
+});
+
+import {
+    C, styles, genId, fmtDate, fmtDateTime, fmtHours, diffMins, hexToRgb, nowTime,
+    initTheme, toggleTheme, isDarkTheme, refreshThemeColors, getThemeColors
+} from './helpers';
 
 describe('C (theme colors object)', () => {
     it('has accent', () => expect(typeof C.accent).toBe('string'));
@@ -11,6 +30,8 @@ describe('C (theme colors object)', () => {
     it('has red', () => expect(typeof C.red).toBe('string'));
     it('has green', () => expect(typeof C.green).toBe('string'));
     it('has blue', () => expect(typeof C.blue).toBe('string'));
+    it('has sidebar', () => expect(typeof C.sidebar).toBe('string'));
+    it('has accentLight', () => expect(typeof C.accentLight).toBe('string'));
 });
 
 describe('styles object completeness', () => {
@@ -29,7 +50,7 @@ describe('styles object completeness', () => {
     });
 });
 
-describe('nowTime format', () => {
+describe('nowTime', () => {
     it('returns HH:MM format', () => expect(nowTime()).toMatch(/^\d{2}:\d{2}$/));
     it('returns 5-char string', () => expect(nowTime().length).toBe(5));
 });
@@ -70,4 +91,85 @@ describe('hexToRgb edge cases', () => {
     it('handles lowercase', () => expect(hexToRgb('#ff0000')).toBe('255,0,0'));
     it('handles no hash', () => expect(hexToRgb('00FF00')).toBe('0,255,0'));
     it('returns 3 parts', () => expect(hexToRgb('#123456').split(',').length).toBe(3));
+});
+
+// ── Theme functions (require jsdom) ──────────────────────────────────────
+
+describe('initTheme', () => {
+    beforeEach(() => {
+        localStorage.removeItem('vidisef-theme');
+    });
+
+    it('returns a string', () => {
+        const theme = initTheme();
+        expect(['light', 'dark']).toContain(theme);
+    });
+
+    it('sets data-theme on html', () => {
+        const theme = initTheme();
+        expect(document.documentElement.getAttribute('data-theme')).toBe(theme);
+    });
+
+    it('uses saved theme from localStorage', () => {
+        localStorage.setItem('vidisef-theme', 'dark');
+        expect(initTheme()).toBe('dark');
+    });
+});
+
+describe('toggleTheme', () => {
+    it('toggles from light to dark', () => {
+        document.documentElement.setAttribute('data-theme', 'light');
+        const result = toggleTheme();
+        expect(result).toBe('dark');
+        expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+    });
+
+    it('toggles from dark to light', () => {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        const result = toggleTheme();
+        expect(result).toBe('light');
+        expect(document.documentElement.getAttribute('data-theme')).toBe('light');
+    });
+
+    it('persists to localStorage', () => {
+        document.documentElement.setAttribute('data-theme', 'light');
+        toggleTheme();
+        expect(localStorage.getItem('vidisef-theme')).toBe('dark');
+    });
+});
+
+describe('isDarkTheme', () => {
+    it('returns true when dark', () => {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        expect(isDarkTheme()).toBe(true);
+    });
+
+    it('returns false when light', () => {
+        document.documentElement.setAttribute('data-theme', 'light');
+        expect(isDarkTheme()).toBe(false);
+    });
+});
+
+describe('refreshThemeColors', () => {
+    it('does not throw', () => {
+        expect(() => refreshThemeColors()).not.toThrow();
+    });
+
+    it('updates C object', () => {
+        refreshThemeColors();
+        // After refresh, C should still have required properties
+        expect(typeof C.accent).toBe('string');
+        expect(typeof C.text).toBe('string');
+    });
+});
+
+describe('getThemeColors', () => {
+    it('returns object with expected keys', () => {
+        const colors = getThemeColors();
+        expect(colors).toHaveProperty('accent');
+        expect(colors).toHaveProperty('text');
+        expect(colors).toHaveProperty('bg');
+        expect(colors).toHaveProperty('card');
+        expect(colors).toHaveProperty('border');
+    });
 });

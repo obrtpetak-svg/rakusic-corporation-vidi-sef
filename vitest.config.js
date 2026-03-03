@@ -5,11 +5,11 @@ export default defineConfig({
     plugins: [react()],
     test: {
         globals: true,
-        environment: 'node',
+        environment: 'jsdom',
         include: ['src/**/*.test.{js,jsx,ts,tsx}', 'api/**/*.test.{js,jsx,ts,tsx}'],
         coverage: {
             reporter: ['text', 'lcov'],
-            include: ['src/utils/**', 'src/context/**'],
+            include: ['src/utils/**', 'src/context/**', 'src/components/**'],
         },
     },
 });
