@@ -1,0 +1,591 @@
+/* ═══════════════════════════════════════════════════════════════
+   ProjectsPage — CSS Extracted from inline styles
+   BEM-style naming: .proj__block--modifier
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Header ── */
+.proj__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* ── Stats Grid ── */
+.proj__stats {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.proj__stats--6 {
+    grid-template-columns: repeat(6, 1fr);
+}
+
+.proj__stats--3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.proj__stats--2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.proj__stat-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.proj__stat-value {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+/* ── Detail Stats ── */
+.proj__detail-stats {
+    display: grid;
+    gap: 12px;
+}
+
+.proj__detail-stat {
+    padding: 12px 16px;
+    border-radius: 10px;
+}
+
+.proj__detail-stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.proj__detail-stat-value {
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.proj__detail-stat--accent {
+    background: var(--accent-light);
+}
+
+.proj__detail-stat--blue {
+    background: rgba(29, 78, 216, 0.08);
+}
+
+.proj__detail-stat--green {
+    background: rgba(4, 120, 87, 0.08);
+}
+
+.proj__detail-stat--purple {
+    background: rgba(124, 58, 237, 0.08);
+}
+
+.proj__detail-stat--orange {
+    background: rgba(234, 88, 12, 0.08);
+}
+
+.proj__detail-stat--red {
+    background: rgba(220, 38, 38, 0.08);
+}
+
+/* ── Detail Header ── */
+.proj__detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.proj__detail-location {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.proj__gps-inline {
+    font-size: 10px;
+    color: #10B981;
+    font-weight: 700;
+}
+
+/* ── Team Roles ── */
+.proj__team-row {
+    display: flex;
+    gap: 20px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+.proj__team-badge {
+    padding: 10px 16px;
+    border-radius: 10px;
+}
+
+.proj__team-badge--leader {
+    background: rgba(29, 78, 216, 0.06);
+    border: 1px solid rgba(29, 78, 216, 0.15);
+}
+
+.proj__team-badge--engineer {
+    background: rgba(4, 120, 87, 0.06);
+    border: 1px solid rgba(4, 120, 87, 0.15);
+}
+
+.proj__team-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.proj__team-name {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* ── Description / Notes Blocks ── */
+.proj__desc-block {
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    background: var(--bg-elevated);
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+}
+
+.proj__detail-block {
+    margin-top: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    background: rgba(59, 130, 246, 0.06);
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+}
+
+.proj__detail-block-title {
+    font-weight: 700;
+    color: var(--blue, #1D4ED8);
+    margin-bottom: 6px;
+    font-size: 12px;
+}
+
+.proj__detail-block-text {
+    white-space: pre-wrap;
+}
+
+.proj__notes-block {
+    margin-top: 10px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    background: rgba(245, 158, 11, 0.08);
+    font-size: 13px;
+    color: var(--yellow, #EAB308);
+    line-height: 1.6;
+}
+
+.proj__dates-row {
+    margin-top: 16px;
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+}
+
+/* ── Section Title ── */
+.proj__section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.proj__section-title--mb {
+    margin-bottom: 16px;
+}
+
+/* ── File Gallery ── */
+.proj__files-grid {
+    display: grid;
+    gap: 12px;
+}
+
+.proj__files-grid--desktop {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+.proj__files-grid--mobile {
+    grid-template-columns: 1fr;
+}
+
+.proj__file-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--bg-elevated);
+}
+
+.proj__file-preview {
+    height: 140px;
+    background: rgba(128, 128, 128, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.proj__file-preview--clickable {
+    cursor: pointer;
+}
+
+.proj__file-info {
+    padding: 8px 12px;
+}
+
+.proj__file-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.proj__file-type {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+/* ── Worker Cards (detail page) ── */
+.proj__worker-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.proj__worker-grid--desktop {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.proj__worker-grid--mobile {
+    grid-template-columns: 1fr;
+}
+
+.proj__worker-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    font-weight: 800;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.proj__worker-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.proj__worker-link {
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* ── Filter Bar ── */
+.proj__filters {
+    margin-bottom: 20px;
+    padding: 12px 16px;
+}
+
+.proj__filter-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.proj__filter-search {
+    position: relative;
+    flex: 1;
+    min-width: 180px;
+}
+
+.proj__filter-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+}
+
+.proj__filter-info {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 8px;
+}
+
+/* ── Project Cards Grid ── */
+.proj__grid {
+    display: grid;
+    gap: 16px;
+}
+
+.proj__grid--desktop {
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+}
+
+.proj__grid--mobile {
+    grid-template-columns: 1fr;
+}
+
+/* ── Project Card ── */
+.proj__card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.proj__card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.proj__card-client {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.proj__card-leader {
+    font-size: 12px;
+    color: var(--blue, #1D4ED8);
+    margin-bottom: 8px;
+}
+
+.proj__card-stat-value {
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.proj__card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.proj__card-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.proj__card-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+
+/* ── GPS badge ── */
+.proj__gps-yes {
+    font-size: 9px;
+    color: #10B981;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: rgba(16, 185, 129, 0.1);
+    margin-left: 4px;
+}
+
+.proj__gps-no {
+    font-size: 9px;
+    color: #F59E0B;
+    font-weight: 600;
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: rgba(245, 158, 11, 0.08);
+    margin-left: 4px;
+}
+
+/* ── Worker Avatars (card) ── */
+.proj__avatar-stack {
+    display: flex;
+    margin-bottom: 12px;
+}
+
+.proj__avatar-mini {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    border: 2px solid #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    font-weight: 800;
+    font-size: 11px;
+}
+
+.proj__avatar-more {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(128, 128, 128, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+/* ── Obligations ── */
+.proj__empty {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+/* ── Progress Bar ── */
+.proj__progress-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.proj__progress-bar {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+/* ── Phase Items ── */
+.proj__phase-completed {
+    font-size: 11px;
+    color: var(--green, #10B981);
+    margin-top: 4px;
+}
+
+/* ── Charts Grid ── */
+.proj__charts-grid {
+    display: grid;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.proj__charts-grid--desktop {
+    grid-template-columns: 1fr 1fr;
+}
+
+.proj__charts-grid--mobile {
+    grid-template-columns: 1fr;
+}
+
+.proj__chart-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ── Form Modal ── */
+.proj__form-grid {
+    display: grid;
+}
+
+.proj__form-grid--desktop {
+    grid-template-columns: 1fr 1fr;
+}
+
+.proj__form-grid--mobile {
+    grid-template-columns: 1fr;
+}
+
+.proj__form-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+/* ── Empty State ── */
+.proj__no-results {
+    text-align: center;
+    padding: 50px;
+    color: var(--text-muted);
+}
+
+.proj__no-results-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+/* ── File Upload (form) ── */
+.proj__file-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.proj__file-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    font-size: 12px;
+}
+
+.proj__file-chip-name {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-dim);
+}
+
+/* ── GPS Display (form) ── */
+.proj__gps-confirm {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: rgba(16, 185, 129, 0.06);
+    border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.proj__gps-confirm-text {
+    font-size: 11px;
+    color: #10B981;
+    font-weight: 700;
+}

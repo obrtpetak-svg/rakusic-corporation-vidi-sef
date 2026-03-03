@@ -4,6 +4,7 @@ import { useConfirm } from './ui/ConfirmModal';
 import { useApp, add as addDoc, update as updateDoc, remove as removeDoc } from '../context/AppContext';
 import { Icon, Modal, Field, Input, Textarea, Select, StatusBadge, WorkerCheckboxList, useIsMobile } from './ui/SharedComponents';
 import { C, styles, genId, today, fmtDate, diffMins, compressImage } from '../utils/helpers';
+import './projects.css';
 
 export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
     const confirm = useConfirm();
@@ -173,60 +174,60 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
             <div>
                 <button onClick={() => setDetailId(null)} style={{ ...styles.btnSecondary, marginBottom: 20, display: 'inline-flex' }}><Icon name="back" size={16} /> Natrag</button>
                 <div style={styles.card} className="u-mb-20">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
+                    <div className="proj__detail-header">
                         <div>
                             <div className="u-fs-22 u-fw-800 u-color-text">{detailProject.name}</div>
-                            <div style={{ color: C.textMuted, fontSize: 13, marginTop: 4 }}>{detailProject.location && `📍 ${detailProject.location}`} {detailProject.siteLat && <span style={{ fontSize: 10, color: '#10B981', fontWeight: 700 }}>({Number(detailProject.siteLat).toFixed(3)}°N, {Number(detailProject.siteLng).toFixed(3)}°E)</span>} {detailProject.client && `• 🏢 ${detailProject.client}`}</div>
+                            <div className="proj__detail-location">{detailProject.location && `📍 ${detailProject.location}`} {detailProject.siteLat && <span className="proj__gps-inline">({Number(detailProject.siteLat).toFixed(3)}°N, {Number(detailProject.siteLng).toFixed(3)}°E)</span>} {detailProject.client && `• 🏢 ${detailProject.client}`}</div>
                         </div>
                         <StatusBadge status={detailProject.status} />
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(6, 1fr)', gap: 12 }}>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: C.accentLight }}>
-                            <div style={{ fontSize: 11, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Radnici</div>
-                            <div style={{ fontSize: 20, fontWeight: 800, color: C.accent }}>{detailWorkers.length}</div>
+                    <div className={`proj__detail-stats ${isMobile ? 'proj__stats--2' : 'proj__stats--6'}`}>
+                        <div className="proj__detail-stat proj__detail-stat--accent">
+                            <div className="proj__detail-stat-label">Radnici</div>
+                            <div className="proj__detail-stat-value" style={{ color: C.accent }}>{detailWorkers.length}</div>
                         </div>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(29,78,216,0.08)' }}>
-                            <div style={{ fontSize: 11, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Ukupno sati</div>
-                            <div style={{ fontSize: 20, fontWeight: 800, color: C.blue }}>{Math.round(totalHours / 60)}h</div>
+                        <div className="proj__detail-stat proj__detail-stat--blue">
+                            <div className="proj__detail-stat-label">Ukupno sati</div>
+                            <div className="proj__detail-stat-value" style={{ color: C.blue }}>{Math.round(totalHours / 60)}h</div>
                         </div>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(4,120,87,0.08)' }}>
-                            <div style={{ fontSize: 11, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Unosi sati</div>
-                            <div style={{ fontSize: 20, fontWeight: 800, color: C.green }}>{detailTimesheets.length}</div>
+                        <div className="proj__detail-stat proj__detail-stat--green">
+                            <div className="proj__detail-stat-label">Unosi sati</div>
+                            <div className="proj__detail-stat-value" style={{ color: C.green }}>{detailTimesheets.length}</div>
                         </div>
-                        <div role="button" tabIndex={0} aria-label="Otvori račune" onClick={() => onNavigate && onNavigate('racuni')} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onNavigate?.('racuni')} style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(124,58,237,0.08)', cursor: onNavigate ? 'pointer' : 'default', transition: 'transform 0.15s' }} onMouseEnter={e => onNavigate && (e.currentTarget.style.transform = 'scale(1.03)')} onMouseLeave={e => e.currentTarget.style.transform = 'none'}>
-                            <div style={{ fontSize: 11, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Računi {onNavigate && '→'}</div>
-                            <div style={{ fontSize: 20, fontWeight: 800, color: '#7C3AED' }}>{detailInvoices.length}</div>
+                        <div role="button" tabIndex={0} aria-label="Otvori račune" onClick={() => onNavigate && onNavigate('racuni')} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onNavigate?.('racuni')} className="proj__detail-stat proj__detail-stat--purple" style={{ cursor: onNavigate ? 'pointer' : 'default', transition: 'transform 0.15s' }} onMouseEnter={e => onNavigate && (e.currentTarget.style.transform = 'scale(1.03)')} onMouseLeave={e => e.currentTarget.style.transform = 'none'}>
+                            <div className="proj__detail-stat-label">Računi {onNavigate && '→'}</div>
+                            <div className="proj__detail-stat-value" style={{ color: '#7C3AED' }}>{detailInvoices.length}</div>
                         </div>
-                        <div role="button" tabIndex={0} aria-label="Otvori otpremnice" onClick={() => onNavigate && onNavigate('otpremnice')} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onNavigate?.('otpremnice')} style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(234,88,12,0.08)', cursor: onNavigate ? 'pointer' : 'default', transition: 'transform 0.15s' }} onMouseEnter={e => onNavigate && (e.currentTarget.style.transform = 'scale(1.03)')} onMouseLeave={e => e.currentTarget.style.transform = 'none'}>
-                            <div style={{ fontSize: 11, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Otpremnice {onNavigate && '→'}</div>
-                            <div style={{ fontSize: 20, fontWeight: 800, color: '#EA580C' }}>{detailOtpremnice.length}</div>
+                        <div role="button" tabIndex={0} aria-label="Otvori otpremnice" onClick={() => onNavigate && onNavigate('otpremnice')} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onNavigate?.('otpremnice')} className="proj__detail-stat proj__detail-stat--orange" style={{ cursor: onNavigate ? 'pointer' : 'default', transition: 'transform 0.15s' }} onMouseEnter={e => onNavigate && (e.currentTarget.style.transform = 'scale(1.03)')} onMouseLeave={e => e.currentTarget.style.transform = 'none'}>
+                            <div className="proj__detail-stat-label">Otpremnice {onNavigate && '→'}</div>
+                            <div className="proj__detail-stat-value" style={{ color: '#EA580C' }}>{detailOtpremnice.length}</div>
                         </div>
-                        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(220,38,38,0.08)' }}>
-                            <div style={{ fontSize: 11, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Obaveze</div>
-                            <div style={{ fontSize: 20, fontWeight: 800, color: '#DC2626' }}>{detailObaveze.filter(o => o.active).length}/{detailObaveze.length}</div>
+                        <div className="proj__detail-stat proj__detail-stat--red">
+                            <div className="proj__detail-stat-label">Obaveze</div>
+                            <div className="proj__detail-stat-value" style={{ color: '#DC2626' }}>{detailObaveze.filter(o => o.active).length}/{detailObaveze.length}</div>
                         </div>
                     </div>
 
                     {/* Team leader & Engineer */}
                     {(detailProject.teamLeader || detailProject.engineer) && (
-                        <div style={{ display: 'flex', gap: 20, marginTop: 16, flexWrap: 'wrap' }}>
-                            {detailProject.teamLeader && <div style={{ padding: '10px 16px', borderRadius: 10, background: 'rgba(29,78,216,0.06)', border: '1px solid rgba(29,78,216,0.15)' }}><div style={{ fontSize: 10, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase' }}>Voditelj ekipe</div><div style={{ fontSize: 14, fontWeight: 700, color: C.blue }}>👷 {getWorkerName(detailProject.teamLeader)}</div></div>}
-                            {detailProject.engineer && <div style={{ padding: '10px 16px', borderRadius: 10, background: 'rgba(4,120,87,0.06)', border: '1px solid rgba(4,120,87,0.15)' }}><div style={{ fontSize: 10, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase' }}>Inženjer</div><div style={{ fontSize: 14, fontWeight: 700, color: C.green }}> {getWorkerName(detailProject.engineer)}</div></div>}
+                        <div className="proj__team-row">
+                            {detailProject.teamLeader && <div className="proj__team-badge proj__team-badge--leader"><div className="proj__team-label">Voditelj ekipe</div><div className="proj__team-name" style={{ color: C.blue }}>👷 {getWorkerName(detailProject.teamLeader)}</div></div>}
+                            {detailProject.engineer && <div className="proj__team-badge proj__team-badge--engineer"><div className="proj__team-label">Inženjer</div><div className="proj__team-name" style={{ color: C.green }}> {getWorkerName(detailProject.engineer)}</div></div>}
                         </div>
                     )}
 
-                    {detailProject.description && <div style={{ marginTop: 16, padding: '12px 16px', borderRadius: 8, background: C.bgElevated, fontSize: 13, color: C.textDim, lineHeight: 1.6 }}>{detailProject.description}</div>}
+                    {detailProject.description && <div className="proj__desc-block">{detailProject.description}</div>}
 
                     {/* Project Details */}
                     {detailProject.details && (
-                        <div style={{ marginTop: 12, padding: '12px 16px', borderRadius: 8, background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.15)', fontSize: 13, color: C.textDim, lineHeight: 1.6 }}>
-                            <div style={{ fontWeight: 700, color: C.blue, marginBottom: 6, fontSize: 12 }}>📋 DETALJI PROJEKTA</div>
-                            <div style={{ whiteSpace: 'pre-wrap' }}>{detailProject.details}</div>
+                        <div className="proj__detail-block">
+                            <div className="proj__detail-block-title">📋 DETALJI PROJEKTA</div>
+                            <div className="proj__detail-block-text">{detailProject.details}</div>
                         </div>
                     )}
 
-                    {detailProject.notes && <div style={{ marginTop: 10, padding: '12px 16px', borderRadius: 8, background: 'rgba(245,158,11,0.08)', fontSize: 13, color: C.yellow, lineHeight: 1.6 }}>📝 {detailProject.notes}</div>}
-                    <div style={{ marginTop: 16, display: 'flex', gap: 16, fontSize: 13, color: C.textMuted, flexWrap: 'wrap' }}>
+                    {detailProject.notes && <div className="proj__notes-block">📝 {detailProject.notes}</div>}
+                    <div className="proj__dates-row">
                         <span>📅 Početak: {fmtDate(detailProject.startDate)}</span>
                         {detailProject.endDate && <span>📅 Kraj: {fmtDate(detailProject.endDate)}</span>}
                     </div>
@@ -235,21 +236,21 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                 {/* Files / Documents */}
                 {projectFiles.length > 0 && (
                     <div style={styles.card} className="u-mb-20">
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="file" size={16} /> Dokumenti i slike ({projectFiles.length})</div>
-                        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
+                        <div className="proj__section-title proj__section-title--mb"><Icon name="file" size={16} /> Dokumenti i slike ({projectFiles.length})</div>
+                        <div className={`proj__files-grid ${isMobile ? 'proj__files-grid--mobile' : 'proj__files-grid--desktop'}`}>
                             {projectFiles.map(f => (
-                                <div key={f.id} style={{ border: `1px solid ${C.border}`, borderRadius: 10, overflow: 'hidden', background: C.bgElevated }}>
+                                <div key={f.id} className="proj__file-card">
                                     {f.type?.startsWith('image/') ? (
-                                        <div style={{ height: 140, background: 'rgba(128,128,128,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }} onClick={() => { const w = window.open(); w.document.write(`<img src="${f.data}" style="max-width:100%;height:auto">`); }}>
+                                        <div className="proj__file-preview proj__file-preview--clickable" onClick={() => { const w = window.open(); w.document.write(`<img src="${f.data}" style="max-width:100%;height:auto">`); }}>
                                             <img src={f.data} alt={f.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'cover' }} />
                                         </div>
                                     ) : (
-                                        <div style={{ height: 140, background: 'rgba(128,128,128,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                            <div className="u-text-center"><Icon name="file" size={32} /><div style={{ fontSize: 11, color: C.textMuted, marginTop: 4 }}>{f.type || 'File'}</div></div>
+                                        <div className="proj__file-preview">
+                                            <div className="u-text-center"><Icon name="file" size={32} /><div className="proj__file-type">{f.type || 'File'}</div></div>
                                         </div>
                                     )}
-                                    <div style={{ padding: '8px 12px' }}>
-                                        <div style={{ fontSize: 12, fontWeight: 600, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.name}</div>
+                                    <div className="proj__file-info">
+                                        <div className="proj__file-name">{f.name}</div>
                                         <div className="u-stat-label">Uploaded: {f.uploadedBy || '—'}</div>
                                     </div>
                                 </div>
@@ -260,21 +261,21 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
 
                 {/* Workers on project */}
                 <div style={styles.card} className="u-mb-20">
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="workers" size={16} /> Radnici na projektu ({detailWorkers.length})</div>
-                    {detailWorkers.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13 }}>Nema dodijeljenih radnika</div> : (
-                        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 10 }}>
+                    <div className="proj__section-title proj__section-title--mb"><Icon name="workers" size={16} /> Radnici na projektu ({detailWorkers.length})</div>
+                    {detailWorkers.length === 0 ? <div className="proj__empty">Nema dodijeljenih radnika</div> : (
+                        <div className={`proj__worker-grid ${isMobile ? 'proj__worker-grid--mobile' : 'proj__worker-grid--desktop'}`}>
                             {detailWorkers.map(w => {
                                 const wHours = detailTimesheets.filter(t => t.workerId === w.id).reduce((s, t) => s + diffMins(t.startTime, t.endTime), 0);
                                 const isLeader = detailProject.teamLeader === w.id;
                                 const isEngineer = detailProject.engineer === w.id;
                                 return (
                                     <div key={w.id} onClick={() => onNavigate && onNavigate('radnici', w.id)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderRadius: 10, background: isLeader ? 'rgba(29,78,216,0.06)' : isEngineer ? 'rgba(4,120,87,0.06)' : 'var(--bg)', border: `1px solid ${isLeader ? 'rgba(29,78,216,0.2)' : isEngineer ? 'rgba(4,120,87,0.2)' : C.border}`, cursor: onNavigate ? 'pointer' : 'default', transition: 'transform 0.15s, box-shadow 0.15s' }} onMouseEnter={e => { if (onNavigate) { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'; } }} onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}>
-                                        <div style={{ width: 36, height: 36, borderRadius: '50%', background: C.accentLight, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.accent, fontWeight: 800, fontSize: 14, flexShrink: 0 }}>{w.name?.charAt(0)}</div>
+                                        <div className="proj__worker-avatar">{w.name?.charAt(0)}</div>
                                         <div className="u-flex-1">
-                                            <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{w.name} {isLeader && <span style={{ fontSize: 10, color: C.blue }}>👷 Voditelj</span>} {isEngineer && <span style={{ fontSize: 10, color: C.green }}> Inženjer</span>}</div>
+                                            <div className="proj__worker-name">{w.name} {isLeader && <span style={{ fontSize: 10, color: C.blue }}>👷 Voditelj</span>} {isEngineer && <span style={{ fontSize: 10, color: C.green }}> Inženjer</span>}</div>
                                             <div className="u-fs-11 u-text-muted">{w.position || 'Radnik'} • {Math.round(wHours / 60)}h</div>
                                         </div>
-                                        {onNavigate && <div style={{ fontSize: 11, color: C.accent, fontWeight: 600 }}>Otvori →</div>}
+                                        {onNavigate && <div className="proj__worker-link">Otvori →</div>}
                                     </div>
                                 );
                             })}
@@ -306,10 +307,10 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                 {/* Project Obligations */}
                 <div style={styles.card} className="u-mb-20">
                     <div className="u-flex-between u-mb-16">
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="warning" size={16} /> Obaveze ({detailObaveze.filter(o => o.active).length} aktivnih)</div>
+                        <div className="proj__section-title"><Icon name="warning" size={16} /> Obaveze ({detailObaveze.filter(o => o.active).length} aktivnih)</div>
                         {!isWorker && <button onClick={openObAdd} style={styles.btnSmall}><Icon name="plus" size={12} /> Nova obaveza</button>}
                     </div>
-                    {detailObaveze.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13 }}>Nema obaveza za ovaj projekt</div> : (
+                    {detailObaveze.length === 0 ? <div className="proj__empty">Nema obaveza za ovaj projekt</div> : (
                         <div>
                             {detailObaveze.sort((a, b) => (a.active === b.active ? 0 : a.active ? -1 : 1)).map(ob => {
                                 const obWorkers = (ob.workerIds || []).map(wid => workers.find(w => w.id === wid)).filter(Boolean);
@@ -339,21 +340,21 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                 {/* Faze rada (Work Phases) */}
                 <div style={styles.card} className="u-mb-20">
                     <div className="u-flex-between u-mb-16">
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.text, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="check" size={16} /> Faze rada ({detailPhases.filter(p => p.status === 'done').length}/{detailPhases.length})</div>
+                        <div className="proj__section-title"><Icon name="check" size={16} /> Faze rada ({detailPhases.filter(p => p.status === 'done').length}/{detailPhases.length})</div>
                     </div>
                     {/* Progress bar */}
                     {detailPhases.length > 0 && (
                         <div className="u-mb-16">
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: C.textMuted, marginBottom: 4 }}>
+                            <div className="proj__progress-header">
                                 <span>Napredak</span>
                                 <span style={{ fontWeight: 700, color: detailPhases.every(p => p.status === 'done') ? C.green : C.accent }}>{Math.round(detailPhases.filter(p => p.status === 'done').length / detailPhases.length * 100)}%</span>
                             </div>
-                            <div style={{ height: 8, background: 'var(--border)', borderRadius: 4, overflow: 'hidden' }}>
+                            <div className="proj__progress-bar">
                                 <div style={{ height: '100%', width: `${detailPhases.filter(p => p.status === 'done').length / detailPhases.length * 100}%`, background: detailPhases.every(p => p.status === 'done') ? C.green : C.accent, borderRadius: 4, transition: 'width 0.4s ease' }} />
                             </div>
                         </div>
                     )}
-                    {detailPhases.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13 }}>Nema definiranih faza</div> : (
+                    {detailPhases.length === 0 ? <div className="proj__empty">Nema definiranih faza</div> : (
                         <div>
                             {detailPhases.map((ph, i) => (
                                 <div key={ph.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 0', borderBottom: i < detailPhases.length - 1 ? `1px solid ${C.border}7A` : 'none' }}>
@@ -366,7 +367,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                                         </div>
                                         {ph.description && <div className="u-fs-12 u-text-muted" style={{ marginTop: 2 }}>{ph.description}</div>}
                                         {ph.status === 'done' && ph.completedBy && (
-                                            <div style={{ fontSize: 11, color: C.green, marginTop: 4 }}>✓ Završio: {ph.completedBy} • {fmtDate(ph.completedAt)}</div>
+                                            <div className="proj__phase-completed">✓ Završio: {ph.completedBy} • {fmtDate(ph.completedAt)}</div>
                                         )}
                                     </div>
                                     {canManagePhases && (
@@ -386,16 +387,16 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
 
                 {/* Charts: Hours by worker + Hours by day */}
                 {detailTimesheets.length > 0 && (
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16, marginBottom: 20 }}>
+                    <div className={`proj__charts-grid ${isMobile ? 'proj__charts-grid--mobile' : 'proj__charts-grid--desktop'}`}>
                         {hoursByWorker.length > 0 && (
                             <div style={styles.card}>
-                                <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="workers" size={16} /> Sati po radniku</div>
+                                <div className="proj__chart-title"><Icon name="workers" size={16} /> Sati po radniku</div>
                                 <SvgHBarChart data={hoursByWorker} dataKey="hours" color={C.accent} height={Math.max(150, hoursByWorker.length * 32)} />
                             </div>
                         )}
                         {hoursByDay.length > 1 && (
                             <div style={styles.card}>
-                                <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="clock" size={16} /> Sati po danu (zadnjih {hoursByDay.length} dana)</div>
+                                <div className="proj__chart-title"><Icon name="clock" size={16} /> Sati po danu (zadnjih {hoursByDay.length} dana)</div>
                                 <SvgLineChart data={hoursByDay} dataKey="hours" color="#3B82F6" height={200} />
                             </div>
                         )}
@@ -407,7 +408,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                     <Modal title="Nova obaveza za projekt" onClose={() => setShowObForm(false)}>
                         <Field label="Naslov" required><Input value={obForm.title} onChange={e => setObForm(f => ({ ...f, title: e.target.value }))} placeholder="Što treba napraviti" autoFocus /></Field>
                         <Field label="Opis"><Textarea value={obForm.description} onChange={e => setObForm(f => ({ ...f, description: e.target.value }))} placeholder="Detalji..." rows={2} /></Field>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                        <div className="proj__form-2col">
                             <Field label="Rok"><Input type="date" value={obForm.dueDate} onChange={e => setObForm(f => ({ ...f, dueDate: e.target.value }))} /></Field>
                             <Field label="Prioritet">
                                 <Select value={obForm.priority} onChange={e => setObForm(f => ({ ...f, priority: e.target.value }))}>
@@ -428,7 +429,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
+            <div className="proj__header">
                 <div>
                     <div className="u-fs-24 u-fw-800 u-color-text">{isWorker ? 'Moji projekti' : '📁 Projekti'}</div>
                     <div className="u-fs-12 u-text-muted" style={{ marginTop: 2 }}>{isWorker ? `${filtered.length} dodijeljenih projekata` : `${projects.length} projekata • ${activeWorkers.length} radnika • Evidencija gradilišta`}</div>
@@ -437,41 +438,41 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
             </div>
 
             {/* Stats overview */}
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : (isWorker ? 'repeat(3, 1fr)' : 'repeat(6, 1fr)'), gap: 10, marginBottom: 20 }}>
-                <div style={{...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
-                    <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>Projekata</div>
-                    <div style={{ fontSize: 22, fontWeight: 800, color: C.accent }}>{projectStats.total}</div>
+            <div className={`proj__stats ${isMobile ? 'proj__stats--2' : isWorker ? 'proj__stats--3' : 'proj__stats--6'}`}>
+                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
+                    <div className="proj__stat-label">Projekata</div>
+                    <div className="proj__stat-value" style={{ color: C.accent }}>{projectStats.total}</div>
                 </div>
-                <div style={{...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
-                    <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>Aktivni</div>
-                    <div style={{ fontSize: 22, fontWeight: 800, color: '#10B981' }}>{projectStats.active}</div>
+                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
+                    <div className="proj__stat-label">Aktivni</div>
+                    <div className="proj__stat-value" style={{ color: '#10B981' }}>{projectStats.active}</div>
                 </div>
-                {!isWorker && <div style={{...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
-                    <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>Završeni</div>
-                    <div style={{ fontSize: 22, fontWeight: 800, color: '#6366F1' }}>{projectStats.finished}</div>
+                {!isWorker && <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
+                    <div className="proj__stat-label">Završeni</div>
+                    <div className="proj__stat-value" style={{ color: '#6366F1' }}>{projectStats.finished}</div>
                 </div>}
-                <div style={{...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
-                    <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>Ukupno sati</div>
-                    <div style={{ fontSize: 22, fontWeight: 800, color: C.blue }}>{projectStats.totalHours}h</div>
+                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
+                    <div className="proj__stat-label">Ukupno sati</div>
+                    <div className="proj__stat-value" style={{ color: C.blue }}>{projectStats.totalHours}h</div>
                 </div>
                 {!isWorker && <>
-                    <div style={{...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
-                        <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>Troškovi</div>
-                        <div style={{ fontSize: 22, fontWeight: 800, color: '#EF4444' }}>{parseFloat(projectStats.totalCosts) > 0 ? `${projectStats.totalCosts}€` : '0€'}</div>
+                    <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
+                        <div className="proj__stat-label">Troškovi</div>
+                        <div className="proj__stat-value" style={{ color: '#EF4444' }}>{parseFloat(projectStats.totalCosts) > 0 ? `${projectStats.totalCosts}€` : '0€'}</div>
                     </div>
-                    <div style={{...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
-                        <div style={{ fontSize: 10, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>Radnika</div>
-                        <div style={{ fontSize: 22, fontWeight: 800, color: '#F59E0B' }}>{projectStats.uniqueWorkers}</div>
+                    <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }} className="u-text-center">
+                        <div className="proj__stat-label">Radnika</div>
+                        <div className="proj__stat-value" style={{ color: '#F59E0B' }}>{projectStats.uniqueWorkers}</div>
                     </div>
                 </>}
             </div>
 
             {/* Advanced Filters */}
-            <div style={{ ...styles.card, marginBottom: 20, padding: '12px 16px' }}>
-                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-                    <div style={{ position: 'relative', flex: 1, minWidth: 180 }}>
+            <div style={styles.card} className="proj__filters">
+                <div className="proj__filter-row">
+                    <div className="proj__filter-search">
                         <Input placeholder="Pretraži projekt, lokaciju, klijenta..." value={search} onChange={e => setSearch(e.target.value)} className="u-pl-36" />
-                        <div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: C.textMuted }}><Icon name="search" size={16} /></div>
+                        <div className="proj__filter-search-icon"><Icon name="search" size={16} /></div>
                     </div>
                     <Select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ width: 140 }}>
                         <option value="all">Svi statusi</option>
@@ -505,11 +506,11 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                         <button onClick={() => { setSearch(''); setFilterStatus('all'); setFilterWorker('all'); setFilterLocation('all'); }} style={{ ...styles.btnSmall, color: C.red, borderColor: 'rgba(239,68,68,0.2)', fontSize: 11 }}>✕ Očisti</button>
                     )}
                 </div>
-                {hasActiveFilters && <div style={{ fontSize: 11, color: C.textMuted, marginTop: 8 }}>Filtrirano: {filtered.length} od {isWorker ? filtered.length : projects.length} projekata</div>}
+                {hasActiveFilters && <div className="proj__filter-info">Filtrirano: {filtered.length} od {isWorker ? filtered.length : projects.length} projekata</div>}
             </div>
 
             {/* Projects grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(340px, 1fr))', gap: 16 }}>
+            <div className={`proj__grid ${isMobile ? 'proj__grid--mobile' : 'proj__grid--desktop'}`}>
                 {filtered.map(p => {
                     const pWorkers = (p.workers || []).map(wid => workers.find(w => w.id === wid)).filter(Boolean);
                     const pTimesheets = timesheets.filter(t => t.projectId === p.id);
@@ -519,40 +520,40 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                     const leader = p.teamLeader ? workers.find(w => w.id === p.teamLeader) : null;
                     return (
                         <div key={p.id} role="button" tabIndex={0} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setDetailId(p.id)} style={{ ...styles.card, cursor: 'pointer', transition: 'all 0.2s', borderLeft: `4px solid ${p.status === 'aktivan' ? '#10B981' : p.status === 'završen' ? '#6366F1' : p.status === 'pausa' ? '#F59E0B' : '#3B82F6'}` }} onClick={() => setDetailId(p.id)} onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,0,0,0.1)'; e.currentTarget.style.transform = 'translateY(-2px)'; }} onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'none'; }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                            <div className="proj__card-header">
                                 <div className="u-flex-1">
-                                    <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{p.name}</div>
-                                    {p.location && <div className="u-fs-12 u-text-muted" style={{ marginTop: 2 }}>📍 {p.location} {p.siteLat ? <span style={{ fontSize: 9, color: '#10B981', fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: 'rgba(16,185,129,0.1)', marginLeft: 4 }}>GPS ✓</span> : <span style={{ fontSize: 9, color: '#F59E0B', fontWeight: 600, padding: '1px 5px', borderRadius: 4, background: 'rgba(245,158,11,0.08)', marginLeft: 4 }}>Bez GPS</span>}</div>}
+                                    <div className="proj__card-title">{p.name}</div>
+                                    {p.location && <div className="u-fs-12 u-text-muted" style={{ marginTop: 2 }}>📍 {p.location} {p.siteLat ? <span className="proj__gps-yes">GPS ✓</span> : <span className="proj__gps-no">Bez GPS</span>}</div>}
                                 </div>
                                 <StatusBadge status={p.status} />
                             </div>
-                            {p.client && <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 8 }}>🏢 {p.client}</div>}
-                            {leader && <div style={{ fontSize: 12, color: C.blue, marginBottom: 8 }}>👷 Voditelj: {leader.name}</div>}
+                            {p.client && <div className="proj__card-client">🏢 {p.client}</div>}
+                            {leader && <div className="proj__card-leader">👷 Voditelj: {leader.name}</div>}
                             <div style={{ display: 'grid', gridTemplateColumns: isWorker ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 8, marginBottom: 12, padding: '10px 0', borderTop: `1px solid ${C.border}7A`, borderBottom: `1px solid ${C.border}7A` }}>
-                                <div className="u-text-center"><div style={{ fontSize: 16, fontWeight: 800, color: C.accent }}>{pWorkers.length}</div><div className="u-stat-label">Radnika</div></div>
-                                <div className="u-text-center"><div style={{ fontSize: 16, fontWeight: 800, color: C.blue }}>{Math.round(pHours / 60)}h</div><div className="u-stat-label">Sati</div></div>
-                                {!isWorker && <div className="u-text-center"><div style={{ fontSize: 16, fontWeight: 800, color: '#7C3AED' }}>{pTimesheets.length}</div><div className="u-stat-label">Unosa</div></div>}
-                                {!isWorker && <div className="u-text-center"><div style={{ fontSize: 16, fontWeight: 800, color: pCosts > 0 ? '#EF4444' : C.textDim }}>{pCosts > 0 ? `${pCosts.toFixed(0)}€` : '—'}</div><div className="u-stat-label">Troškovi</div></div>}
+                                <div className="u-text-center"><div className="proj__card-stat-value" style={{ color: C.accent }}>{pWorkers.length}</div><div className="u-stat-label">Radnika</div></div>
+                                <div className="u-text-center"><div className="proj__card-stat-value" style={{ color: C.blue }}>{Math.round(pHours / 60)}h</div><div className="u-stat-label">Sati</div></div>
+                                {!isWorker && <div className="u-text-center"><div className="proj__card-stat-value" style={{ color: '#7C3AED' }}>{pTimesheets.length}</div><div className="u-stat-label">Unosa</div></div>}
+                                {!isWorker && <div className="u-text-center"><div className="proj__card-stat-value" style={{ color: pCosts > 0 ? '#EF4444' : C.textDim }}>{pCosts > 0 ? `${pCosts.toFixed(0)}€` : '—'}</div><div className="u-stat-label">Troškovi</div></div>}
                             </div>
                             {/* Worker avatars */}
                             {pWorkers.length > 0 && (
-                                <div style={{ display: 'flex', marginBottom: 12 }}>
+                                <div className="proj__avatar-stack">
                                     {pWorkers.slice(0, 6).map((w, i) => (
-                                        <div key={w.id} style={{ width: 28, height: 28, borderRadius: '50%', background: C.accentLight, border: '2px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.accent, fontWeight: 800, fontSize: 11, marginLeft: i > 0 ? -6 : 0 }}>{w.name?.charAt(0)}</div>
+                                        <div key={w.id} className="proj__avatar-mini" style={{ marginLeft: i > 0 ? -6 : 0 }}>{w.name?.charAt(0)}</div>
                                     ))}
-                                    {pWorkers.length > 6 && <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(128,128,128,0.12)', border: `2px solid ${C.card}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: C.textMuted, marginLeft: -6 }}>+{pWorkers.length - 6}</div>}
+                                    {pWorkers.length > 6 && <div className="proj__avatar-more" style={{ marginLeft: -6, border: `2px solid ${C.card}` }}>+{pWorkers.length - 6}</div>}
                                 </div>
                             )}
                             {(pOtpremnice.length > 0 || (p.files || []).length > 0) && (
-                                <div style={{ display: 'flex', gap: 12, fontSize: 11, color: C.textMuted, marginBottom: 12 }}>
+                                <div className="proj__card-meta">
                                     {pOtpremnice.length > 0 && <span>📦 {pOtpremnice.length} otpremnica</span>}
                                     {(p.files || []).length > 0 && <span>📎 {(p.files || []).length} dokumenata</span>}
                                 </div>
                             )}
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 11, color: C.textMuted }}>
+                            <div className="proj__card-footer">
                                 <span>📅 {fmtDate(p.startDate)}{p.endDate ? ' → ' + fmtDate(p.endDate) : ''}</span>
                                 {!isWorker && (
-                                    <div style={{ display: 'flex', gap: 6 }} onClick={e => e.stopPropagation()}>
+                                    <div className="proj__card-actions" onClick={e => e.stopPropagation()}>
                                         <button onClick={() => openEdit(p)} style={styles.btnSmall}><Icon name="edit" size={12} /></button>
                                         <button onClick={() => doDelete(p.id)} style={styles.btnDanger}><Icon name="trash" size={12} /></button>
                                     </div>
@@ -562,12 +563,12 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                     );
                 })}
             </div>
-            {filtered.length === 0 && <div style={{ ...styles.card, textAlign: 'center', padding: 50, color: C.textMuted }}><div style={{ fontSize: 32, marginBottom: 8 }}>📭</div>Nema projekata za odabrane filtre</div>}
+            {filtered.length === 0 && <div style={styles.card} className="proj__no-results"><div className="proj__no-results-icon">📭</div>Nema projekata za odabrane filtre</div>}
 
             {/* Add/Edit Modal */}
             {showForm && (
                 <Modal title={editId ? 'Uredi projekt' : 'Novi projekt'} onClose={() => setShowForm(false)} wide>
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }} className="u-gap-16">
+                    <div className={`proj__form-grid ${isMobile ? 'proj__form-grid--mobile' : 'proj__form-grid--desktop'} u-gap-16`}>
                         <Field label="Naziv projekta" required><Input value={form.name} onChange={e => update('name', e.target.value)} placeholder="Naziv gradilišta / projekta" autoFocus /></Field>
                         <Field label="Status"><Select value={form.status} onChange={e => update('status', e.target.value)}><option value="aktivan">Aktivan</option><option value="planiran">Planiran</option><option value="pausa">Pauza</option><option value="završen">Završen</option></Select></Field>
                         <Field label="Lokacija">
@@ -594,8 +595,8 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                                 }} style={{ ...styles.btnSmall, padding: '8px 10px', whiteSpace: 'nowrap' }} title="Koristi moju lokaciju">📌</button>
                             </div>
                             {form.siteLat && form.siteLng && (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6, padding: '6px 10px', borderRadius: 8, background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.15)' }}>
-                                    <span style={{ fontSize: 11, color: '#10B981', fontWeight: 700 }}>✅ {Number(form.siteLat).toFixed(4)}°N, {Number(form.siteLng).toFixed(4)}°E</span>
+                                <div className="proj__gps-confirm">
+                                    <span className="proj__gps-confirm-text">✅ {Number(form.siteLat).toFixed(4)}°N, {Number(form.siteLng).toFixed(4)}°E</span>
                                     <button type="button" onClick={() => setForm(f => ({ ...f, siteLat: '', siteLng: '' }))} style={{ background: 'none', border: 'none', color: C.red, cursor: 'pointer', fontSize: 11, marginLeft: 'auto' }}>✕ Ukloni</button>
                                 </div>
                             )}
@@ -616,11 +617,11 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
 
                     {/* File uploads */}
                     <Field label="Dokumenti i slike">
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 10 }}>
+                        <div className="proj__file-list">
                             {(form.files || []).map(f => (
-                                <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', borderRadius: 8, background: C.bgElevated, border: `1px solid ${C.border}`, fontSize: 12 }}>
+                                <div key={f.id} className="proj__file-chip">
                                     {f.type?.startsWith('image/') ? <img src={f.data} alt="" style={{ width: 24, height: 24, borderRadius: 4, objectFit: 'cover' }} /> : <Icon name="file" size={14} />}
-                                    <span style={{ maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: C.textDim }}>{f.name}</span>
+                                    <span className="proj__file-chip-name">{f.name}</span>
                                     <button onClick={() => removeFile(f.id)} style={{ background: 'none', border: 'none', color: C.red, cursor: 'pointer', fontSize: 14, padding: 0 }}>✕</button>
                                 </div>
                             ))}
