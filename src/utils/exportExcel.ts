@@ -6,12 +6,13 @@ type RowData = Record<string, unknown>;
 interface ColumnDef { key: string; label?: string; width?: number; }
 interface EntityRow { id: string;[key: string]: unknown; }
 
+/**
  * Export array of objects to Excel(.xlsx)
-    * @param { Object[] } data - Array of row objects
-        * @param { string } filename - Name without extension
-            * @param { string } sheetName - Sheet tab name
-                * @param { Object[] } columns - Optional[{ key, label, width }] to control column order / names
-                    */
+ * @param data - Array of row objects
+ * @param filename - Name without extension
+ * @param sheetName - Sheet tab name
+ * @param columns - Optional[{ key, label, width }] to control column order / names
+ */
 export function exportToExcel(data: RowData[], filename = 'export', sheetName = 'Podaci', columns: ColumnDef[] | null = null) {
     if (!data || data.length === 0) {
         alert('Nema podataka za export');
