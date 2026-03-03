@@ -49,17 +49,28 @@ export const Icon = ({ name, size = 20, ariaLabel = undefined }) => (
 );
 
 // ── Modal ────────────────────────────────────────────────────────────────
-export const Modal = ({ title, onClose, children, wide }) => (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px 12px' }} role="dialog" aria-modal="true" aria-label={title}>
-        <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, width: '100%', maxWidth: wide ? 820 : 560, position: 'relative', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
-                <div style={{ fontSize: 18, fontWeight: 700, color: C.text }}>{title}</div>
-                <button onClick={onClose} style={{ background: 'none', border: 'none', color: C.textMuted, cursor: 'pointer' }} aria-label="Zatvori"><Icon name="close" size={20} /></button>
+export const Modal = ({ title, onClose, children, wide }) => {
+    const dialogRef = useRef(null);
+    useEffect(() => {
+        const prev = document.activeElement;
+        dialogRef.current?.focus();
+        document.body.style.overflow = 'hidden';
+        const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+        window.addEventListener('keydown', onKey);
+        return () => { window.removeEventListener('keydown', onKey); document.body.style.overflow = ''; prev?.focus?.(); };
+    }, [onClose]);
+    return (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px 12px' }} role="dialog" aria-modal="true" aria-label={title} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+            <div ref={dialogRef} tabIndex={-1} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, width: '100%', maxWidth: wide ? 820 : 560, position: 'relative', maxHeight: '90vh', display: 'flex', flexDirection: 'column', outline: 'none' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
+                    <div style={{ fontSize: 18, fontWeight: 700, color: C.text }}>{title}</div>
+                    <button onClick={onClose} style={{ background: 'none', border: 'none', color: C.textMuted, cursor: 'pointer' }} aria-label="Zatvori"><Icon name="close" size={20} /></button>
+                </div>
+                <div style={{ padding: 24, overflowY: 'auto', flex: 1, WebkitOverflowScrolling: 'touch' }}>{children}</div>
             </div>
-            <div style={{ padding: 24, overflowY: 'auto', flex: 1, WebkitOverflowScrolling: 'touch' }}>{children}</div>
         </div>
-    </div>
-);
+    );
+};
 
 // ── Form Components ──────────────────────────────────────────────────────
 export const Field = ({ label, children, required }) => (
