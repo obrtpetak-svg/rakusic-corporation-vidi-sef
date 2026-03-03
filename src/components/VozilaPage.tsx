@@ -275,7 +275,7 @@ export function VozilaPage({ workerFilterId }) {
                     const fuelCount = (v.fuelLogs || []).length;
                     const totalFuelCost = (v.fuelLogs || []).reduce((s, f) => s + (parseFloat(f.totalCost) || 0), 0);
                     return (
-                        <div key={v.id} style={{ ...styles.card, cursor: 'pointer' }} onClick={() => setDetailId(v.id)}>
+                        <div key={v.id} role="button" tabIndex={0} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && e.currentTarget.click()} style={{ ...styles.card, cursor: 'pointer' }} onClick={() => setDetailId(v.id)}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                                 <div><div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{v.name || v.regNumber}</div><div style={{ fontSize: 12, color: C.textMuted }}>{v.brand} {v.model} {v.year && `(${v.year})`}</div></div>
                                 <div style={{ ...styles.badge('249,115,22'), fontSize: 12 }}>{v.regNumber || '—'}</div>

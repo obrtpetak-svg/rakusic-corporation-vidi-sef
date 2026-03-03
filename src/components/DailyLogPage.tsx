@@ -366,7 +366,7 @@ export function DailyLogPage({ workerFilterId, leaderProjectIds }) {
                     const p = projects.find(x => x.id === log.projectId);
                     const photoCount = (log.photos || []).length;
                     return (
-                        <div key={log.id} style={{ ...styles.card, cursor: 'pointer', transition: 'box-shadow 0.2s' }} onClick={() => setDetailId(log.id)}>
+                        <div key={log.id} role="button" tabIndex={0} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && e.currentTarget.click()} style={{ ...styles.card, cursor: 'pointer', transition: 'box-shadow 0.2s' }} onClick={() => setDetailId(log.id)}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
                                 <div style={{ flex: 1, minWidth: 200 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>

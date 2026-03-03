@@ -317,7 +317,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
                         ) : (
                             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
                                 {visibleTemplates.map(tpl => (
-                                    <div key={tpl.id} onClick={() => openFill(tpl)} style={{ ...styles.card, cursor: 'pointer', transition: 'all 0.2s', border: `2px solid transparent` }}
+                                    <div key={tpl.id} role="button" tabIndex={0} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && openFill(tpl)} onClick={() => openFill(tpl)} style={{ ...styles.card, cursor: 'pointer', transition: 'all 0.2s', border: `2px solid transparent` }}
                                         onMouseEnter={e => e.currentTarget.style.borderColor = C.accent} onMouseLeave={e => e.currentTarget.style.borderColor = 'transparent'}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                                             <div style={{ width: 48, height: 48, borderRadius: 12, background: `${C.accent}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}></div>
@@ -357,7 +357,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
                             const proj = projects.find(p => p.id === cl.projectId);
                             const sb = statusBadge(cl.status);
                             return (
-                                <div key={cl.id} style={{ ...styles.card, cursor: 'pointer', transition: 'box-shadow 0.2s' }} onClick={() => setDetailId(cl.id)}>
+                                <div key={cl.id} role="button" tabIndex={0} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && e.currentTarget.click()} style={{ ...styles.card, cursor: 'pointer', transition: 'box-shadow 0.2s' }} onClick={() => setDetailId(cl.id)}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
                                         <div style={{ flex: 1, minWidth: 200 }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>

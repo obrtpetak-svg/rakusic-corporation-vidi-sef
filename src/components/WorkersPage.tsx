@@ -245,7 +245,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                     const wProjects = projects.filter(p => (p.workers || []).includes(w.id));
                     const wHours = timesheets.filter(t => t.workerId === w.id).reduce((s, t) => s + diffMins(t.startTime, t.endTime), 0);
                     return (
-                        <div key={w.id} style={{ ...styles.card, cursor: 'pointer' }} onClick={() => setDetailId(w.id)}>
+                        <div key={w.id} role="button" tabIndex={0} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && e.currentTarget.click()} style={{ ...styles.card, cursor: 'pointer' }} onClick={() => setDetailId(w.id)}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 12 }}>
                                 <div style={{ width: 44, height: 44, borderRadius: '50%', background: w.active !== false ? C.accentLight : 'rgba(100,116,139,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 800, color: w.active !== false ? C.accent : C.textMuted, flexShrink: 0 }}>{w.name?.charAt(0)}</div>
                                 <div style={{ flex: 1, minWidth: 0 }}>
