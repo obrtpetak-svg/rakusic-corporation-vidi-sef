@@ -491,7 +491,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                                 </div>
                                 <div style={{ fontSize: 13, color: C.accent, fontWeight: 700, margin: '8px 0' }}>Ukupno: {(costForm.quantity * costForm.unitPrice).toFixed(2)}€</div>
                                 <Field label="Napomena"><Input value={costForm.notes} onChange={e => setCostForm(f => ({ ...f, notes: e.target.value }))} placeholder="Opcionalno..." /></Field>
-                                <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 16 }}>
+                                <div className="u-flex-end u-mt-16">
                                     <button onClick={() => setShowCostForm(false)} style={styles.btnSecondary}>Odustani</button>
                                     <button onClick={() => addCostItem(detailOrder)} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
                                 </div>

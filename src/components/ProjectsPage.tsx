@@ -416,7 +416,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                             </Field>
                         </div>
                         <Field label="Dodijeli radnicima"><WorkerCheckboxList allWorkers={detailWorkers.length > 0 ? detailWorkers : activeWorkers} selected={obForm.workerIds} onChange={v => setObForm(f => ({ ...f, workerIds: v }))} /></Field>
-                        <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 16 }}>
+                        <div className="u-flex-end u-mt-16">
                             <button onClick={() => setShowObForm(false)} style={styles.btnSecondary}>Odustani</button>
                             <button onClick={saveObligation} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
                         </div>

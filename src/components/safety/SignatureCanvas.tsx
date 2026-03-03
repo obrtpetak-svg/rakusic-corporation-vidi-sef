@@ -37,7 +37,7 @@ export function SignatureCanvas({ onSave, existingSignature }) {
             <canvas ref={canvasRef} onMouseDown={start} onMouseMove={draw} onMouseUp={stop} onMouseLeave={stop}
                 onTouchStart={start} onTouchMove={draw} onTouchEnd={stop}
                 style={{ width: '100%', height: 120, border: `2px dashed ${C.border}`, borderRadius: 12, cursor: 'crosshair', touchAction: 'none', background: C.bgElevated }} />
-            <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
+            <div className="u-flex u-gap-8" style={{ marginTop: 6 }}>
                 <button onClick={clear} style={{ ...styles.btnSmall, fontSize: 11 }}>🗑️ Obriši</button>
                 <button onClick={save} disabled={!hasContent} style={{ ...styles.btnSmall, fontSize: 11, background: hasContent ? C.accent : C.border, color: '#fff' }}>✓ Potvrdi potpis</button>
             </div>

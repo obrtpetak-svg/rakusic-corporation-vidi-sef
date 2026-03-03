@@ -220,7 +220,7 @@ export function VozilaPage({ workerFilterId }) {
                             <Field label="Lokacija / Pumpa"><Input value={fuelForm.location} onChange={e => setFuelForm(f => ({ ...f, location: e.target.value }))} placeholder="INA Zagreb" /></Field>
                         </div>
                         <Field label="Napomene"><Input value={fuelForm.notes} onChange={e => setFuelForm(f => ({ ...f, notes: e.target.value }))} placeholder="Napomene..." /></Field>
-                        <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 16 }}>
+                        <div className="u-flex-end u-mt-16">
                             <button onClick={() => setShowFuelForm(null)} style={styles.btnSecondary}>Odustani</button>
                             <button onClick={() => addFuelLog(detailVehicle.id)} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
                         </div>
@@ -236,7 +236,7 @@ export function VozilaPage({ workerFilterId }) {
                             <Field label="Tip"><Select value={kmForm.type} onChange={e => setKmForm(f => ({ ...f, type: e.target.value }))}><option value="servis">Servis</option><option value="tehnički">Tehnički pregled</option><option value="dnevni">Dnevni unos</option><option value="ostalo">Ostalo</option></Select></Field>
                         </div>
                         <Field label="Napomena"><Input value={kmForm.notes} onChange={e => setKmForm(f => ({ ...f, notes: e.target.value }))} placeholder="Napomene..." /></Field>
-                        <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 16 }}>
+                        <div className="u-flex-end u-mt-16">
                             <button onClick={() => setShowKmForm(null)} style={styles.btnSecondary}>Odustani</button>
                             <button onClick={() => addKmLog(detailVehicle.id)} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
                         </div>
@@ -252,7 +252,7 @@ export function VozilaPage({ workerFilterId }) {
                         </div>
                         <Field label="Naslov"><Input value={diaryForm.title} onChange={e => setDiaryForm(f => ({ ...f, title: e.target.value }))} placeholder="Zamjena ulja, registracija..." /></Field>
                         <Field label="Opis"><Textarea value={diaryForm.description} onChange={e => setDiaryForm(f => ({ ...f, description: e.target.value }))} placeholder="Detaljni opis..." rows={3} /></Field>
-                        <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 16 }}>
+                        <div className="u-flex-end u-mt-16">
                             <button onClick={() => setShowDiaryForm(null)} style={styles.btnSecondary}>Odustani</button>
                             <button onClick={() => addDiaryEntry(detailVehicle.id)} style={styles.btn}><Icon name="check" size={16} /> Spremi</button>
                         </div>

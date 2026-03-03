@@ -248,7 +248,7 @@ export function TimesheetEntry() {
                     <div style={{ background: C.accentLight, borderRadius: 8, padding: '10px 14px', marginBottom: 12, fontSize: 13 }}>
                         Neto: <strong style={{ color: C.accent }}>{(netMins / 60).toFixed(1)}h</strong>
                     </div>
-                    <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+                    <div className="u-flex-end">
                         <button onClick={() => setShowEditModal(false)} style={styles.btnSecondary}>Odustani</button>
                         <button onClick={saveEdit} disabled={saving} style={styles.btn}><Icon name="check" size={16} /> Spremi izmjenu</button>
                     </div>
