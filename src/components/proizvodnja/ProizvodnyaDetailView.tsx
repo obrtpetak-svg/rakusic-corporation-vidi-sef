@@ -39,7 +39,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
                         <div>
                             <div style={{ fontSize: 11, color: C.accent, fontWeight: 700, marginBottom: 4 }}>{detailOrder.orderNumber}</div>
-                            <div className="u-fs-22 u-fw-800" style={{ color: C.text }}>{detailOrder.name}</div>
+                            <div className="u-fs-22 u-fw-800" className="u-color-text">{detailOrder.name}</div>
                             <div style={{ fontSize: 13, color: C.textMuted, marginTop: 4 }}>🏢 {detailOrder.client || '—'} {detailOrder.quantity && `• ${detailOrder.quantity} ${detailOrder.unit}`}</div>
                             {detailOrder.projectId && (() => { const proj = projects.find(p => p.id === detailOrder.projectId); return proj ? <div style={{ fontSize: 12, color: '#7C3AED', fontWeight: 600, marginTop: 2 }}>📁 Projekt: {proj.name}</div> : null; })()}
                         </div>
@@ -160,10 +160,10 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                     <div style={{ ...styles.card, marginBottom: 20 }}>
                         {detailOrder.description && <div style={{ padding: '12px 16px', borderRadius: 8, background: C.bgElevated, fontSize: 13, color: C.textDim, lineHeight: 1.6, marginBottom: 12 }}>{detailOrder.description}</div>}
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, fontSize: 13 }}>
-                            <div><span style={{ color: C.textMuted }}>📅 Kreiran:</span> <strong>{fmtDate(detailOrder.createdAt)}</strong></div>
-                            <div><span style={{ color: C.textMuted }}>📅 Rok:</span> <strong>{fmtDate(detailOrder.deadline) || '—'}</strong></div>
-                            <div><span style={{ color: C.textMuted }}>👤 Kreirao:</span> <strong>{detailOrder.createdBy || '—'}</strong></div>
-                            <div><span style={{ color: C.textMuted }}>📋 Broj:</span> <strong>{detailOrder.orderNumber}</strong></div>
+                            <div><span className="u-text-muted">📅 Kreiran:</span> <strong>{fmtDate(detailOrder.createdAt)}</strong></div>
+                            <div><span className="u-text-muted">📅 Rok:</span> <strong>{fmtDate(detailOrder.deadline) || '—'}</strong></div>
+                            <div><span className="u-text-muted">👤 Kreirao:</span> <strong>{detailOrder.createdBy || '—'}</strong></div>
+                            <div><span className="u-text-muted">📋 Broj:</span> <strong>{detailOrder.orderNumber}</strong></div>
                         </div>
                         {detailOrder.notes && <div style={{ marginTop: 12, padding: '10px 14px', borderRadius: 8, background: 'rgba(245,158,11,0.08)', fontSize: 13, color: '#D97706' }}>📝 {detailOrder.notes}</div>}
 
@@ -183,7 +183,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                                         </div>
                                         <div style={{ flex: 1, paddingTop: 2 }}>
                                             <div style={{ fontSize: 13, fontWeight: isCurrent ? 700 : 500, color: isCurrent ? C.text : isDone || isPast ? C.textDim : C.textMuted }}>{s.label}</div>
-                                            {record && <div className="u-fs-11" style={{ color: C.textMuted }}>
+                                            {record && <div className="u-fs-11" className="u-text-muted">
                                                 {record.enteredAt && `Započeto: ${fmtDate(record.enteredAt)}`}
                                                 {record.completedAt && ` → Završeno: ${fmtDate(record.completedAt)}`}
                                                 {record.signedBy && <span style={{ color: '#10B981', fontWeight: 600 }}>{' '}✍️ {record.signedBy}</span>}
@@ -467,7 +467,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                                     <tbody>
                                         {costItems.map(c => (
                                             <tr key={c.id}>
-                                                <td style={styles.td}><span className="u-fw-600">{c.name}</span>{c.notes && <div style={{ fontSize: 10, color: C.textMuted }}>{c.notes}</div>}</td>
+                                                <td style={styles.td}><span className="u-fw-600">{c.name}</span>{c.notes && <div className="u-stat-label">{c.notes}</div>}</td>
                                                 <td style={styles.td}>{COST_CATEGORIES.find(cat => cat.value === c.category)?.label || c.category}</td>
                                                 <td style={styles.td}>{c.quantity}</td>
                                                 <td style={styles.td}>{(c.unitPrice || 0).toFixed(2)}€</td>
@@ -549,7 +549,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                                             <div style={{ width: 8, height: 8, borderRadius: '50%', background: stage?.color || C.accent, marginTop: 6, flexShrink: 0 }} />
                                             <div>
                                                 <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{stage?.emoji} {stage?.label}</div>
-                                                <div className="u-fs-11" style={{ color: C.textMuted }}>
+                                                <div className="u-fs-11" className="u-text-muted">
                                                     Ulaz: {fmtDate(h.enteredAt)}
                                                     {h.completedAt && ` → Izlaz: ${fmtDate(h.completedAt)}`}
                                                     {h.completedBy && ` • ${h.completedBy}`}

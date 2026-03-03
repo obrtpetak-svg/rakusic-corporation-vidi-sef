@@ -201,7 +201,7 @@ export default function GpsAnalyticsTab({
                         {donutData.map(d => (
                             <div key={d.label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12 }}>
                                 <div style={{ width: 10, height: 10, borderRadius: '50%', background: d.color }} />
-                                <span style={{ color: C.textMuted }}>{d.label}: <b style={{ color: C.text }}>{d.value}</b></span>
+                                <span className="u-text-muted">{d.label}: <b className="u-color-text">{d.value}</b></span>
                             </div>
                         ))}
                     </div>
@@ -299,7 +299,7 @@ export default function GpsAnalyticsTab({
                                         <div className="u-flex-1">
                                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 2 }}>
                                                 <span style={{ fontWeight: 600, color: C.text }}>{e.label}</span>
-                                                <span style={{ color: C.textMuted }}>{e.count}x</span>
+                                                <span className="u-text-muted">{e.count}x</span>
                                             </div>
                                             <div style={{ height: 6, borderRadius: 3, background: `${C.border}20`, overflow: 'hidden' }}>
                                                 <div style={{
@@ -325,7 +325,7 @@ export default function GpsAnalyticsTab({
                         <span style={{ fontSize: 18 }}>⚠️</span>
                         <div>
                             <div style={{ fontSize: 14, fontWeight: 700, color: '#DC2626' }}>Anomalije — izvan zone (&gt;500m)</div>
-                            <div className="u-fs-12" style={{ color: C.textMuted }}>Radnici koji su česti bili daleko od gradilišta</div>
+                            <div className="u-fs-12" className="u-text-muted">Radnici koji su česti bili daleko od gradilišta</div>
                         </div>
                     </div>
                     <div style={{
@@ -418,7 +418,7 @@ function KpiCard({ label, value, icon, color, sub }) {
                 <div>
                     <div style={{ fontSize: 20, fontWeight: 800, color: C.text }}>{value}</div>
                     <div style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
-                    {sub && <div style={{ fontSize: 10, color: C.textMuted }}>{sub}</div>}
+                    {sub && <div className="u-stat-label">{sub}</div>}
                 </div>
             </div>
         </div>

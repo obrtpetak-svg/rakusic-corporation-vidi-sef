@@ -185,7 +185,7 @@ export function TimesheetEntry() {
                                     <div style={{ color: C.textMuted, fontSize: 12 }}>{t.startTime} - {t.endTime} ({(mins / 60).toFixed(1)}h) {t.description && `• ${t.description.slice(0, 40)}`}</div>
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                                    {hasEdits && <span style={{ fontSize: 10, color: C.textMuted }} title="Izmijenjeno">✏️</span>}
+                                    {hasEdits && <span className="u-stat-label" title="Izmijenjeno">✏️</span>}
                                     <span style={{ ...styles.badge(t.status === 'odobren' ? '34,197,94' : t.status === 'odbijen' ? '239,68,68' : '234,179,8'), fontSize: 10 }}>{t.status === 'odobren' ? 'ODOBREN' : t.status === 'odbijen' ? 'ODBIJEN' : 'ČEKA'}</span>
                                     <button onClick={() => openEdit(t)} style={{ ...styles.btnSmall, padding: '4px 10px', fontSize: 11 }} title="Uredi unos">
                                         <Icon name="edit" size={12} /> Uredi
@@ -203,7 +203,7 @@ export function TimesheetEntry() {
                                             {' — '}<span style={{ color: C.yellow }}>{log.by}</span>
                                             {': '}<span style={{ fontStyle: 'italic' }}>{log.reason}</span>
                                             {log.changes && Object.keys(log.changes).length > 0 && (
-                                                <span style={{ color: C.textMuted }}> ({Object.keys(log.changes).map(k => {
+                                                <span className="u-text-muted"> ({Object.keys(log.changes).map(k => {
                                                     const c = log.changes[k];
                                                     return `${k}: ${c.from || '—'} → ${c.to || '—'}`;
                                                 }).join(', ')})</span>

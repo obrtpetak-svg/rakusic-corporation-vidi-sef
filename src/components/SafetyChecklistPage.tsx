@@ -214,7 +214,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
                 <div>
-                    <div className="u-fs-22 u-fw-800" style={{ color: C.text }}> Kontrolne liste sigurnosti</div>
+                    <div className="u-fs-22 u-fw-800" className="u-color-text"> Kontrolne liste sigurnosti</div>
                     <div style={{ color: C.textMuted, fontSize: 13, marginTop: 2 }}>Predlošci, inspekcije, digitalni potpisi</div>
                 </div>
             </div>
@@ -223,7 +223,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
                 <div style={{ ...styles.card, display: 'flex', alignItems: 'center', gap: 14 }}>
                     <div style={{ background: `${C.accent}18`, borderRadius: 12, padding: 12, color: C.accent }}></div>
-                    <div><div className="u-stat-label">Ukupno</div><div className="u-fs-24 u-fw-800" style={{ color: C.text }}>{totalChecklists}</div></div>
+                    <div><div className="u-stat-label">Ukupno</div><div className="u-fs-24 u-fw-800" className="u-color-text">{totalChecklists}</div></div>
                 </div>
                 <div style={{ ...styles.card, display: 'flex', alignItems: 'center', gap: 14 }}>
                     <div style={{ background: 'rgba(16,185,129,0.12)', borderRadius: 12, padding: 12, color: '#10B981' }}>✅</div>
@@ -261,7 +261,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
                     {(safetyTemplates || []).length === 0 ? (
                         <div style={{ ...styles.card, textAlign: 'center', padding: 40, color: C.textMuted }}>
                             <div style={{ fontSize: 40, marginBottom: 12 }}>📋</div>
-                            <div style={{ fontSize: 14, fontWeight: 600 }}>Nema predložaka</div>
+                            <div className="u-fw-600" style={{ fontSize: 14 }}>Nema predložaka</div>
                             <div style={{ fontSize: 12, marginTop: 4 }}>Kreirajte prvi predložak kontrolne liste.</div>
                         </div>
                     ) : (
@@ -271,7 +271,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                         <div>
                                             <div className="u-section-title">{tpl.name}</div>
-                                            {tpl.description && <div className="u-fs-12" style={{ color: C.textMuted, marginTop: 2 }}>{tpl.description}</div>}
+                                            {tpl.description && <div className="u-fs-12" className="u-text-muted" style={{ marginTop: 2 }}>{tpl.description}</div>}
                                         </div>
                                         <div className="u-flex-gap-4">
                                             <button onClick={() => openEditTemplate(tpl)} style={styles.btnSmall}><Icon name="edit" size={12} /></button>
@@ -287,7 +287,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
                                         {(tpl.items || []).slice(0, 4).map((item, i) => (
                                             <span key={i} style={{ padding: '2px 8px', borderRadius: 4, background: C.bgElevated, fontSize: 10, color: C.textDim }}>☐ {item.text}</span>
                                         ))}
-                                        {(tpl.items || []).length > 4 && <span style={{ fontSize: 10, color: C.textMuted }}>+{tpl.items.length - 4} više</span>}
+                                        {(tpl.items || []).length > 4 && <span className="u-stat-label">+{tpl.items.length - 4} više</span>}
                                     </div>
                                 </div>
                             ))}
@@ -311,7 +311,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
                         return visibleTemplates.length === 0 ? (
                             <div style={{ ...styles.card, textAlign: 'center', padding: 40, color: C.textMuted }}>
                                 <div style={{ fontSize: 40, marginBottom: 12 }}>📋</div>
-                                <div style={{ fontSize: 14, fontWeight: 600 }}>Nema dostupnih predložaka</div>
+                                <div className="u-fw-600" style={{ fontSize: 14 }}>Nema dostupnih predložaka</div>
                                 <div style={{ fontSize: 12, marginTop: 4 }}>{isAdmin ? 'Kreirajte predložak u tabu "Predlošci".' : 'Nema predložaka za vaše projekte.'}</div>
                             </div>
                         ) : (
@@ -323,7 +323,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
                                             <div style={{ width: 48, height: 48, borderRadius: 12, background: `${C.accent}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}></div>
                                             <div className="u-flex-1">
                                                 <div className="u-section-title">{tpl.name}</div>
-                                                <div className="u-fs-11" style={{ color: C.textMuted }}>
+                                                <div className="u-fs-11" className="u-text-muted">
                                                     {tpl.projectId && <span style={{ color: C.accent }}>📍 {projects.find(p => p.id === tpl.projectId)?.name || '—'} • </span>}
                                                     {tpl.items?.length || 0} stavki {tpl.requireSignature ? '• ✍️ Potpis' : ''}
                                                 </div>

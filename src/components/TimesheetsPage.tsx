@@ -182,8 +182,8 @@ export function TimesheetsPage() {
                 {/* Header */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
                     <div>
-                        <div className="u-fs-22 u-fw-800" style={{ color: C.text }}> Radni sati</div>
-                        <div className="u-fs-13" style={{ color: C.textMuted }}>Upravljanje evidencijom radnog vremena</div>
+                        <div className="u-fs-22 u-fw-800" className="u-color-text"> Radni sati</div>
+                        <div className="u-fs-13" className="u-text-muted">Upravljanje evidencijom radnog vremena</div>
                     </div>
                     <div className="u-flex-center u-gap-8">
                         <button onClick={exportCSV} style={styles.btnSecondary}><Icon name="download" size={14} /> CSV/Excel</button>
@@ -249,7 +249,7 @@ export function TimesheetsPage() {
                         <div style={{ fontSize: 20 }}>⏳</div>
                         <div>
                             <div style={{ fontWeight: 700, color: C.yellow, fontSize: 14 }}>{pendingCount} unos{pendingCount > 1 ? 'a' : ''} čeka odobrenje</div>
-                            <div className="u-fs-12" style={{ color: C.textMuted }}>Pregledajte i odobrite/odbijte unose radnika</div>
+                            <div className="u-fs-12" className="u-text-muted">Pregledajte i odobrite/odbijte unose radnika</div>
                         </div>
                         <button onClick={() => { setFilterStatus('na čekanju'); }} style={{ ...styles.btnSmall, marginLeft: 'auto', color: C.yellow, borderColor: 'rgba(180,83,9,0.3)' }}>Prikaži sve</button>
                     </div>
@@ -259,7 +259,7 @@ export function TimesheetsPage() {
                 <div style={{ ...styles.card, padding: 0, overflow: 'hidden' }}>
                     <div style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div className="u-section-title">Pregled ({filtered.length})</div>
-                        <div className="u-fs-12" style={{ color: C.textMuted }}>{(totalFiltered / 60).toFixed(1)}h ukupno</div>
+                        <div className="u-fs-12" className="u-text-muted">{(totalFiltered / 60).toFixed(1)}h ukupno</div>
                     </div>
                     <div className="u-overflow-x">
                         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 800 }}>
@@ -348,7 +348,7 @@ export function TimesheetsPage() {
                                     {detailTs.gpsLocation && <div className="u-mb-12"><span style={styles.label}>GPS Lokacija</span><div style={{ fontSize: 13, color: C.accent }}>📍 {detailTs.gpsLocation}</div></div>}
                                     {detailTs.notes && <div className="u-mb-12"><span style={styles.label}>Napomene</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(245,158,11,0.08)', fontSize: 13, color: C.yellow }}>{detailTs.notes}</div></div>}
                                     {detailTs.rejectReason && <div className="u-mb-12"><span style={styles.label}>Razlog odbijanja</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(239,68,68,0.1)', fontSize: 13, color: C.red }}>{detailTs.rejectReason}</div></div>}
-                                    {detailTs.source && <div className="u-fs-12" style={{ color: C.textMuted }}>Izvor: {detailTs.source === 'admin' ? 'Admin unos' : 'Radnički unos'}</div>}
+                                    {detailTs.source && <div className="u-fs-12" className="u-text-muted">Izvor: {detailTs.source === 'admin' ? 'Admin unos' : 'Radnički unos'}</div>}
                                     {detailTs.invoiceFile && <div className="u-mt-12"><span style={styles.label}>Priloženi račun</span><div style={{ marginTop: 4 }}><a href={detailTs.invoiceFile.data} download={detailTs.invoiceFile.name} style={styles.btnSmall}><Icon name="download" size={14} /> {detailTs.invoiceFile.name}</a></div></div>}
                                     {detailTs.status === 'na čekanju' && (
                                         <div style={{ display: 'flex', gap: 12, marginTop: 20, borderTop: `1px solid ${C.border}`, paddingTop: 16 }}>

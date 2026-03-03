@@ -131,7 +131,7 @@ export default function FleetVehicleList({ vehicles, onSelectVehicle }: {
                                         }}>🚛</div>
                                         <div>
                                             <div className="u-section-title">{v.name}</div>
-                                            <div className="u-fs-11" style={{ color: C.textMuted }}>🔖 {v.plate}</div>
+                                            <div className="u-fs-11" className="u-text-muted">🔖 {v.plate}</div>
                                         </div>
                                     </div>
                                     <div style={{
@@ -151,8 +151,8 @@ export default function FleetVehicleList({ vehicles, onSelectVehicle }: {
                                 </div>
                                 {/* Footer */}
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10, paddingTop: 8, borderTop: `1px solid ${C.border}` }}>
-                                    <span style={{ fontSize: 10, color: C.textMuted }}>{v.group || '—'}</span>
-                                    <span style={{ fontSize: 10, color: C.textMuted }}>⏱️ {timeSince(v.lastUpdate)}</span>
+                                    <span className="u-stat-label">{v.group || '—'}</span>
+                                    <span className="u-stat-label">⏱️ {timeSince(v.lastUpdate)}</span>
                                 </div>
                             </button>
                         );

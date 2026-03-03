@@ -124,7 +124,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                 <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 4 }}>{order.name}</div>
                 <div style={{ fontSize: 11, color: C.textMuted, marginBottom: 6 }}>🏢 {order.client || '—'}</div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 11 }}>
-                    <span style={{ color: C.textMuted }}>{order.quantity} {order.unit}</span>
+                    <span className="u-text-muted">{order.quantity} {order.unit}</span>
                     {daysLeft !== null && (
                         <span style={{ fontWeight: 700, color: daysLeft < 0 ? '#EF4444' : daysLeft <= 3 ? '#F59E0B' : C.green, fontSize: 10, padding: '2px 6px', borderRadius: 4, background: daysLeft < 0 ? 'rgba(239,68,68,0.1)' : daysLeft <= 3 ? 'rgba(245,158,11,0.1)' : 'rgba(16,185,129,0.1)' }}>
                             {daysLeft < 0 ? `${Math.abs(daysLeft)}d kasni` : daysLeft === 0 ? 'DANAS' : `${daysLeft}d`}
@@ -142,8 +142,8 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
                 <div>
-                    <div className="u-fs-24 u-fw-800" style={{ color: C.text }}>Proizvodnja</div>
-                    <div className="u-fs-12" style={{ color: C.textMuted, marginTop: 2 }}>{activeOrders.length} narudžbi • Praćenje proizvodnog procesa</div>
+                    <div className="u-fs-24 u-fw-800" className="u-color-text">Proizvodnja</div>
+                    <div className="u-fs-12" className="u-text-muted" style={{ marginTop: 2 }}>{activeOrders.length} narudžbi • Praćenje proizvodnog procesa</div>
                 </div>
                 <div className="u-flex-gap-8">
                     {canManage && <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> Nova narudžba</button>}
@@ -157,7 +157,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                 <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div className="u-stat-label">Ukupno</div><div style={{ fontSize: 22, fontWeight: 800, color: C.accent }}>{stats.total}</div></div>
                 <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div className="u-stat-label">U tijeku</div><div style={{ fontSize: 22, fontWeight: 800, color: '#3B82F6' }}>{stats.inProgress}</div></div>
                 <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div className="u-stat-label">Na čekanju</div><div style={{ fontSize: 22, fontWeight: 800, color: '#F59E0B' }}>{stats.waiting}</div></div>
-                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div className="u-stat-label">Završeno</div><div style={{ fontSize: 22, fontWeight: 800, color: C.green }}>{stats.doneTotal}</div><div style={{ fontSize: 10, color: C.textMuted }}>{stats.doneMonth > 0 ? `+${stats.doneMonth} ovaj mj.` : ''}</div></div>
+                <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div className="u-stat-label">Završeno</div><div style={{ fontSize: 22, fontWeight: 800, color: C.green }}>{stats.doneTotal}</div><div className="u-stat-label">{stats.doneMonth > 0 ? `+${stats.doneMonth} ovaj mj.` : ''}</div></div>
                 <div style={{ ...styles.card, textAlign: 'center', padding: '14px 10px' }}><div className="u-stat-label">Troškovi</div><div style={{ fontSize: 22, fontWeight: 800, color: '#EF4444' }}>{stats.totalCost > 0 ? `${stats.totalCost.toFixed(0)}€` : '0€'}</div></div>
                 {/* Mini pie chart */}
                 <div style={{ ...styles.card, textAlign: 'center', padding: '10px' }}>
@@ -374,14 +374,14 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                         <div>
                                             <div style={{ fontSize: 10, color: C.accent, fontWeight: 700 }}>{o.orderNumber}</div>
                                             <div className="u-section-title">{o.name}</div>
-                                            <div className="u-fs-11" style={{ color: C.textMuted }}>🏢 {o.client || '—'}</div>
+                                            <div className="u-fs-11" className="u-text-muted">🏢 {o.client || '—'}</div>
                                         </div>
                                         <div className="u-flex-gap-4">
                                             <button onClick={() => setDetailId(o.id)} style={styles.btnSmall}>Detalji</button>
                                             {canManage && <button onClick={() => unarchiveOrder(o)} style={styles.btnSmall}>↩️</button>}
                                         </div>
                                     </div>
-                                    <div className="u-fs-12" style={{ color: C.textMuted }}>💰 {(o.totalCost || 0).toFixed(2)}€ • 📅 {fmtDate(o.deadline)}</div>
+                                    <div className="u-fs-12" className="u-text-muted">💰 {(o.totalCost || 0).toFixed(2)}€ • 📅 {fmtDate(o.deadline)}</div>
                                 </div>
                             ))}
                         </div>
@@ -425,7 +425,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                                 onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}>
                                 <div style={{ fontSize: 32, marginBottom: 8 }}>{tpl.name.split(' ')[0]}</div>
                                 <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 4 }}>{tpl.name.replace(/^[^\s]+\s/, '')}</div>
-                                <div className="u-fs-11" style={{ color: C.textMuted }}>{tpl.desc}</div>
+                                <div className="u-fs-11" className="u-text-muted">{tpl.desc}</div>
                                 {tpl.specDefaults?.materials?.length > 0 && (
                                     <div style={{ marginTop: 8, fontSize: 10, color: C.accent, fontWeight: 600 }}>{tpl.specDefaults.materials.length} materijala • {tpl.specDefaults.dimensions?.length || 0} dimenzija</div>
                                 )}

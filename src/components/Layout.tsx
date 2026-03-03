@@ -464,7 +464,7 @@ export function Layout() {
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
                                 <div style={{ fontSize: 13, fontWeight: 700, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{currentUser?.name}</div>
-                                <div className="u-fs-11" style={{ color: C.textMuted }}>{isAdmin ? 'Administrator' : isLeader ? 'Voditelj' : 'Radnik'}</div>
+                                <div className="u-fs-11" className="u-text-muted">{isAdmin ? 'Administrator' : isLeader ? 'Voditelj' : 'Radnik'}</div>
                             </div>
                             <button onClick={handleLogout} title="Odjava" style={{ background: 'none', border: 'none', color: C.textMuted, cursor: 'pointer', padding: 4 }}>
                                 <Icon name="logout" size={16} />
@@ -493,7 +493,7 @@ export function Layout() {
                         <span style={{ fontWeight: 600, color: C.text }}>{navItems.find(n => n.id === page)?.label || page}</span>
                         {pageHistory.length > 2 && (
                             <span style={{ marginLeft: 'auto', display: 'flex', gap: 4, alignItems: 'center' }}>
-                                <span style={{ fontSize: 10, color: C.textMuted }}>Nedavno:</span>
+                                <span className="u-stat-label">Nedavno:</span>
                                 {pageHistory.slice(1, 4).map(p => {
                                     const item = navItems.find(n => n.id === p);
                                     return item ? <button key={p} onClick={() => navigate(p)} style={{ background: C.accentLight, border: 'none', borderRadius: 6, padding: '2px 8px', fontSize: 10, fontWeight: 600, color: C.accent, cursor: 'pointer' }}>{item.label}</button> : null;

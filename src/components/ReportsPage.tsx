@@ -211,7 +211,7 @@ const StatCard = ({ label, value, color, sub }) => (
     <div style={styles.card} className="u-text-center">
         <div className="u-stat-label">{label}</div>
         <div style={{ fontSize: 26, fontWeight: 800, color: color || C.accent }}>{value}</div>
-        {sub && <div className="u-fs-11" style={{ color: C.textMuted }}>{sub}</div>}
+        {sub && <div className="u-fs-11" className="u-text-muted">{sub}</div>}
     </div>
 );
 
@@ -219,7 +219,7 @@ return (
     <div>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
-            <div className="u-fs-24 u-fw-800" style={{ color: C.text }}> Izvještaji</div>
+            <div className="u-fs-24 u-fw-800" className="u-color-text"> Izvještaji</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
                 <button onClick={exportCSV} style={styles.btnSecondary}><Icon name="download" size={14} /> CSV</button>
                 <button onClick={exportPDF} style={styles.btn}><Icon name="file" size={14} /> PDF</button>
@@ -229,7 +229,7 @@ return (
         {/* Filters */}
         <div style={{ ...styles.card, marginBottom: 20, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
             <Input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} style={{ width: 140 }} />
-            <span style={{ color: C.textMuted }}>—</span>
+            <span className="u-text-muted">—</span>
             <Input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} style={{ width: 140 }} />
             <Select value={filterWorker} onChange={e => setFilterWorker(e.target.value)} style={{ width: 160 }}>
                 <option value="sve">Svi radnici</option>
@@ -275,7 +275,7 @@ return (
                 <div style={styles.card}>
                     <div className="u-card-header">
                         <div className="u-section-title">Detaljna tablica po radnicima</div>
-                        <div className="u-fs-12" style={{ color: C.textMuted }}>{hoursByWorker.length} radnika | {filterWorker !== 'sve' ? workers.find(w => w.id === filterWorker)?.name : 'Svi'}{filterProject !== 'sve' ? ` • ${projects.find(p => p.id === filterProject)?.name}` : ''}</div>
+                        <div className="u-fs-12" className="u-text-muted">{hoursByWorker.length} radnika | {filterWorker !== 'sve' ? workers.find(w => w.id === filterWorker)?.name : 'Svi'}{filterProject !== 'sve' ? ` • ${projects.find(p => p.id === filterProject)?.name}` : ''}</div>
                     </div>
                     <div className="u-overflow-x"><table aria-label="Podaci" style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}><thead><tr><th style={styles.th}>Radnik</th><th style={styles.th}>Sati</th><th style={styles.th}>Normalan</th><th style={styles.th}>Prekovrm.</th><th style={styles.th}>Noćni</th><th style={styles.th}>Vikend</th><th style={styles.th}>Unosa</th><th style={styles.th}>Prosj/dan</th></tr></thead><tbody>
                         {hoursByWorker.map(w => <tr key={w.name}><td style={{ ...styles.td, fontWeight: 600 }}>{w.name}</td><td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{w.sati}h</td><td style={styles.td}>{w.normalan}h</td><td style={styles.td}>{w.prekovremeni}h</td><td style={styles.td}>{w.nocni}h</td><td style={styles.td}>{w.vikend}h</td><td style={styles.td}>{w.unosa}</td><td style={styles.td}>{w.unosa > 0 ? (w.sati / w.unosa).toFixed(1) : 0}h</td></tr>)}
@@ -297,7 +297,7 @@ return (
                 <div style={styles.card}>
                     <div className="u-card-header">
                         <div className="u-section-title">Projekti - detalji</div>
-                        <div className="u-fs-12" style={{ color: C.textMuted }}>{hoursByProject.length} projekata | {filterProject !== 'sve' ? projects.find(p => p.id === filterProject)?.name : 'Svi'}{filterWorker !== 'sve' ? ` • ${workers.find(w => w.id === filterWorker)?.name}` : ''}</div>
+                        <div className="u-fs-12" className="u-text-muted">{hoursByProject.length} projekata | {filterProject !== 'sve' ? projects.find(p => p.id === filterProject)?.name : 'Svi'}{filterWorker !== 'sve' ? ` • ${workers.find(w => w.id === filterWorker)?.name}` : ''}</div>
                     </div>
                     <div className="u-overflow-x"><table aria-label="Podaci" style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}><thead><tr><th style={styles.th}>Projekt</th><th style={styles.th}>Sati</th><th style={styles.th}>Radnika</th><th style={styles.th}>Troškovi</th><th style={styles.th}>Status</th><th style={styles.th}>% vremena</th></tr></thead><tbody>
                         {hoursByProject.map(p => {
@@ -472,9 +472,9 @@ return (
                     <StatCard label="Prosj. iznos" value={`${otpStats.avgAmount}€`} color="#6366F1" />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: 16, marginBottom: 20 }}>
-                    {otpStats.statusChart?.length > 0 && <div style={styles.card}><div className="u-section-title" className="u-fs-13 u-mb-12" style={{ marginBottom: 10 }}>Status otpremnica</div><SvgDonutChart data={otpStats.statusChart} height={160} /></div>}
-                    {otpStats.projectChart?.length > 0 && <div style={styles.card}><div className="u-section-title" className="u-fs-13 u-mb-12" style={{ marginBottom: 10 }}>Po projektu (iznos)</div><SvgHBarChart data={otpStats.projectChart} dataKey="iznos" height={180} /></div>}
-                    {otpStats.supplierChart?.length > 0 && <div style={styles.card}><div className="u-section-title" className="u-fs-13 u-mb-12" style={{ marginBottom: 10 }}>Po dobavljaču</div><SvgHBarChart data={otpStats.supplierChart} dataKey="iznos" color="#10B981" height={180} /></div>}
+                    {otpStats.statusChart?.length > 0 && <div style={styles.card}><div className="u-section-title" className="u-fs-13 u-mb-12" className="u-mb-12" style={{ marginBottom: 10 }}>Status otpremnica</div><SvgDonutChart data={otpStats.statusChart} height={160} /></div>}
+                    {otpStats.projectChart?.length > 0 && <div style={styles.card}><div className="u-section-title" className="u-fs-13 u-mb-12" className="u-mb-12" style={{ marginBottom: 10 }}>Po projektu (iznos)</div><SvgHBarChart data={otpStats.projectChart} dataKey="iznos" height={180} /></div>}
+                    {otpStats.supplierChart?.length > 0 && <div style={styles.card}><div className="u-section-title" className="u-fs-13 u-mb-12" className="u-mb-12" style={{ marginBottom: 10 }}>Po dobavljaču</div><SvgHBarChart data={otpStats.supplierChart} dataKey="iznos" color="#10B981" height={180} /></div>}
                 </div>
                 <div style={styles.card}>
                     <div className="u-section-title u-mb-16">📦 Sve otpremnice u periodu ({otpremnicePeriod.length})</div>

@@ -71,7 +71,7 @@ export function ObavezePage({ workerFilterId }) {
     return (
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
-                <div className="u-fs-22 u-fw-800" style={{ color: C.text }}>{isWorker ? 'Moje obaveze' : 'Obaveze'}</div>
+                <div className="u-fs-22 u-fw-800" className="u-color-text">{isWorker ? 'Moje obaveze' : 'Obaveze'}</div>
                 {!isWorker && <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> Nova obaveza</button>}
             </div>
             <div style={{ position: 'relative', marginBottom: 20 }}><Input placeholder="Traži..." value={search} onChange={e => setSearch(e.target.value)} className="u-pl-36" /><div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: C.textMuted }}><Icon name="search" size={16} /></div></div>
@@ -123,9 +123,9 @@ export function ObavezePage({ workerFilterId }) {
                                                 <span style={{ color: comp ? C.green : C.textDim, fontWeight: comp ? 600 : 400 }}>{w.name}</span>
                                             </div>
                                             {comp && <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                                <span className="u-fs-11" style={{ color: C.textMuted }}>{fmtDateTime(comp.completedAt)}</span>
+                                                <span className="u-fs-11" className="u-text-muted">{fmtDateTime(comp.completedAt)}</span>
                                                 {!isWorker && !comp.adminSeen && <button onClick={() => markAdminSeen(o.id, w.id)} style={{ ...styles.btnSmall, fontSize: 10, padding: '3px 8px' }}>Viđeno</button>}
-                                                {!isWorker && comp.adminSeen && <span style={{ fontSize: 10, color: C.textMuted }}>✓ viđeno</span>}
+                                                {!isWorker && comp.adminSeen && <span className="u-stat-label">✓ viđeno</span>}
                                             </div>}
                                         </div>
                                     );

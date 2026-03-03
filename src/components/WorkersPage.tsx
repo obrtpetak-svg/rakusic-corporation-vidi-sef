@@ -160,7 +160,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
                         <div style={{ width: 56, height: 56, borderRadius: '50%', background: C.accentLight, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.accent, fontWeight: 800, fontSize: 22 }}>{detailWorker.name?.charAt(0)}</div>
                         <div>
-                            <div className="u-fs-22 u-fw-800" style={{ color: C.text }}>{detailWorker.name}</div>
+                            <div className="u-fs-22 u-fw-800" className="u-color-text">{detailWorker.name}</div>
                             <div style={{ color: C.textMuted, fontSize: 13 }}>{detailWorker.position || 'Radnik'} • {detailWorker.active !== false ? '🟢 Aktivan' : '🔴 Neaktivan'}</div>
                         </div>
                     </div>
@@ -225,7 +225,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
     return (
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
-                <div className="u-fs-22 u-fw-800" style={{ color: C.text }}>Radnici</div>
+                <div className="u-fs-22 u-fw-800" className="u-color-text">Radnici</div>
                 <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> Novi radnik</button>
             </div>
             <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
@@ -250,7 +250,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                                 <div style={{ width: 44, height: 44, borderRadius: '50%', background: w.active !== false ? C.accentLight : 'rgba(100,116,139,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 800, color: w.active !== false ? C.accent : C.textMuted, flexShrink: 0 }}>{w.name?.charAt(0)}</div>
                                 <div style={{ flex: 1, minWidth: 0 }}>
                                     <div style={{ fontSize: 14, fontWeight: 700, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{w.name}</div>
-                                    <div className="u-fs-12" style={{ color: C.textMuted }}>{w.position || 'Radnik'}{w.phone ? ` • ${w.phone}` : ''}</div>
+                                    <div className="u-fs-12" className="u-text-muted">{w.position || 'Radnik'}{w.phone ? ` • ${w.phone}` : ''}</div>
                                 </div>
                             </div>
                             <div style={{ display: 'flex', gap: 12, fontSize: 12, color: C.textMuted, marginBottom: 12 }}>
@@ -318,7 +318,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                                                 </button>
                                             );
                                         })}
-                                        {projects.length === 0 && <div className="u-fs-12" style={{ color: C.textMuted }}>Nema projekata</div>}
+                                        {projects.length === 0 && <div className="u-fs-12" className="u-text-muted">Nema projekata</div>}
                                     </div>
                                 </Field>
                             </div>

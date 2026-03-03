@@ -90,7 +90,7 @@ export const SvgDonutChart = ({ data = [], height = 200 }) => {
                 <text x={cx} y={cy + 12} textAnchor="middle" fontSize="10" fill="var(--text-muted)">UKUPNO</text>
             </svg>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {slices.map((s, i) => (<div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}><div style={{ width: 12, height: 12, borderRadius: 3, background: s.color || '#F97316', flexShrink: 0 }} /><span style={{ color: C.textMuted }}>{s.name}</span><span style={{ color: C.text, fontWeight: 700, marginLeft: 4 }}>{s.value}</span></div>))}
+                {slices.map((s, i) => (<div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}><div style={{ width: 12, height: 12, borderRadius: 3, background: s.color || '#F97316', flexShrink: 0 }} /><span className="u-text-muted">{s.name}</span><span style={{ color: C.text, fontWeight: 700, marginLeft: 4 }}>{s.value}</span></div>))}
             </div>
         </div>
     );

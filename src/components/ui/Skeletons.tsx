@@ -23,7 +23,7 @@ export const SkeletonLine = ({ width = '100%', height = 14, style: sx = {} }) =>
 export const SkeletonCard = ({ lines = 3, style: sx = {} }) => (
     <div style={{ ...styles.card, ...sx }}>
         <SkeletonLine width="40%" height={18} className="u-mb-16" />
-        {Array.from({ length: lines }).map((_, i) => <SkeletonLine key={i} width={`${85 - i * 15}%`} style={{ marginBottom: 10 }} />)}
+        {Array.from({ length: lines }).map((_, i) => <SkeletonLine key={i} width={`${85 - i * 15}%`} className="u-mb-12" style={{ marginBottom: 10 }} />)}
     </div>
 );
 

@@ -70,7 +70,7 @@ export function PwaInstallBanner() {
                 <img src="/icon-192.png" alt="" style={{ width: 44, height: 44, borderRadius: 10, flexShrink: 0 }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 2 }}>Instaliraj RAKUŠIĆ corporation</div>
-                    <div className="u-fs-12" style={{ color: C.textMuted }}>
+                    <div className="u-fs-12" className="u-text-muted">
                         {isIos ? 'Operativni centar upravljanja — dodajte na početni ekran' : 'Operativni centar upravljanja — brži pristup i offline rad'}
                     </div>
                 </div>

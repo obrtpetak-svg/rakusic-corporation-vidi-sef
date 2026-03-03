@@ -2236,6 +2236,10 @@ a,
   flex: 1;
 }
 
+.u-color-text {
+  color: var(--text);
+}
+
 .u-relative {
   position: relative;
 }

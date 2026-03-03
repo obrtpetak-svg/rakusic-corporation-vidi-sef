@@ -178,7 +178,7 @@ export default function GpsSettingsTab({
                 }}>
                     <div>
                         <div style={{ fontWeight: 700, fontSize: 15, color: C.text }}>📡 GPS praćenje</div>
-                        <div className="u-fs-12" style={{ color: C.textMuted }}>Uključi/isključi GPS modul</div>
+                        <div className="u-fs-12" className="u-text-muted">Uključi/isključi GPS modul</div>
                     </div>
                     <ToggleSwitch value={form.enabled} onChange={v => updateField('enabled', v)} />
                 </div>
@@ -207,7 +207,7 @@ export default function GpsSettingsTab({
                                         />
                                         <div>
                                             <div style={{ fontWeight: 600, fontSize: 14, color: C.text }}>{mode.label}</div>
-                                            <div className="u-fs-12" style={{ color: C.textMuted }}>{mode.desc}</div>
+                                            <div className="u-fs-12" className="u-text-muted">{mode.desc}</div>
                                         </div>
                                     </label>
                                 ))}

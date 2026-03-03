@@ -308,9 +308,9 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                         <span style={{ fontSize: 20 }}>⚠️</span>
                         <div className="u-flex-1">
                             <div style={{ fontSize: 13, fontWeight: 700, color: C.red }}>{alerts.length} vremensko upozorenje{alerts.length !== 1 ? 'a' : ''}</div>
-                            <div className="u-fs-12" style={{ color: C.textMuted }}>{alerts[0].issues[0]} — klikni za detalje</div>
+                            <div className="u-fs-12" className="u-text-muted">{alerts[0].issues[0]} — klikni za detalje</div>
                         </div>
-                        <span className="u-fs-11" style={{ color: C.textMuted }}>▶</span>
+                        <span className="u-fs-11" className="u-text-muted">▶</span>
                     </div>
                 </div>
             )}
@@ -396,7 +396,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                                             <div key={i} style={{ textAlign: 'center', padding: '4px 6px', borderRadius: 8, minWidth: 40, background: i === 0 ? 'rgba(249,115,22,0.06)' : 'transparent' }}>
                                                 <div style={{ fontSize: 9, color: C.textMuted, fontWeight: 600 }}>{d.label}</div>
                                                 <div style={{ fontSize: 16, margin: '2px 0' }}>{getWmo(d.code).i}</div>
-                                                <div style={{ fontSize: 10 }}><span style={{ fontWeight: 700, color: '#F97316' }}>{Math.round(d.max)}°</span><span style={{ color: C.textMuted }}>/</span><span style={{ color: '#3B82F6' }}>{Math.round(d.min)}°</span></div>
+                                                <div style={{ fontSize: 10 }}><span style={{ fontWeight: 700, color: '#F97316' }}>{Math.round(d.max)}°</span><span className="u-text-muted">/</span><span style={{ color: '#3B82F6' }}>{Math.round(d.min)}°</span></div>
                                             </div>
                                         ))}
                                     </div>
@@ -406,7 +406,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                                             {todayScore.issues[0]}
                                         </div>
                                     )}
-                                    <div style={{ textAlign: 'center', marginTop: 4 }}><span style={{ fontSize: 10, color: C.textMuted }}>{isExp ? '▲' : '▼'}</span></div>
+                                    <div style={{ textAlign: 'center', marginTop: 4 }}><span className="u-stat-label">{isExp ? '▲' : '▼'}</span></div>
                                 </div>
                                 {/* Expanded */}
                                 {isExp && daily.length > 0 && (
@@ -492,7 +492,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                                         <tr key={p.id} style={{ borderBottom: `1px solid ${C.border}7A` }}>
                                             <td style={{ padding: '10px 8px' }}>
                                                 <div style={{ fontSize: 12, fontWeight: 700, color: C.text }}>{p.name}</div>
-                                                <div style={{ fontSize: 10, color: C.textMuted }}>📍 {p.location || '—'}</div>
+                                                <div className="u-stat-label">📍 {p.location || '—'}</div>
                                             </td>
                                             {[...Array(7)].map((_, i) => {
                                                 const d = daily[i];
@@ -504,7 +504,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                                                         <div style={{ fontSize: 18 }}>{getWmo(d.code).i}</div>
                                                         <div style={{ fontSize: 10, fontWeight: 700 }}>
                                                             <span style={{ color: '#F97316' }}>{Math.round(d.max)}°</span>
-                                                            <span style={{ color: C.textMuted }}>/</span>
+                                                            <span className="u-text-muted">/</span>
                                                             <span style={{ color: '#3B82F6' }}>{Math.round(d.min)}°</span>
                                                         </div>
                                                         {d.precip > 0.5 && <div style={{ fontSize: 9, color: '#3B82F6' }}>💧{d.precip.toFixed(1)}</div>}
@@ -541,7 +541,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                                         <div>
                                             <div className="u-section-title">{a.project.name}</div>
-                                            <div className="u-fs-11" style={{ color: C.textMuted }}>{a.daysAhead === 1 ? '⏰ Sutra' : '📅 Za 2 dana'} — {a.day.label}</div>
+                                            <div className="u-fs-11" className="u-text-muted">{a.daysAhead === 1 ? '⏰ Sutra' : '📅 Za 2 dana'} — {a.day.label}</div>
                                         </div>
                                         <ScoreRing score={a.score} size={52} />
                                     </div>
@@ -568,7 +568,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                     <div className="u-flex-between u-mb-16">
                         <div>
                             <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>⚙️ Pravila upozorenja</div>
-                            <div className="u-fs-12" style={{ color: C.textMuted }}>Definirajte pragove za svaki projekt i tip radova</div>
+                            <div className="u-fs-12" className="u-text-muted">Definirajte pragove za svaki projekt i tip radova</div>
                         </div>
                         <button onClick={() => { setRuleForm({ projectId: '', activities: [], customThresholds: {} }); setShowRuleModal(true); }} style={styles.btn}>
                             <Icon name="plus" size={14} /> Novo pravilo
@@ -581,7 +581,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                         if (!pRules.length) return null;
                         return (
                             <div key={p.id} style={{ ...styles.card, marginBottom: 12 }}>
-                                <div className="u-section-title" className="u-fs-13 u-mb-12" style={{ marginBottom: 10 }}>{p.name} <span className="u-fs-11" style={{ color: C.textMuted }}>— {pRules.length} pravilo{pRules.length !== 1 ? 'a' : ''}</span></div>
+                                <div className="u-section-title" className="u-fs-13 u-mb-12" className="u-mb-12" style={{ marginBottom: 10 }}>{p.name} <span className="u-fs-11" className="u-text-muted">— {pRules.length} pravilo{pRules.length !== 1 ? 'a' : ''}</span></div>
                                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill,minmax(220px,1fr))', gap: 8 }}>
                                     {pRules.map(r => {
                                         const preset = ACTIVITY_PRESETS[r.activity];
@@ -654,11 +654,11 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                                     <div key={act} style={{ padding: '10px 12px', borderRadius: 8, background: C.bgElevated, marginTop: 8 }}>
                                         <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 6 }}>{preset.label}</div>
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
-                                            <div><label style={{ fontSize: 10, color: C.textMuted }}>Min temp (°C)</label>
+                                            <div><label className="u-stat-label">Min temp (°C)</label>
                                                 <Input type="number" placeholder={String(preset.minTemp)} value={custom.minTemp ?? ''} onChange={e => setCustom('minTemp', e.target.value)} /></div>
-                                            <div><label style={{ fontSize: 10, color: C.textMuted }}>Max kiša (mm)</label>
+                                            <div><label className="u-stat-label">Max kiša (mm)</label>
                                                 <Input type="number" placeholder={String(preset.maxRain)} value={custom.maxRain ?? ''} onChange={e => setCustom('maxRain', e.target.value)} /></div>
-                                            <div><label style={{ fontSize: 10, color: C.textMuted }}>Max vjetar (km/h)</label>
+                                            <div><label className="u-stat-label">Max vjetar (km/h)</label>
                                                 <Input type="number" placeholder={String(preset.maxWind)} value={custom.maxWind ?? ''} onChange={e => setCustom('maxWind', e.target.value)} /></div>
                                         </div>
                                     </div>

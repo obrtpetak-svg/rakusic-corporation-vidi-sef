@@ -295,7 +295,7 @@ export const SvgDonutChart = ({ data = [], height = 200 }) => {
                 {slices.map((s, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
                         <div style={{ width: 12, height: 12, borderRadius: 3, background: s.color || '#F97316', flexShrink: 0 }} />
-                        <span style={{ color: C.textMuted }}>{s.name}</span>
+                        <span className="u-text-muted">{s.name}</span>
                         <span style={{ color: C.text, fontWeight: 700, marginLeft: 4 }}>{s.value}</span>
                     </div>
                 ))}
@@ -353,8 +353,8 @@ export const Pagination = ({ currentPage, totalPages, pageSize, setCurrentPage, 
 
     return (
         <nav aria-label="Straničenje" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderTop: `1px solid ${C.border}`, flexWrap: 'wrap', gap: 8 }}>
-            <div className="u-fs-12" style={{ color: C.textMuted }}>
-                Prikazano <b style={{ color: C.text }}>{showingFrom}–{showingTo}</b> od <b style={{ color: C.text }}>{totalItems}</b> {label}
+            <div className="u-fs-12" className="u-text-muted">
+                Prikazano <b className="u-color-text">{showingFrom}–{showingTo}</b> od <b className="u-color-text">{totalItems}</b> {label}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <button onClick={() => setCurrentPage(1)} disabled={currentPage <= 1} style={currentPage <= 1 ? btnDisabled : btnBase} title="Prva">«</button>

@@ -160,7 +160,7 @@ export function InvoicesPage({ workerFilterId }) {
             {!isWorker && invoices.filter(i => i.status === 'na čekanju' && i.source === 'radnik').length > 0 && (
                 <div style={{ ...styles.card, background: 'rgba(234,179,8,0.08)', borderColor: 'rgba(234,179,8,0.3)', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12 }}>
                     <span style={{ fontSize: 24 }}>📋</span>
-                    <div><div style={{ fontWeight: 700, color: C.yellow, fontSize: 14 }}>{invoices.filter(i => i.status === 'na čekanju' && i.source === 'radnik').length} računa čeka odobrenje</div><div className="u-fs-12" style={{ color: C.textMuted }}>Računi poslani od radnika</div></div>
+                    <div><div style={{ fontWeight: 700, color: C.yellow, fontSize: 14 }}>{invoices.filter(i => i.status === 'na čekanju' && i.source === 'radnik').length} računa čeka odobrenje</div><div className="u-fs-12" className="u-text-muted">Računi poslani od radnika</div></div>
                 </div>
             )}
 

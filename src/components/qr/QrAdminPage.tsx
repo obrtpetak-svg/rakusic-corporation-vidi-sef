@@ -168,7 +168,7 @@ export function QrAdminPage() {
                                 <div style={{ padding: '14px 16px', borderRadius: 10, background: 'rgba(217,93,8,0.06)', border: '1px solid rgba(217,93,8,0.15)', marginBottom: 16 }}>
                                     <div style={{ fontSize: 16, fontWeight: 700, color: C.text }}>{project.name}</div>
                                     {project.location && <div style={{ fontSize: 12, color: C.textMuted, marginTop: 4 }}>📍 {project.location}</div>}
-                                    {project.client && <div className="u-fs-12" style={{ color: C.textMuted, marginTop: 2 }}>🏢 {project.client}</div>}
+                                    {project.client && <div className="u-fs-12" className="u-text-muted" style={{ marginTop: 2 }}>🏢 {project.client}</div>}
                                     <div style={{ fontSize: 11, color: C.accent, marginTop: 6, fontFamily: 'monospace' }}>VIDISEF:{project.id}</div>
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -189,9 +189,9 @@ export function QrAdminPage() {
                                         <div style={{ marginTop: 16, padding: '12px 16px', borderRadius: 10, background: C.bgElevated, border: `1px solid ${C.border}` }}>
                                             <div style={{ fontSize: 11, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>QR statistika za ovaj projekt</div>
                                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, textAlign: 'center' }}>
-                                                <div><div style={{ fontSize: 18, fontWeight: 800, color: C.accent }}>{pToday.length}</div><div style={{ fontSize: 10, color: C.textMuted }}>Danas</div></div>
-                                                <div><div style={{ fontSize: 18, fontWeight: 800, color: C.blue }}>{pQr.length}</div><div style={{ fontSize: 10, color: C.textMuted }}>Ukupno</div></div>
-                                                <div><div style={{ fontSize: 18, fontWeight: 800, color: '#7C3AED' }}>{new Set(pQr.map((t: any) => t.workerId)).size}</div><div style={{ fontSize: 10, color: C.textMuted }}>Radnika</div></div>
+                                                <div><div style={{ fontSize: 18, fontWeight: 800, color: C.accent }}>{pToday.length}</div><div className="u-stat-label">Danas</div></div>
+                                                <div><div style={{ fontSize: 18, fontWeight: 800, color: C.blue }}>{pQr.length}</div><div className="u-stat-label">Ukupno</div></div>
+                                                <div><div style={{ fontSize: 18, fontWeight: 800, color: '#7C3AED' }}>{new Set(pQr.map((t: any) => t.workerId)).size}</div><div className="u-stat-label">Radnika</div></div>
                                             </div>
                                         </div>
                                     ) : null;
@@ -202,7 +202,7 @@ export function QrAdminPage() {
                         {!project && (
                             <div style={{ textAlign: 'center', padding: '40px 20px', color: C.textMuted }}>
                                 <div style={{ fontSize: 48, marginBottom: 12, opacity: 0.3 }}>📷</div>
-                                <div style={{ fontSize: 14, fontWeight: 600 }}>Odaberi projekt za generiranje QR koda</div>
+                                <div className="u-fw-600" style={{ fontSize: 14 }}>Odaberi projekt za generiranje QR koda</div>
                                 <div style={{ fontSize: 12, marginTop: 4 }}>QR kod služi za brzi check-in radnika na gradilištu</div>
                             </div>
                         )}
@@ -311,7 +311,7 @@ export function QrAdminPage() {
                             <div key={p.id} style={{ textAlign: 'center', padding: 12, borderRadius: 10, background: C.bgElevated, border: `1px solid ${C.border}` }}>
                                 <BatchQrPreview project={p} />
                                 <div style={{ fontSize: 12, fontWeight: 600, color: C.text, marginTop: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
-                                {p.location && <div style={{ fontSize: 10, color: C.textMuted }}>{p.location}</div>}
+                                {p.location && <div className="u-stat-label">{p.location}</div>}
                             </div>
                         ))}
                     </div>

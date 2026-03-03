@@ -334,7 +334,7 @@ export default function GpsPlaybackTab({
                                 <div style={{ fontSize: 24 }}>{currentMeta.icon}</div>
                                 <div className="u-flex-1">
                                     <div style={{ fontWeight: 700, fontSize: 13, color: C.text }}>{currentMeta.label}</div>
-                                    <div className="u-fs-12" style={{ color: C.textMuted }}>
+                                    <div className="u-fs-12" className="u-text-muted">
                                         {currentEvent.timestamp ? new Date(currentEvent.timestamp).toLocaleTimeString('hr', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : ''}
                                         {currentEvent.accuracy ? ` • ±${currentEvent.accuracy}m` : ''}
                                         {currentEvent.distanceFromSite != null ? ` • ${formatDistance(currentEvent.distanceFromSite)} od gradilišta` : ''}

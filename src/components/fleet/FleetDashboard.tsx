@@ -188,7 +188,7 @@ export default function FleetDashboard() {
                         <div style={{ fontSize: 13, fontWeight: 700, color: cacheDoc.providerStatus === 'ERROR' ? C.red : '#F59E0B' }}>
                             {cacheDoc.providerStatus === 'ERROR' ? 'GPS sustav nedostupan' : `GPS podaci stari ${staleAge}s`}
                         </div>
-                        <div className="u-fs-11" style={{ color: C.textMuted }}>
+                        <div className="u-fs-11" className="u-text-muted">
                             {cacheDoc.providerStatus === 'FALLBACK' ? 'Koristi se polling fallback' : 'Prikazuju se zadnji poznati podaci'}
                             {cacheDoc.dataSource === 'mock' && ' · Demo podaci'}
                         </div>
@@ -216,7 +216,7 @@ export default function FleetDashboard() {
                             {cacheDoc.dataSource !== 'mock' ? 'LIVE' : 'OFFLINE'}
                         </span>
                     </div>
-                    <div className="u-fs-12" style={{ color: C.textMuted, marginTop: 2 }}>
+                    <div className="u-fs-12" className="u-text-muted" style={{ marginTop: 2 }}>
                         Mapon FMLC · {stats.total} vozila · Ažurirano: {new Date(cacheDoc.updatedAt).toLocaleTimeString('hr')}
                     </div>
                 </div>

@@ -107,7 +107,7 @@ export function LeaveTracker() {
     return (
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
-                <div className="u-fs-22 u-fw-800" style={{ color: C.text }}>🏖️ Godišnji odmori & odsutnosti</div>
+                <div className="u-fs-22 u-fw-800" className="u-color-text">🏖️ Godišnji odmori & odsutnosti</div>
                 <button onClick={() => setShowAdd(true)} style={styles.btn}><Icon name="plus" size={16} /> Novi zahtjev</button>
             </div>
 
@@ -133,7 +133,7 @@ export function LeaveTracker() {
                             <div style={{ fontSize: 24, marginBottom: 4 }}>{lt.emoji}</div>
                             <div style={{ fontSize: 22, fontWeight: 800, color: lt.color }}>{totalDays}</div>
                             <div style={{ fontSize: 10, color: C.textMuted, textTransform: 'uppercase' }}>{lt.label}</div>
-                            {lt.maxDays && <div style={{ fontSize: 10, color: C.textMuted }}>max {lt.maxDays} dana</div>}
+                            {lt.maxDays && <div className="u-stat-label">max {lt.maxDays} dana</div>}
                         </div>
                     );
                 })}

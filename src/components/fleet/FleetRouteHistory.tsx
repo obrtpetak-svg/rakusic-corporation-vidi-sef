@@ -269,7 +269,7 @@ export default function FleetRouteHistory({ vehicles }: { vehicles: FleetVehicle
                 <div style={{ background: 'var(--card)', border: `1px solid ${C.border}`, borderRadius: 14, padding: 60, textAlign: 'center' }}>
                     <div style={{ fontSize: 48, marginBottom: 12 }}>📍</div>
                     <div style={{ fontSize: 16, fontWeight: 700, color: C.text, marginBottom: 6 }}>Odaberite vozilo i period</div>
-                    <div className="u-fs-13" style={{ color: C.textMuted }}>Povijest ruta s replay animacijom, brzinom na karti i PDF izvozom</div>
+                    <div className="u-fs-13" className="u-text-muted">Povijest ruta s replay animacijom, brzinom na karti i PDF izvozom</div>
                 </div>
             )}
         </div>
@@ -285,7 +285,7 @@ function MiniStat({ label, value, unit, color }: { label: string; value: string;
     return (
         <div style={{ background: 'var(--card)', border: `1px solid ${C.border}`, borderRadius: 12, padding: 14, textAlign: 'center' }}>
             <div style={{ fontSize: 20, fontWeight: 800, color }}>{value}</div>
-            <div style={{ fontSize: 10, color: C.textMuted }}>{unit} {label}</div>
+            <div className="u-stat-label">{unit} {label}</div>
         </div>
     );
 }

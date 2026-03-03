@@ -175,7 +175,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                 <div style={{ ...styles.card, marginBottom: 20 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
                         <div>
-                            <div className="u-fs-22 u-fw-800" style={{ color: C.text }}>{detailProject.name}</div>
+                            <div className="u-fs-22 u-fw-800" className="u-color-text">{detailProject.name}</div>
                             <div style={{ color: C.textMuted, fontSize: 13, marginTop: 4 }}>{detailProject.location && `📍 ${detailProject.location}`} {detailProject.siteLat && <span style={{ fontSize: 10, color: '#10B981', fontWeight: 700 }}>({Number(detailProject.siteLat).toFixed(3)}°N, {Number(detailProject.siteLng).toFixed(3)}°E)</span>} {detailProject.client && `• 🏢 ${detailProject.client}`}</div>
                         </div>
                         <StatusBadge status={detailProject.status} />
@@ -250,7 +250,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                                     )}
                                     <div style={{ padding: '8px 12px' }}>
                                         <div style={{ fontSize: 12, fontWeight: 600, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.name}</div>
-                                        <div style={{ fontSize: 10, color: C.textMuted }}>Uploaded: {f.uploadedBy || '—'}</div>
+                                        <div className="u-stat-label">Uploaded: {f.uploadedBy || '—'}</div>
                                     </div>
                                 </div>
                             ))}
@@ -272,7 +272,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                                         <div style={{ width: 36, height: 36, borderRadius: '50%', background: C.accentLight, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.accent, fontWeight: 800, fontSize: 14, flexShrink: 0 }}>{w.name?.charAt(0)}</div>
                                         <div className="u-flex-1">
                                             <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{w.name} {isLeader && <span style={{ fontSize: 10, color: C.blue }}>👷 Voditelj</span>} {isEngineer && <span style={{ fontSize: 10, color: C.green }}> Inženjer</span>}</div>
-                                            <div className="u-fs-11" style={{ color: C.textMuted }}>{w.position || 'Radnik'} • {Math.round(wHours / 60)}h</div>
+                                            <div className="u-fs-11" className="u-text-muted">{w.position || 'Radnik'} • {Math.round(wHours / 60)}h</div>
                                         </div>
                                         {onNavigate && <div style={{ fontSize: 11, color: C.accent, fontWeight: 600 }}>Otvori →</div>}
                                     </div>
@@ -321,7 +321,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                                         </button>
                                         <div className="u-flex-1">
                                             <div style={{ fontWeight: 600, fontSize: 13, color: ob.active ? C.text : C.textMuted, textDecoration: ob.active ? 'none' : 'line-through' }}>{ob.title}</div>
-                                            {ob.description && <div className="u-fs-12" style={{ color: C.textMuted, marginTop: 2 }}>{ob.description}</div>}
+                                            {ob.description && <div className="u-fs-12" className="u-text-muted" style={{ marginTop: 2 }}>{ob.description}</div>}
                                             <div style={{ display: 'flex', gap: 8, marginTop: 4, fontSize: 11, color: C.textMuted, flexWrap: 'wrap' }}>
                                                 {ob.dueDate && <span style={{ color: isOverdue ? C.red : C.textMuted }}>📅 {fmtDate(ob.dueDate)}{isOverdue ? ' ⚠️' : ''}</span>}
                                                 {ob.priority === 'hitno' && <span style={{ color: C.red, fontWeight: 700 }}>🔴 HITNO</span>}
@@ -364,7 +364,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                                         <div style={{ fontWeight: 600, fontSize: 14, color: ph.status === 'done' ? C.textMuted : C.text, textDecoration: ph.status === 'done' ? 'line-through' : 'none' }}>
                                             <span style={{ fontSize: 12, fontWeight: 700, color: C.accent, marginRight: 6 }}>{i + 1}.</span>{ph.name}
                                         </div>
-                                        {ph.description && <div className="u-fs-12" style={{ color: C.textMuted, marginTop: 2 }}>{ph.description}</div>}
+                                        {ph.description && <div className="u-fs-12" className="u-text-muted" style={{ marginTop: 2 }}>{ph.description}</div>}
                                         {ph.status === 'done' && ph.completedBy && (
                                             <div style={{ fontSize: 11, color: C.green, marginTop: 4 }}>✓ Završio: {ph.completedBy} • {fmtDate(ph.completedAt)}</div>
                                         )}
@@ -430,8 +430,8 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
                 <div>
-                    <div className="u-fs-24 u-fw-800" style={{ color: C.text }}>{isWorker ? 'Moji projekti' : '📁 Projekti'}</div>
-                    <div className="u-fs-12" style={{ color: C.textMuted, marginTop: 2 }}>{isWorker ? `${filtered.length} dodijeljenih projekata` : `${projects.length} projekata • ${activeWorkers.length} radnika • Evidencija gradilišta`}</div>
+                    <div className="u-fs-24 u-fw-800" className="u-color-text">{isWorker ? 'Moji projekti' : '📁 Projekti'}</div>
+                    <div className="u-fs-12" className="u-text-muted" style={{ marginTop: 2 }}>{isWorker ? `${filtered.length} dodijeljenih projekata` : `${projects.length} projekata • ${activeWorkers.length} radnika • Evidencija gradilišta`}</div>
                 </div>
                 {!isWorker && <button onClick={openAdd} style={styles.btn}><Icon name="plus" size={16} /> Novi projekt</button>}
             </div>
@@ -522,17 +522,17 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                                 <div className="u-flex-1">
                                     <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{p.name}</div>
-                                    {p.location && <div className="u-fs-12" style={{ color: C.textMuted, marginTop: 2 }}>📍 {p.location} {p.siteLat ? <span style={{ fontSize: 9, color: '#10B981', fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: 'rgba(16,185,129,0.1)', marginLeft: 4 }}>GPS ✓</span> : <span style={{ fontSize: 9, color: '#F59E0B', fontWeight: 600, padding: '1px 5px', borderRadius: 4, background: 'rgba(245,158,11,0.08)', marginLeft: 4 }}>Bez GPS</span>}</div>}
+                                    {p.location && <div className="u-fs-12" className="u-text-muted" style={{ marginTop: 2 }}>📍 {p.location} {p.siteLat ? <span style={{ fontSize: 9, color: '#10B981', fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: 'rgba(16,185,129,0.1)', marginLeft: 4 }}>GPS ✓</span> : <span style={{ fontSize: 9, color: '#F59E0B', fontWeight: 600, padding: '1px 5px', borderRadius: 4, background: 'rgba(245,158,11,0.08)', marginLeft: 4 }}>Bez GPS</span>}</div>}
                                 </div>
                                 <StatusBadge status={p.status} />
                             </div>
                             {p.client && <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 8 }}>🏢 {p.client}</div>}
                             {leader && <div style={{ fontSize: 12, color: C.blue, marginBottom: 8 }}>👷 Voditelj: {leader.name}</div>}
                             <div style={{ display: 'grid', gridTemplateColumns: isWorker ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 8, marginBottom: 12, padding: '10px 0', borderTop: `1px solid ${C.border}7A`, borderBottom: `1px solid ${C.border}7A` }}>
-                                <div className="u-text-center"><div style={{ fontSize: 16, fontWeight: 800, color: C.accent }}>{pWorkers.length}</div><div style={{ fontSize: 10, color: C.textMuted }}>Radnika</div></div>
-                                <div className="u-text-center"><div style={{ fontSize: 16, fontWeight: 800, color: C.blue }}>{Math.round(pHours / 60)}h</div><div style={{ fontSize: 10, color: C.textMuted }}>Sati</div></div>
-                                {!isWorker && <div className="u-text-center"><div style={{ fontSize: 16, fontWeight: 800, color: '#7C3AED' }}>{pTimesheets.length}</div><div style={{ fontSize: 10, color: C.textMuted }}>Unosa</div></div>}
-                                {!isWorker && <div className="u-text-center"><div style={{ fontSize: 16, fontWeight: 800, color: pCosts > 0 ? '#EF4444' : C.textDim }}>{pCosts > 0 ? `${pCosts.toFixed(0)}€` : '—'}</div><div style={{ fontSize: 10, color: C.textMuted }}>Troškovi</div></div>}
+                                <div className="u-text-center"><div style={{ fontSize: 16, fontWeight: 800, color: C.accent }}>{pWorkers.length}</div><div className="u-stat-label">Radnika</div></div>
+                                <div className="u-text-center"><div style={{ fontSize: 16, fontWeight: 800, color: C.blue }}>{Math.round(pHours / 60)}h</div><div className="u-stat-label">Sati</div></div>
+                                {!isWorker && <div className="u-text-center"><div style={{ fontSize: 16, fontWeight: 800, color: '#7C3AED' }}>{pTimesheets.length}</div><div className="u-stat-label">Unosa</div></div>}
+                                {!isWorker && <div className="u-text-center"><div style={{ fontSize: 16, fontWeight: 800, color: pCosts > 0 ? '#EF4444' : C.textDim }}>{pCosts > 0 ? `${pCosts.toFixed(0)}€` : '—'}</div><div className="u-stat-label">Troškovi</div></div>}
                             </div>
                             {/* Worker avatars */}
                             {pWorkers.length > 0 && (

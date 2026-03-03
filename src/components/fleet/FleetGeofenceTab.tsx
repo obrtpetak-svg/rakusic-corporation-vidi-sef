@@ -51,7 +51,7 @@ export default function FleetGeofenceTab({ vehicles }: { vehicles: FleetVehicle[
                             }}>{g.type === 'circle' ? '⭕' : '🔷'}</div>
                             <div className="u-flex-1">
                                 <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{g.name}</div>
-                                <div className="u-fs-11" style={{ color: C.textMuted }}>
+                                <div className="u-fs-11" className="u-text-muted">
                                     {g.type === 'circle' ? `Krug · ${g.radius}m` : 'Poligon'} · Alert: {g.alertType === 'both' ? 'ulaz+izlaz' : g.alertType === 'enter' ? 'ulaz' : 'izlaz'}
                                 </div>
                             </div>
@@ -103,7 +103,7 @@ export default function FleetGeofenceTab({ vehicles }: { vehicles: FleetVehicle[
                                 <div style={{ fontSize: 12, fontWeight: 600, color: C.text }}>
                                     {e.vehicleName} — {e.type === 'GEOFENCE_ENTER' ? 'Ulaz u zonu' : e.type === 'GEOFENCE_EXIT' ? 'Izlaz iz zone' : 'Prekoračenje brzine'}
                                 </div>
-                                <div className="u-fs-11" style={{ color: C.textMuted }}>
+                                <div className="u-fs-11" className="u-text-muted">
                                     {e.geofenceName || '—'} · {new Date(e.timestamp).toLocaleString('hr')}
                                 </div>
                             </div>
