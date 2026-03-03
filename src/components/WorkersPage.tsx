@@ -156,7 +156,7 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
 
         return (
             <div>
-                <button onClick={() => setDetailId(null)} className="s-btn-sec" style={{ marginBottom: 20, display: 'inline-flex' }}><Icon name="back" size={16} /> Natrag</button>
+                <button onClick={() => setDetailId(null)} className="s-btn-sec" className="u-mb-20" style={{ display: 'inline-flex' }}><Icon name="back" size={16} /> Natrag</button>
                 <div className="s-card" className="u-mb-20">
                     <div className="workers__detail-header">
                         <div className="workers__avatar workers__avatar--active workers__avatar--large">{detailWorker.name?.charAt(0)}</div>

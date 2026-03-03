@@ -195,23 +195,23 @@ export function TimesheetsPage() {
 
                 {/* Stats */}
                 <div className={`ts__stats ${isMobile ? 'ts__stats--mobile' : 'ts__stats--desktop'}`}>
-                    <div className="s-card" style={{ textAlign: 'center', padding: '14px 12px' }}>
+                    <div className="s-card" className="u-text-center" style={{ padding: '14px 12px' }}>
                         <div className="u-stat-label">Ukupno sati</div>
-                        <div className="ts__stat-value" style={{ color: C.accent }}>{(totalFiltered / 60).toFixed(1)}h</div>
+                        <div className="ts__stat-value" style={{ color: 'var(--accent)' }}>{(totalFiltered / 60).toFixed(1)}h</div>
                     </div>
-                    <div className="s-card" style={{ textAlign: 'center', padding: '14px 12px' }}>
+                    <div className="s-card" className="u-text-center" style={{ padding: '14px 12px' }}>
                         <div className="u-stat-label">Unosa</div>
-                        <div className="ts__stat-value" style={{ color: C.blue }}>{filtered.length}</div>
+                        <div className="ts__stat-value" style={{ color: 'var(--blue)' }}>{filtered.length}</div>
                     </div>
-                    <div className="s-card" style={{ textAlign: 'center', padding: '14px 12px' }}>
+                    <div className="s-card" className="u-text-center" style={{ padding: '14px 12px' }}>
                         <div className="u-stat-label">Odobreno</div>
-                        <div className="ts__stat-value" style={{ color: C.green }}>{approvedCount}</div>
+                        <div className="ts__stat-value" style={{ color: 'var(--green)' }}>{approvedCount}</div>
                     </div>
-                    <div className="s-card" style={{ textAlign: 'center', padding: '14px 12px' }}>
+                    <div className="s-card" className="u-text-center" style={{ padding: '14px 12px' }}>
                         <div className="u-stat-label">Na čekanju</div>
                         <div className="ts__stat-value" style={{ color: C.yellow }}>{pendingCount}</div>
                     </div>
-                    <div className="s-card" style={{ textAlign: 'center', padding: '14px 12px' }}>
+                    <div className="s-card" className="u-text-center" style={{ padding: '14px 12px' }}>
                         <div className="u-stat-label">Prosj./dan</div>
                         <div className="ts__stat-value" style={{ color: 'var(--purple)' }}>{avgPerDay}h</div>
                     </div>
@@ -268,16 +268,16 @@ export function TimesheetsPage() {
                                 <th style={{ ...styles.th, position: 'sticky', top: 0, background: C.bgElevated, zIndex: 1, width: 36, textAlign: 'center' }}>
                                     <input type="checkbox" checked={pg.paginate(filtered).length > 0 && pg.paginate(filtered).every(t => selectedIds.has(t.id))} onChange={selectAllVisible} style={{ accentColor: 'var(--accent)', cursor: 'pointer', width: 16, height: 16 }} />
                                 </th>
-                                <th style={{ ...styles.th, position: 'sticky', top: 0, background: C.bgElevated, zIndex: 1 }}>Datum</th>
-                                <th style={{ ...styles.th, position: 'sticky', top: 0, background: C.bgElevated, zIndex: 1 }}>Radnik</th>
-                                <th style={{ ...styles.th, position: 'sticky', top: 0, background: C.bgElevated, zIndex: 1 }}>Projekt</th>
-                                <th style={{ ...styles.th, position: 'sticky', top: 0, background: C.bgElevated, zIndex: 1 }}>Od</th>
-                                <th style={{ ...styles.th, position: 'sticky', top: 0, background: C.bgElevated, zIndex: 1 }}>Do</th>
-                                <th style={{ ...styles.th, position: 'sticky', top: 0, background: C.bgElevated, zIndex: 1 }}>Pauza</th>
-                                <th style={{ ...styles.th, position: 'sticky', top: 0, background: C.bgElevated, zIndex: 1 }}>Neto</th>
-                                <th style={{ ...styles.th, position: 'sticky', top: 0, background: C.bgElevated, zIndex: 1 }}>Tip</th>
-                                <th style={{ ...styles.th, position: 'sticky', top: 0, background: C.bgElevated, zIndex: 1 }}>Status</th>
-                                <th style={{ ...styles.th, position: 'sticky', top: 0, background: C.bgElevated, zIndex: 1 }}>Akcije</th>
+                                <th className="s-th ts__th-sticky">Datum</th>
+                                <th className="s-th ts__th-sticky">Radnik</th>
+                                <th className="s-th ts__th-sticky">Projekt</th>
+                                <th className="s-th ts__th-sticky">Od</th>
+                                <th className="s-th ts__th-sticky">Do</th>
+                                <th className="s-th ts__th-sticky">Pauza</th>
+                                <th className="s-th ts__th-sticky">Neto</th>
+                                <th className="s-th ts__th-sticky">Tip</th>
+                                <th className="s-th ts__th-sticky">Status</th>
+                                <th className="s-th ts__th-sticky">Akcije</th>
                             </tr></thead>
                             <tbody>
                                 {pg.paginate(filtered).map((t, idx) => {
@@ -299,11 +299,11 @@ export function TimesheetsPage() {
                                                 </div>
                                             </td>
                                             <td className="s-td" className="ts__project-cell">{p?.name || '—'}</td>
-                                            <td className="s-td" style={{ fontSize: 13 }}>{t.startTime}</td>
-                                            <td className="s-td" style={{ fontSize: 13 }}>{t.endTime}</td>
+                                            <td className="s-td" className="u-fs-13">{t.startTime}</td>
+                                            <td className="s-td" className="u-fs-13">{t.endTime}</td>
                                             <td className="s-td" style={{ fontSize: 12, color: C.textMuted }}>{t.breakMins || 0}m</td>
                                             <td className="s-td" style={{ fontWeight: 700, color: C.accent, fontSize: 13 }}>{(mins / 60).toFixed(1)}h</td>
-                                            <td className="s-td" style={{ fontSize: 12 }}>{typeLabel[t.type] || ''} {t.type || 'normalan'}</td>
+                                            <td className="s-td" className="u-fs-12">{typeLabel[t.type] || ''} {t.type || 'normalan'}</td>
                                             <td className="s-td"><StatusBadge status={t.status} /></td>
                                             <td className="s-td">
                                                 <div className="ts__actions">
@@ -341,7 +341,7 @@ export function TimesheetsPage() {
                                         <div><span className="s-label">Datum</span><div>{fmtDate(detailTs.date)}</div></div>
                                         <div><span className="s-label">Tip</span><div>{detailTs.type || 'normalan'}</div></div>
                                         <div><span className="s-label">Od - Do</span><div>{detailTs.startTime} — {detailTs.endTime}</div></div>
-                                        <div><span className="s-label">Neto sati</span><div style={{ fontWeight: 700, color: C.accent }}>{(mins / 60).toFixed(1)}h</div></div>
+                                        <div><span className="s-label">Neto sati</span><div className="u-fw-700" style={{ color: 'var(--accent)' }}>{(mins / 60).toFixed(1)}h</div></div>
                                         <div><span className="s-label">Pauza</span><div>{detailTs.breakMins || 0} min</div></div>
                                         <div><span className="s-label">Status</span><StatusBadge status={detailTs.status} /></div>
                                     </div>
@@ -350,7 +350,7 @@ export function TimesheetsPage() {
                                     {detailTs.notes && <div className="u-mb-12"><span className="s-label">Napomene</span><div className="ts__detail-notes">{detailTs.notes}</div></div>}
                                     {detailTs.rejectReason && <div className="u-mb-12"><span className="s-label">Razlog odbijanja</span><div className="ts__detail-reject">{detailTs.rejectReason}</div></div>}
                                     {detailTs.source && <div className="u-fs-12 u-text-muted">Izvor: {detailTs.source === 'admin' ? 'Admin unos' : 'Radnički unos'}</div>}
-                                    {detailTs.invoiceFile && <div className="u-mt-12"><span className="s-label">Priloženi račun</span><div style={{ marginTop: 4 }}><a href={detailTs.invoiceFile.data} download={detailTs.invoiceFile.name} className="s-btn-sm"><Icon name="download" size={14} /> {detailTs.invoiceFile.name}</a></div></div>}
+                                    {detailTs.invoiceFile && <div className="u-mt-12"><span className="s-label">Priloženi račun</span><div className="u-mt-4"><a href={detailTs.invoiceFile.data} download={detailTs.invoiceFile.name} className="s-btn-sm"><Icon name="download" size={14} /> {detailTs.invoiceFile.name}</a></div></div>}
                                     {detailTs.status === 'na čekanju' && (
                                         <div className="ts__detail-actions">
                                             <button onClick={() => { approve(detailTs); setDetailId(null); }} className="s-btn" style={{ background: C.green, flex: 1, justifyContent: 'center' }}><Icon name="check" size={16} /> Odobri</button>

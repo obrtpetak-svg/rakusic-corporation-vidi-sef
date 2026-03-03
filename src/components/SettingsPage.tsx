@@ -224,7 +224,7 @@ export function SettingsPage({ workerFilterId }) {
                         <Field label="Nova lozinka" required><Input type="password" value={pwForm.newPw} onChange={e => setPwForm(f => ({ ...f, newPw: e.target.value }))} placeholder="Min 8, 1 veliko, 1 broj" /></Field>
                         <Field label="Potvrdi novu" required><Input type="password" value={pwForm.confirmPw} onChange={e => setPwForm(f => ({ ...f, confirmPw: e.target.value }))} placeholder="Ponovi novu lozinku" /></Field>
                     </div>
-                    {pwMsg && <div className={`settings__status ${pwMsg.startsWith('✅') ? 'settings__status--success' : 'settings__status--error'}`} style={{ marginTop: 12 }}>{pwMsg}</div>}
+                    {pwMsg && <div className={`settings__status ${pwMsg.startsWith('✅') ? 'settings__status--success' : 'settings__status--error'}`} className="u-mt-12">{pwMsg}</div>}
                     <button onClick={doChangePassword} disabled={pwLoading || !pwForm.currentPw || !pwForm.newPw} className="s-btn" style={{ marginTop: 16, opacity: pwLoading ? 0.5 : 1 }}>
                         {pwLoading ? '⏳ Mijenjam...' : '🔐 Promijeni lozinku'}
                     </button>
@@ -323,7 +323,7 @@ export function SettingsPage({ workerFilterId }) {
                         Vrati SVE podatke iz backup datoteke. ⚠️ Ovo će zamijeniti trenutne podatke!
                     </div>
                     <div className="settings__action-row">
-                        <input ref={fileRef} type="file" accept=".json" onChange={doRestore} style={{ display: 'none' }} />
+                        <input ref={fileRef} type="file" accept=".json" onChange={doRestore} className="u-hidden" />
                         <button onClick={() => fileRef.current?.click()} className="s-btn" style={{ background: C.yellow }}>
                             📥 Vrati SVE iz Backupa
                         </button>
@@ -464,7 +464,7 @@ export function SettingsPage({ workerFilterId }) {
                 <div className="u-flex-between u-mb-16">
                     <div>
                         <div className="u-section-title">👥 Korisnici sustava</div>
-                        <div className="u-fs-12 u-text-muted" style={{ marginTop: 2 }}>Upravljanje korisnicima koji se mogu prijaviti u aplikaciju ({users?.length || 0})</div>
+                        <div className="u-fs-12 u-text-muted" className="u-mt-2">Upravljanje korisnicima koji se mogu prijaviti u aplikaciju ({users?.length || 0})</div>
                     </div>
                     <button onClick={() => { setShowAddUser(true); setUserForm({ name: '', username: '', role: 'radnik', password: '' }); setUserMsg(''); setEditingUser(null); }} className="s-btn" style={{ fontSize: 12, padding: '8px 16px' }}>+ Dodaj korisnika</button>
                 </div>
@@ -513,7 +513,7 @@ export function SettingsPage({ workerFilterId }) {
                         </Field>
                         {!editingUser && <Field label="Lozinka" required><Input type="password" value={userForm.password} onChange={e => setUserForm(f => ({ ...f, password: e.target.value }))} placeholder="Min 8, 1 veliko, 1 broj" /></Field>}
                     </div>
-                    {userMsg && <div className={`settings__status ${userMsg.startsWith('✅') ? 'settings__status--success' : 'settings__status--error'}`} style={{ marginTop: 12 }}>{userMsg}</div>}
+                    {userMsg && <div className={`settings__status ${userMsg.startsWith('✅') ? 'settings__status--success' : 'settings__status--error'}`} className="u-mt-12">{userMsg}</div>}
                     <div className="settings__form-footer">
                         <button onClick={() => setShowAddUser(false)} className="s-btn-sec">Odustani</button>
                         <button onClick={async () => {
@@ -570,7 +570,7 @@ export function SettingsPage({ workerFilterId }) {
                     <Field label="Nova lozinka" required><Input type="password" value={pwForm.newPw} onChange={e => setPwForm(f => ({ ...f, newPw: e.target.value }))} placeholder="Min 8, 1 veliko, 1 broj" /></Field>
                     <Field label="Potvrdi novu" required><Input type="password" value={pwForm.confirmPw} onChange={e => setPwForm(f => ({ ...f, confirmPw: e.target.value }))} placeholder="Ponovi novu lozinku" /></Field>
                 </div>
-                {pwMsg && <div className={`settings__status ${pwMsg.startsWith('✅') ? 'settings__status--success' : 'settings__status--error'}`} style={{ marginTop: 12 }}>{pwMsg}</div>}
+                {pwMsg && <div className={`settings__status ${pwMsg.startsWith('✅') ? 'settings__status--success' : 'settings__status--error'}`} className="u-mt-12">{pwMsg}</div>}
                 <button onClick={doChangePassword} disabled={pwLoading || !pwForm.currentPw || !pwForm.newPw} className="s-btn" style={{ marginTop: 16, opacity: pwLoading ? 0.5 : 1 }}>
                     {pwLoading ? '⏳ Mijenjam...' : '🔐 Promijeni lozinku'}
                 </button>

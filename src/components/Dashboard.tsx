@@ -243,7 +243,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
 
                 {/* ── Donut Chart (1×1) ── */}
                 <BentoCard style={{ animationDelay: '0.25s' }}>
-                    <div className="u-bento-header" style={{ marginBottom: 12 }}>
+                    <div className="u-bento-header" className="u-mb-12">
                         <div className="dash__icon-badge" style={{ background: 'var(--purple-light)', color: 'var(--purple)' }}>
                             <Icon name="project" size={14} />
                         </div>
@@ -349,7 +349,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                 <BentoCard style={{ animationDelay: '0.45s' }}>
                     <div className="u-bento-header">
                         <div className="dash__icon-badge" style={{ background: 'var(--green-light)', color: 'var(--green)' }}>
-                            <span style={{ fontSize: 14 }}>📍</span>
+                            <span className="u-fs-14">📍</span>
                         </div>
                         Danas na poslu
                         <span style={{ marginLeft: 'auto', fontSize: 24, fontWeight: 900, color: 'var(--green)', fontVariantNumeric: 'tabular-nums' }}>{currentlyWorking.length}</span>
@@ -507,7 +507,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                 <BentoCard style={{ animationDelay: '0.65s' }}>
                     <div className="u-bento-header">
                         <div className="dash__icon-badge" style={{ background: 'var(--accent-light)', color: 'var(--accent)' }}>
-                            <span style={{ fontSize: 14 }}>🎯</span>
+                            <span className="u-fs-14">🎯</span>
                         </div>
                         Obaveze
                         <span style={{ marginLeft: 'auto', fontSize: 20, fontWeight: 900, color: 'var(--accent)' }}>{obaveze.filter(o => o.active !== false).length}</span>
@@ -530,7 +530,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                                 );
                             })}
                         </div>
-                    ) : <div style={{ color: 'var(--text-muted)', fontSize: 13, padding: 20, textAlign: 'center' }}>Nema aktivnih obaveza</div>}
+                    ) : <div className="dash__empty" className="u-p-20">Nema aktivnih obaveza</div>}
                 </BentoCard>
             </div>
 
@@ -546,7 +546,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                         <span style={{ marginLeft: 'auto', fontSize: 20, fontWeight: 900, color: workersNoEntries.length > 0 ? 'var(--red)' : 'var(--green)' }}>{workersNoEntries.length}</span>
                     </div>
                     {workersNoEntries.length > 0 ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <div className="u-flex-col u-gap-6">
                             {workersNoEntries.map((w, i) => (
                                 <div key={w.id || i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 8, background: w.days > 7 ? 'rgba(239,68,68,0.06)' : 'var(--divider)', borderLeft: `3px solid ${w.days > 7 ? 'var(--red)' : w.days > 4 ? 'var(--yellow)' : 'var(--text-muted)'}` }}>
                                     <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>{w.name}</span>
@@ -582,7 +582,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                         Radnici po projektima
                     </div>
                     {workersPerProject.length > 0 ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <div className="u-flex-col u-gap-6">
                             {workersPerProject.map((p, i) => {
                                 const maxV = workersPerProject[0]?.value || 1;
                                 return (
@@ -596,7 +596,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                                 );
                             })}
                         </div>
-                    ) : <div style={{ color: 'var(--text-muted)', fontSize: 13, padding: 20, textAlign: 'center' }}>Nema podataka</div>}
+                    ) : <div className="dash__empty" className="u-p-20">Nema podataka</div>}
                 </BentoCard>
 
                 {/* ── Cost per project ── */}
@@ -608,7 +608,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                         Troškovi po projektu
                     </div>
                     {costPerProject.length > 0 ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <div className="u-flex-col u-gap-6">
                             {costPerProject.map((p, i) => {
                                 const maxC = costPerProject[0]?.cost || 1;
                                 return (
@@ -622,7 +622,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                                 );
                             })}
                         </div>
-                    ) : <div style={{ color: 'var(--text-muted)', fontSize: 13, padding: 20, textAlign: 'center' }}>Nema podataka</div>}
+                    ) : <div className="dash__empty" className="u-p-20">Nema podataka</div>}
                 </BentoCard>
             </div>
 
@@ -639,7 +639,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                     </div>
                     {projectStatusBreakdown.length > 0
                         ? <SvgDonutChart data={projectStatusBreakdown} height={isMobile ? 120 : 140} />
-                        : <div style={{ color: 'var(--text-muted)', fontSize: 13, padding: 20, textAlign: 'center' }}>Nema projekata</div>
+                        : <div className="dash__empty" className="u-p-20">Nema projekata</div>
                     }
                 </BentoCard>
 
@@ -682,7 +682,7 @@ export function Dashboard({ onGoToNotifications, onNavigate }) {
                         </button>
                     </div>
                     {auditLog.length === 0
-                        ? <div className="dash__empty" style={{ padding: 16 }}>Nema log zapisa</div>
+                        ? <div className="dash__empty" className="u-p-16">Nema log zapisa</div>
                         : auditLog.slice(-5).reverse().map((entry, i) => {
                             const timeAgo = (() => {
                                 if (!entry.timestamp) return '';

@@ -279,8 +279,8 @@ export function ReportsPage() {
                             <div className="u-section-title">Detaljna tablica po radnicima</div>
                             <div className="u-fs-12 u-text-muted">{hoursByWorker.length} radnika | {filterWorker !== 'sve' ? workers.find(w => w.id === filterWorker)?.name : 'Svi'}{filterProject !== 'sve' ? ` • ${projects.find(p => p.id === filterProject)?.name}` : ''}</div>
                         </div>
-                        <div className="u-overflow-x"><table aria-label="Podaci" style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}><thead><tr><th className="s-th">Radnik</th><th className="s-th">Sati</th><th className="s-th">Normalan</th><th className="s-th">Prekovrm.</th><th className="s-th">Noćni</th><th className="s-th">Vikend</th><th className="s-th">Unosa</th><th className="s-th">Prosj/dan</th></tr></thead><tbody>
-                            {hoursByWorker.map(w => <tr key={w.name}><td className="s-td" style={{ fontWeight: 600 }}>{w.name}</td><td className="s-td" style={{ fontWeight: 700, color: C.accent }}>{w.sati}h</td><td className="s-td">{w.normalan}h</td><td className="s-td">{w.prekovremeni}h</td><td className="s-td">{w.nocni}h</td><td className="s-td">{w.vikend}h</td><td className="s-td">{w.unosa}</td><td className="s-td">{w.unosa > 0 ? (w.sati / w.unosa).toFixed(1) : 0}h</td></tr>)}
+                        <div className="u-overflow-x"><table aria-label="Podaci" className="u-table" style={{ minWidth: 600 }}><thead><tr><th className="s-th">Radnik</th><th className="s-th">Sati</th><th className="s-th">Normalan</th><th className="s-th">Prekovrm.</th><th className="s-th">Noćni</th><th className="s-th">Vikend</th><th className="s-th">Unosa</th><th className="s-th">Prosj/dan</th></tr></thead><tbody>
+                            {hoursByWorker.map(w => <tr key={w.name}><td className="s-td" className="u-fw-600">{w.name}</td><td className="s-td" className="u-fw-700" style={{ color: 'var(--accent)' }}>{w.sati}h</td><td className="s-td">{w.normalan}h</td><td className="s-td">{w.prekovremeni}h</td><td className="s-td">{w.nocni}h</td><td className="s-td">{w.vikend}h</td><td className="s-td">{w.unosa}</td><td className="s-td">{w.unosa > 0 ? (w.sati / w.unosa).toFixed(1) : 0}h</td></tr>)}
                         </tbody></table></div>
                     </div>
                 </div>
@@ -301,10 +301,10 @@ export function ReportsPage() {
                             <div className="u-section-title">Projekti - detalji</div>
                             <div className="u-fs-12 u-text-muted">{hoursByProject.length} projekata | {filterProject !== 'sve' ? projects.find(p => p.id === filterProject)?.name : 'Svi'}{filterWorker !== 'sve' ? ` • ${workers.find(w => w.id === filterWorker)?.name}` : ''}</div>
                         </div>
-                        <div className="u-overflow-x"><table aria-label="Podaci" style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}><thead><tr><th className="s-th">Projekt</th><th className="s-th">Sati</th><th className="s-th">Radnika</th><th className="s-th">Troškovi</th><th className="s-th">Status</th><th className="s-th">% vremena</th></tr></thead><tbody>
+                        <div className="u-overflow-x"><table aria-label="Podaci" className="u-table" style={{ minWidth: 600 }}><thead><tr><th className="s-th">Projekt</th><th className="s-th">Sati</th><th className="s-th">Radnika</th><th className="s-th">Troškovi</th><th className="s-th">Status</th><th className="s-th">% vremena</th></tr></thead><tbody>
                             {hoursByProject.map(p => {
                                 const proj = projects.find(x => x.id === p.id);
-                                return <tr key={p.name}><td className="s-td" style={{ fontWeight: 600 }}>{p.fullName || p.name}</td><td className="s-td" style={{ fontWeight: 700, color: C.accent }}>{p.sati}h</td><td className="s-td">{p.radnika}</td><td className="s-td">{p.trošak.toFixed(0)}€</td><td className="s-td"><span className={`reports__status-badge ${proj?.status === 'aktivan' ? 'reports__status-badge--approved' : 'reports__status-badge--pending'}`}>{proj?.status || 'aktivan'}</span></td><td className="s-td">{totalHours > 0 ? ((p.sati / (totalHours / 60)) * 100).toFixed(1) : 0}%</td></tr>;
+                                return <tr key={p.name}><td className="s-td" className="u-fw-600">{p.fullName || p.name}</td><td className="s-td" className="u-fw-700" style={{ color: 'var(--accent)' }}>{p.sati}h</td><td className="s-td">{p.radnika}</td><td className="s-td">{p.trošak.toFixed(0)}€</td><td className="s-td"><span className={`reports__status-badge ${proj?.status === 'aktivan' ? 'reports__status-badge--approved' : 'reports__status-badge--pending'}`}>{proj?.status || 'aktivan'}</span></td><td className="s-td">{totalHours > 0 ? ((p.sati / (totalHours / 60)) * 100).toFixed(1) : 0}%</td></tr>;
                             })}
                         </tbody></table></div>
                     </div>
@@ -321,10 +321,10 @@ export function ReportsPage() {
                         const workerList = Object.entries(projectWorkers).sort((a, b) => b[1].total - a[1].total);
                         if (workerList.length === 0) return null;
                         return (
-                            <div key={p.id} className="s-card" style={{ marginTop: 12 }}>
+                            <div key={p.id} className="s-card" className="u-mt-12">
                                 <div className="u-section-title" style={{ fontSize: 13, marginBottom: 8 }}>🏗️ {p.fullName || p.name} — Radnici ({workerList.length})</div>
-                                <div className="u-overflow-x"><table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th className="s-th">Radnik</th><th className="s-th">Sati</th><th className="s-th">Unosa</th><th className="s-th">% od projekta</th></tr></thead><tbody>
-                                    {workerList.map(([name, d]) => <tr key={name}><td className="s-td" style={{ fontWeight: 600 }}>{name}</td><td className="s-td" style={{ fontWeight: 700, color: C.accent }}>{d.total.toFixed(1)}h</td><td className="s-td">{d.entries}</td><td className="s-td">{p.sati > 0 ? ((d.total / p.sati) * 100).toFixed(1) : 0}%</td></tr>)}
+                                <div className="u-overflow-x"><table aria-label="Pregled" className="u-table"><thead><tr><th className="s-th">Radnik</th><th className="s-th">Sati</th><th className="s-th">Unosa</th><th className="s-th">% od projekta</th></tr></thead><tbody>
+                                    {workerList.map(([name, d]) => <tr key={name}><td className="s-td" className="u-fw-600">{name}</td><td className="s-td" className="u-fw-700" style={{ color: 'var(--accent)' }}>{d.total.toFixed(1)}h</td><td className="s-td">{d.entries}</td><td className="s-td">{p.sati > 0 ? ((d.total / p.sati) * 100).toFixed(1) : 0}%</td></tr>)}
                                 </tbody></table></div>
                             </div>
                         );
@@ -355,9 +355,9 @@ export function ReportsPage() {
                     </div>
                     <div className="s-card">
                         <div className="u-section-title u-mb-12">Troškovi po projektima - tablica</div>
-                        <div className="u-overflow-x"><table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th className="s-th">Projekt</th><th className="s-th">Troškovi €</th><th className="s-th">% ukupnog</th></tr></thead><tbody>
-                            {costsByProject.map(c => <tr key={c.name}><td className="s-td" style={{ fontWeight: 600 }}>{c.fullName || c.name}</td><td className="s-td" style={{ fontWeight: 700, color: C.red }}>{c.iznos.toFixed(2)}€</td><td className="s-td">{totalCosts > 0 ? ((c.iznos / totalCosts) * 100).toFixed(1) : 0}%</td></tr>)}
-                            {costsByProject.length === 0 && <tr><td colSpan={3} className="s-td" style={{ textAlign: 'center', color: C.textMuted }}>Nema podataka</td></tr>}
+                        <div className="u-overflow-x"><table aria-label="Pregled" className="u-table"><thead><tr><th className="s-th">Projekt</th><th className="s-th">Troškovi €</th><th className="s-th">% ukupnog</th></tr></thead><tbody>
+                            {costsByProject.map(c => <tr key={c.name}><td className="s-td" className="u-fw-600">{c.fullName || c.name}</td><td className="s-td" style={{ fontWeight: 700, color: C.red }}>{c.iznos.toFixed(2)}€</td><td className="s-td">{totalCosts > 0 ? ((c.iznos / totalCosts) * 100).toFixed(1) : 0}%</td></tr>)}
+                            {costsByProject.length === 0 && <tr><td colSpan={3} className="s-td" className="u-text-center u-text-muted">Nema podataka</td></tr>}
                         </tbody></table></div>
                     </div>
                 </div>
@@ -376,8 +376,8 @@ export function ReportsPage() {
                     </div>
                     <div className="s-card">
                         <div className="u-section-title u-mb-12">Dnevna tablica</div>
-                        <div className="u-overflow-x"><table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th className="s-th">Dan</th><th className="s-th">Sati</th></tr></thead><tbody>
-                            {dailyTrend.map(d => <tr key={d.dan}><td className="s-td">{d.dan}</td><td className="s-td" style={{ fontWeight: 700, color: C.accent }}>{d.sati}h</td></tr>)}
+                        <div className="u-overflow-x"><table aria-label="Pregled" className="u-table"><thead><tr><th className="s-th">Dan</th><th className="s-th">Sati</th></tr></thead><tbody>
+                            {dailyTrend.map(d => <tr key={d.dan}><td className="s-td">{d.dan}</td><td className="s-td" className="u-fw-700" style={{ color: 'var(--accent)' }}>{d.sati}h</td></tr>)}
                         </tbody></table></div>
                     </div>
                 </div>
@@ -409,9 +409,9 @@ export function ReportsPage() {
                         </div>
                     </div>
                     <div className="s-card">
-                        <div className="u-overflow-x"><table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th className="s-th">Vozilo</th><th className="s-th">Litara</th><th className="s-th">Trošak €</th><th className="s-th">Km</th><th className="s-th">Unosa</th></tr></thead><tbody>
-                            {vehicleData.map(v => <tr key={v.name}><td className="s-td" style={{ fontWeight: 600 }}>{v.name}</td><td className="s-td">{v.litara.toFixed(1)}</td><td className="s-td" style={{ fontWeight: 700, color: C.red }}>{v.trošak.toFixed(2)}€</td><td className="s-td">{v.km.toFixed(0)}</td><td className="s-td">{v.unosa}</td></tr>)}
-                            {vehicleData.length === 0 && <tr><td colSpan={5} className="s-td" style={{ textAlign: 'center', color: C.textMuted }}>Nema podataka</td></tr>}
+                        <div className="u-overflow-x"><table aria-label="Pregled" className="u-table"><thead><tr><th className="s-th">Vozilo</th><th className="s-th">Litara</th><th className="s-th">Trošak €</th><th className="s-th">Km</th><th className="s-th">Unosa</th></tr></thead><tbody>
+                            {vehicleData.map(v => <tr key={v.name}><td className="s-td" className="u-fw-600">{v.name}</td><td className="s-td">{v.litara.toFixed(1)}</td><td className="s-td" style={{ fontWeight: 700, color: C.red }}>{v.trošak.toFixed(2)}€</td><td className="s-td">{v.km.toFixed(0)}</td><td className="s-td">{v.unosa}</td></tr>)}
+                            {vehicleData.length === 0 && <tr><td colSpan={5} className="s-td" className="u-text-center u-text-muted">Nema podataka</td></tr>}
                         </tbody></table></div>
                     </div>
                 </div>
@@ -427,13 +427,13 @@ export function ReportsPage() {
                     </div>
                     <div className="s-card">
                         <div className="u-section-title u-mb-16"> Produktivnost po radnicima</div>
-                        <div className="u-overflow-x"><table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <div className="u-overflow-x"><table aria-label="Pregled" className="u-table">
                             <thead><tr><th className="s-th">Radnik</th><th className="s-th">Ukupno h</th><th className="s-th">Radnih dana</th><th className="s-th">Prosj./dan</th><th className="s-th">Projekata</th><th className="s-th">Prekov.</th><th className="s-th">Efikasnost</th></tr></thead>
                             <tbody>{productivity.map(w => (
-                                <tr key={w.name}><td className="s-td" style={{ fontWeight: 600 }}>{w.name}</td><td className="s-td" style={{ fontWeight: 700, color: C.accent }}>{w.totalH}h</td><td className="s-td">{w.days}</td><td className="s-td">{w.avgH}h</td><td className="s-td">{w.projects}</td><td className="s-td" style={{ color: w.overtime > 0 ? '#F59E0B' : C.textMuted }}>{w.overtime}h</td>
+                                <tr key={w.name}><td className="s-td" className="u-fw-600">{w.name}</td><td className="s-td" className="u-fw-700" style={{ color: 'var(--accent)' }}>{w.totalH}h</td><td className="s-td">{w.days}</td><td className="s-td">{w.avgH}h</td><td className="s-td">{w.projects}</td><td className="s-td" style={{ color: w.overtime > 0 ? '#F59E0B' : C.textMuted }}>{w.overtime}h</td>
                                     <td className="s-td"><div className="reports__progress-cell"><div className="reports__progress-track"><div className="reports__progress-fill" style={{ width: `${w.efficiency}%`, background: w.efficiency >= 80 ? '#10B981' : w.efficiency >= 50 ? '#F59E0B' : '#EF4444' }} /></div><span className="reports__progress-label" style={{ color: w.efficiency >= 80 ? '#10B981' : '#F59E0B' }}>{w.efficiency}%</span></div></td></tr>
                             ))}
-                                {productivity.length === 0 && <tr><td colSpan={7} className="s-td" style={{ textAlign: 'center', color: C.textMuted }}>Nema podataka</td></tr>}
+                                {productivity.length === 0 && <tr><td colSpan={7} className="s-td" className="u-text-center u-text-muted">Nema podataka</td></tr>}
                             </tbody></table></div>
                     </div>
                 </div>
@@ -449,10 +449,10 @@ export function ReportsPage() {
                     </div>
                     <div className="s-card">
                         <div className="u-section-title u-mb-16">📋 Prisutnost radnika</div>
-                        <div className="u-overflow-x"><table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <div className="u-overflow-x"><table aria-label="Pregled" className="u-table">
                             <thead><tr><th className="s-th">Radnik</th><th className="s-th">Prisutan (dana)</th><th className="s-th">Odsutan</th><th className="s-th">Kašnjenja</th><th className="s-th">Stopa prisutnosti</th></tr></thead>
                             <tbody>{attendance.map(a => (
-                                <tr key={a.name}><td className="s-td" style={{ fontWeight: 600 }}>{a.name}</td><td className="s-td" style={{ fontWeight: 700, color: C.green }}>{a.present}</td><td className="s-td" style={{ color: a.absent > 3 ? C.red : C.textMuted }}>{a.absent}</td><td className="s-td" style={{ color: a.late > 0 ? '#F59E0B' : C.textMuted }}>{a.late}</td>
+                                <tr key={a.name}><td className="s-td" className="u-fw-600">{a.name}</td><td className="s-td" style={{ fontWeight: 700, color: C.green }}>{a.present}</td><td className="s-td" style={{ color: a.absent > 3 ? C.red : C.textMuted }}>{a.absent}</td><td className="s-td" style={{ color: a.late > 0 ? '#F59E0B' : C.textMuted }}>{a.late}</td>
                                     <td className="s-td"><div className="reports__progress-cell"><div className="reports__progress-track"><div className="reports__progress-fill" style={{ width: `${a.rate}%`, background: a.rate >= 80 ? '#10B981' : a.rate >= 50 ? '#F59E0B' : '#EF4444' }} /></div><span className="reports__progress-label">{a.rate}%</span></div></td></tr>
                             ))}
                             </tbody></table></div>
@@ -474,22 +474,22 @@ export function ReportsPage() {
                         <StatCard label="Prosj. iznos" value={`${otpStats.avgAmount}€`} color="#6366F1" />
                     </div>
                     <div className={`reports__grid-3 ${isMobile ? 'reports__grid-3--mobile' : 'reports__grid-3--desktop'}`}>
-                        {otpStats.statusChart?.length > 0 && <div className="s-card"><div className="u-section-title u-fs-13 u-mb-12 u-mb-12" style={{ marginBottom: 10 }}>Status otpremnica</div><SvgDonutChart data={otpStats.statusChart} height={160} /></div>}
-                        {otpStats.projectChart?.length > 0 && <div className="s-card"><div className="u-section-title u-fs-13 u-mb-12 u-mb-12" style={{ marginBottom: 10 }}>Po projektu (iznos)</div><SvgHBarChart data={otpStats.projectChart} dataKey="iznos" height={180} /></div>}
-                        {otpStats.supplierChart?.length > 0 && <div className="s-card"><div className="u-section-title u-fs-13 u-mb-12 u-mb-12" style={{ marginBottom: 10 }}>Po dobavljaču</div><SvgHBarChart data={otpStats.supplierChart} dataKey="iznos" color="#10B981" height={180} /></div>}
+                        {otpStats.statusChart?.length > 0 && <div className="s-card"><div className="u-section-title u-fs-13 u-mb-12 u-mb-12" className="u-mb-8">Status otpremnica</div><SvgDonutChart data={otpStats.statusChart} height={160} /></div>}
+                        {otpStats.projectChart?.length > 0 && <div className="s-card"><div className="u-section-title u-fs-13 u-mb-12 u-mb-12" className="u-mb-8">Po projektu (iznos)</div><SvgHBarChart data={otpStats.projectChart} dataKey="iznos" height={180} /></div>}
+                        {otpStats.supplierChart?.length > 0 && <div className="s-card"><div className="u-section-title u-fs-13 u-mb-12 u-mb-12" className="u-mb-8">Po dobavljaču</div><SvgHBarChart data={otpStats.supplierChart} dataKey="iznos" color="#10B981" height={180} /></div>}
                     </div>
                     <div className="s-card">
                         <div className="u-section-title u-mb-16">📦 Sve otpremnice u periodu ({otpremnicePeriod.length})</div>
-                        <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}>
+                        <div className="u-overflow-x"><table className="u-table" style={{ minWidth: 700 }}>
                             <thead><tr><th className="s-th">Br.</th><th className="s-th">Datum</th><th className="s-th">Dobavljač</th><th className="s-th">Projekt</th><th className="s-th">Iznos</th><th className="s-th">Status</th><th className="s-th">Napomena</th></tr></thead>
                             <tbody>{otpremnicePeriod.sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 100).map(o => {
                                 const proj = projects.find(p => p.id === o.projectId);
                                 return <tr key={o.id} style={{ background: String(o.status).includes('čekanju') ? 'rgba(245,158,11,0.05)' : 'transparent' }}>
-                                    <td className="s-td" style={{ fontWeight: 600 }}>{o.deliveryNumber || '—'}</td>
+                                    <td className="s-td" className="u-fw-600">{o.deliveryNumber || '—'}</td>
                                     <td className="s-td">{fmtDate(o.date)}</td>
                                     <td className="s-td">{o.supplier || '—'}</td>
                                     <td className="s-td">{proj?.name || '—'}</td>
-                                    <td className="s-td" style={{ fontWeight: 700, color: C.accent }}>{o.amount ? `${parseFloat(o.amount).toFixed(2)}€` : '—'}</td>
+                                    <td className="s-td" className="u-fw-700" style={{ color: 'var(--accent)' }}>{o.amount ? `${parseFloat(o.amount).toFixed(2)}€` : '—'}</td>
                                     <td className="s-td"><span className={`reports__status-badge ${String(o.status).includes('odobren') ? 'reports__status-badge--approved' : 'reports__status-badge--pending'}`}>{o.status || '—'}</span></td>
                                     <td className="s-td" className="reports__note-cell">{o.note || '—'}</td>
                                 </tr>;
@@ -504,12 +504,12 @@ export function ReportsPage() {
             {tab === 'sve' && (
                 <div className="s-card">
                     <div className="u-section-title u-mb-12">Svi radni sati ({periodTs.length} unosa)</div>
-                    <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}><thead><tr><th className="s-th">Datum</th><th className="s-th">Radnik</th><th className="s-th">Projekt</th><th className="s-th">Od</th><th className="s-th">Do</th><th className="s-th">Sati</th><th className="s-th">Tip</th><th className="s-th">Status</th></tr></thead><tbody>
+                    <div className="u-overflow-x"><table className="u-table" style={{ minWidth: 700 }}><thead><tr><th className="s-th">Datum</th><th className="s-th">Radnik</th><th className="s-th">Projekt</th><th className="s-th">Od</th><th className="s-th">Do</th><th className="s-th">Sati</th><th className="s-th">Tip</th><th className="s-th">Status</th></tr></thead><tbody>
                         {periodTs.sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 200).map(t => {
                             const w = workers.find(x => x.id === t.workerId);
                             const p = projects.find(x => x.id === t.projectId);
                             const h = ((t.durationMins || diffMins(t.startTime, t.endTime)) / 60).toFixed(1);
-                            return <tr key={t.id}><td className="s-td">{fmtDate(t.date)}</td><td className="s-td">{w?.name || '—'}</td><td className="s-td">{p?.name || '—'}</td><td className="s-td">{t.startTime}</td><td className="s-td">{t.endTime}</td><td className="s-td" style={{ fontWeight: 700 }}>{h}h</td><td className="s-td">{t.type || 'normalan'}</td><td className="s-td">{t.status || '—'}</td></tr>;
+                            return <tr key={t.id}><td className="s-td">{fmtDate(t.date)}</td><td className="s-td">{w?.name || '—'}</td><td className="s-td">{p?.name || '—'}</td><td className="s-td">{t.startTime}</td><td className="s-td">{t.endTime}</td><td className="s-td" className="u-fw-700">{h}h</td><td className="s-td">{t.type || 'normalan'}</td><td className="s-td">{t.status || '—'}</td></tr>;
                         })}
                     </tbody></table></div>
                     {periodTs.length > 200 && <div className="reports__truncated">Prikazano prvih 200 od {periodTs.length}</div>}
