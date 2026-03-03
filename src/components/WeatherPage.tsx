@@ -474,7 +474,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
                 <div style={{ ...styles.card }}>
                     <div className="u-section-title u-mb-12">📅 Tjedni vremenski planer</div>
                     <div className="u-overflow-x">
-                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
+                        <table aria-label="Podaci" style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
                             <thead><tr>
                                 <th style={{ textAlign: 'left', padding: '10px 8px', borderBottom: `2px solid ${C.border}`, fontSize: 11, color: C.textMuted, fontWeight: 700, minWidth: 120 }}>PROJEKT</th>
                                 {[...Array(7)].map((_, i) => {

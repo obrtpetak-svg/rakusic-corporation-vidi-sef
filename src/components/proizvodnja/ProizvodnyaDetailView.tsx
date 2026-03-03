@@ -360,7 +360,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                             </div>
                             {specs.materials.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, textAlign: 'center', padding: 20 }}>Nema materijala — dodajte stavke</div> : (
                                 <div style={{ overflowX: 'auto', marginBottom: 20 }}>
-                                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                    <table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}>
                                         <thead><tr><th style={styles.th}>Naziv</th><th style={styles.th}>Profil</th><th style={styles.th}>Kol.</th><th style={styles.th}>Jed.</th><th style={styles.th}>Dimenzije (mm)</th><th style={styles.th}>Debljina (mm)</th><th style={styles.th}>Čelik</th>{canManage && <th style={styles.th}></th>}</tr></thead>
                                         <tbody>
                                             {specs.materials.map(m => (
@@ -462,7 +462,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                         })()}
                         {costItems.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, textAlign: 'center', padding: 20 }}>Nema stavki troškova</div> : (
                             <div className="u-overflow-x">
-                                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                <table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}>
                                     <thead><tr><th style={styles.th}>Stavka</th><th style={styles.th}>Kat.</th><th style={styles.th}>Kol.</th><th style={styles.th}>Cijena</th><th style={styles.th}>Ukupno</th>{canManage && <th style={styles.th}></th>}</tr></thead>
                                     <tbody>
                                         {costItems.map(c => (

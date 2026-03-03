@@ -90,7 +90,7 @@ export function WorkerEvidencija(): React.JSX.Element {
             <div style={styles.card}>
                 <div className="u-section-title u-mb-12">Povijest ({myTs.length} unosa)</div>
                 <div className="u-overflow-x">
-                    <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 500 }}>
+                    <table aria-label="Projekti" style={{ width: '100%', borderCollapse: 'collapse', minWidth: 500 }}>
                         <thead><tr><th style={styles.th}>Datum</th><th style={styles.th}>Projekt</th><th style={styles.th}>Od</th><th style={styles.th}>Do</th><th style={styles.th}>Sati</th><th style={styles.th}>Status</th></tr></thead>
                         <tbody>
                             {myTs.slice(0, 50).map(t => {

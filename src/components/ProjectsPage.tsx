@@ -287,7 +287,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                     <div style={{ ...styles.card, marginBottom: 20 }}>
                         <div className="u-section-title u-mb-12">Radni sati ({detailTimesheets.length})</div>
                         <div className="u-overflow-x">
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}>
                                 <thead><tr><th style={styles.th}>Datum</th><th style={styles.th}>Radnik</th><th style={styles.th}>Od</th><th style={styles.th}>Do</th><th style={styles.th}>Sati</th><th style={styles.th}>Status</th></tr></thead>
                                 <tbody>
                                     {detailTimesheets.sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 20).map(t => {

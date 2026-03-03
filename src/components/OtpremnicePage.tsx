@@ -178,7 +178,7 @@ export function OtpremnicePage({ workerFilterId }) {
             {/* List */}
             <div style={styles.card}>
                 <div className="u-overflow-x">
-                    <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
+                    <table aria-label="Podaci" style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
                         <thead>
                             <tr>
                                 <th style={styles.th}>Datum</th>

@@ -15,9 +15,9 @@ import { Dashboard } from './Dashboard';
 import { ProjectsPage } from './ProjectsPage';
 import { WorkersPage } from './WorkersPage';
 import { TimesheetsPage } from './TimesheetsPage';
-import { TimesheetEntry } from './TimesheetEntry';
-import { InvoicesPage } from './InvoicesPage';
-import { WorkerEvidencija } from './WorkerEvidencija';
+const TimesheetEntry = lazy(() => import('./TimesheetEntry').then(m => ({ default: m.TimesheetEntry })));
+const InvoicesPage = lazy(() => import('./InvoicesPage').then(m => ({ default: m.InvoicesPage })));
+const WorkerEvidencija = lazy(() => import('./WorkerEvidencija').then(m => ({ default: m.WorkerEvidencija })));
 import { useNotifications, requestNotificationPermission } from '../hooks/useNotifications';
 
 // Lazy-loaded pages (less frequently accessed, heavier components)

@@ -265,7 +265,7 @@ export function QrAdminPage() {
                         <div style={{ textAlign: 'center', padding: 40, color: C.textMuted }}>Nema QR check-in zapisa</div>
                     ) : (
                         <div className="u-overflow-x">
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}>
                                 <thead><tr>
                                     <th style={styles.th}>Datum</th><th style={styles.th}>Radnik</th><th style={styles.th}>Projekt</th>
                                     <th style={styles.th}>Check-in</th><th style={styles.th}>Check-out</th><th style={styles.th}>Sati</th><th style={styles.th}>Status</th>

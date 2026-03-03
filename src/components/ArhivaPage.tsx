@@ -557,7 +557,7 @@ export function ArhivaPage() {
             {/* Data Table */}
             <div style={{ ...styles.card, padding: 0, overflow: 'hidden' }}>
                 <div style={{ overflowX: 'auto', maxHeight: 500 }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
+                    <table aria-label="Podaci" style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
                         <thead>
                             <tr>{headers.map((h, i) => (
                                 <th key={h} onClick={() => handleSort(i)} style={{ ...styles.th, position: 'sticky', top: 0, background: C.bgElevated, zIndex: 1, cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}>

@@ -240,7 +240,7 @@ export function ProizvodnyaPage({ leaderProjectIds }) {
                 <div>
                     {filtered.length === 0 ? <div style={{ ...styles.card, textAlign: 'center', padding: 50, color: C.textMuted }}><div style={{ fontSize: 32, marginBottom: 8 }}>📭</div>Nema narudžbi za odabrane filtre</div> : (
                         <div className="u-overflow-x">
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}>
                                 <thead>
                                     <tr>
                                         <th style={styles.th}>Broj</th><th style={styles.th}>Naziv</th><th style={styles.th}>Naručitelj</th>

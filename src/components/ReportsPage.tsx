@@ -277,7 +277,7 @@ return (
                         <div className="u-section-title">Detaljna tablica po radnicima</div>
                         <div className="u-fs-12" style={{ color: C.textMuted }}>{hoursByWorker.length} radnika | {filterWorker !== 'sve' ? workers.find(w => w.id === filterWorker)?.name : 'Svi'}{filterProject !== 'sve' ? ` • ${projects.find(p => p.id === filterProject)?.name}` : ''}</div>
                     </div>
-                    <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}><thead><tr><th style={styles.th}>Radnik</th><th style={styles.th}>Sati</th><th style={styles.th}>Normalan</th><th style={styles.th}>Prekovrm.</th><th style={styles.th}>Noćni</th><th style={styles.th}>Vikend</th><th style={styles.th}>Unosa</th><th style={styles.th}>Prosj/dan</th></tr></thead><tbody>
+                    <div className="u-overflow-x"><table aria-label="Podaci" style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}><thead><tr><th style={styles.th}>Radnik</th><th style={styles.th}>Sati</th><th style={styles.th}>Normalan</th><th style={styles.th}>Prekovrm.</th><th style={styles.th}>Noćni</th><th style={styles.th}>Vikend</th><th style={styles.th}>Unosa</th><th style={styles.th}>Prosj/dan</th></tr></thead><tbody>
                         {hoursByWorker.map(w => <tr key={w.name}><td style={{ ...styles.td, fontWeight: 600 }}>{w.name}</td><td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{w.sati}h</td><td style={styles.td}>{w.normalan}h</td><td style={styles.td}>{w.prekovremeni}h</td><td style={styles.td}>{w.nocni}h</td><td style={styles.td}>{w.vikend}h</td><td style={styles.td}>{w.unosa}</td><td style={styles.td}>{w.unosa > 0 ? (w.sati / w.unosa).toFixed(1) : 0}h</td></tr>)}
                     </tbody></table></div>
                 </div>
@@ -299,7 +299,7 @@ return (
                         <div className="u-section-title">Projekti - detalji</div>
                         <div className="u-fs-12" style={{ color: C.textMuted }}>{hoursByProject.length} projekata | {filterProject !== 'sve' ? projects.find(p => p.id === filterProject)?.name : 'Svi'}{filterWorker !== 'sve' ? ` • ${workers.find(w => w.id === filterWorker)?.name}` : ''}</div>
                     </div>
-                    <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}><thead><tr><th style={styles.th}>Projekt</th><th style={styles.th}>Sati</th><th style={styles.th}>Radnika</th><th style={styles.th}>Troškovi</th><th style={styles.th}>Status</th><th style={styles.th}>% vremena</th></tr></thead><tbody>
+                    <div className="u-overflow-x"><table aria-label="Podaci" style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}><thead><tr><th style={styles.th}>Projekt</th><th style={styles.th}>Sati</th><th style={styles.th}>Radnika</th><th style={styles.th}>Troškovi</th><th style={styles.th}>Status</th><th style={styles.th}>% vremena</th></tr></thead><tbody>
                         {hoursByProject.map(p => {
                             const proj = projects.find(x => x.id === p.id);
                             return <tr key={p.name}><td style={{ ...styles.td, fontWeight: 600 }}>{p.fullName || p.name}</td><td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{p.sati}h</td><td style={styles.td}>{p.radnika}</td><td style={styles.td}>{p.trošak.toFixed(0)}€</td><td style={styles.td}><span style={{ padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600, background: proj?.status === 'aktivan' ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)', color: proj?.status === 'aktivan' ? '#10B981' : '#F59E0B' }}>{proj?.status || 'aktivan'}</span></td><td style={styles.td}>{totalHours > 0 ? ((p.sati / (totalHours / 60)) * 100).toFixed(1) : 0}%</td></tr>;
@@ -321,7 +321,7 @@ return (
                     return (
                         <div key={p.id} style={{ ...styles.card, marginTop: 12 }}>
                             <div className="u-section-title" style={{ fontSize: 13, marginBottom: 8 }}>🏗️ {p.fullName || p.name} — Radnici ({workerList.length})</div>
-                            <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th style={styles.th}>Radnik</th><th style={styles.th}>Sati</th><th style={styles.th}>Unosa</th><th style={styles.th}>% od projekta</th></tr></thead><tbody>
+                            <div className="u-overflow-x"><table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th style={styles.th}>Radnik</th><th style={styles.th}>Sati</th><th style={styles.th}>Unosa</th><th style={styles.th}>% od projekta</th></tr></thead><tbody>
                                 {workerList.map(([name, d]) => <tr key={name}><td style={{ ...styles.td, fontWeight: 600 }}>{name}</td><td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{d.total.toFixed(1)}h</td><td style={styles.td}>{d.entries}</td><td style={styles.td}>{p.sati > 0 ? ((d.total / p.sati) * 100).toFixed(1) : 0}%</td></tr>)}
                             </tbody></table></div>
                         </div>
@@ -353,7 +353,7 @@ return (
                 </div>
                 <div style={styles.card}>
                     <div className="u-section-title u-mb-12">Troškovi po projektima - tablica</div>
-                    <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th style={styles.th}>Projekt</th><th style={styles.th}>Troškovi €</th><th style={styles.th}>% ukupnog</th></tr></thead><tbody>
+                    <div className="u-overflow-x"><table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th style={styles.th}>Projekt</th><th style={styles.th}>Troškovi €</th><th style={styles.th}>% ukupnog</th></tr></thead><tbody>
                         {costsByProject.map(c => <tr key={c.name}><td style={{ ...styles.td, fontWeight: 600 }}>{c.fullName || c.name}</td><td style={{ ...styles.td, fontWeight: 700, color: C.red }}>{c.iznos.toFixed(2)}€</td><td style={styles.td}>{totalCosts > 0 ? ((c.iznos / totalCosts) * 100).toFixed(1) : 0}%</td></tr>)}
                         {costsByProject.length === 0 && <tr><td colSpan={3} style={{ ...styles.td, textAlign: 'center', color: C.textMuted }}>Nema podataka</td></tr>}
                     </tbody></table></div>
@@ -374,7 +374,7 @@ return (
                 </div>
                 <div style={styles.card}>
                     <div className="u-section-title u-mb-12">Dnevna tablica</div>
-                    <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th style={styles.th}>Dan</th><th style={styles.th}>Sati</th></tr></thead><tbody>
+                    <div className="u-overflow-x"><table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th style={styles.th}>Dan</th><th style={styles.th}>Sati</th></tr></thead><tbody>
                         {dailyTrend.map(d => <tr key={d.dan}><td style={styles.td}>{d.dan}</td><td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{d.sati}h</td></tr>)}
                     </tbody></table></div>
                 </div>
@@ -407,7 +407,7 @@ return (
                     </div>
                 </div>
                 <div style={styles.card}>
-                    <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th style={styles.th}>Vozilo</th><th style={styles.th}>Litara</th><th style={styles.th}>Trošak €</th><th style={styles.th}>Km</th><th style={styles.th}>Unosa</th></tr></thead><tbody>
+                    <div className="u-overflow-x"><table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th style={styles.th}>Vozilo</th><th style={styles.th}>Litara</th><th style={styles.th}>Trošak €</th><th style={styles.th}>Km</th><th style={styles.th}>Unosa</th></tr></thead><tbody>
                         {vehicleData.map(v => <tr key={v.name}><td style={{ ...styles.td, fontWeight: 600 }}>{v.name}</td><td style={styles.td}>{v.litara.toFixed(1)}</td><td style={{ ...styles.td, fontWeight: 700, color: C.red }}>{v.trošak.toFixed(2)}€</td><td style={styles.td}>{v.km.toFixed(0)}</td><td style={styles.td}>{v.unosa}</td></tr>)}
                         {vehicleData.length === 0 && <tr><td colSpan={5} style={{ ...styles.td, textAlign: 'center', color: C.textMuted }}>Nema podataka</td></tr>}
                     </tbody></table></div>
@@ -425,7 +425,7 @@ return (
                 </div>
                 <div style={styles.card}>
                     <div className="u-section-title u-mb-16"> Produktivnost po radnicima</div>
-                    <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <div className="u-overflow-x"><table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead><tr><th style={styles.th}>Radnik</th><th style={styles.th}>Ukupno h</th><th style={styles.th}>Radnih dana</th><th style={styles.th}>Prosj./dan</th><th style={styles.th}>Projekata</th><th style={styles.th}>Prekov.</th><th style={styles.th}>Efikasnost</th></tr></thead>
                         <tbody>{productivity.map(w => (
                             <tr key={w.name}><td style={{ ...styles.td, fontWeight: 600 }}>{w.name}</td><td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{w.totalH}h</td><td style={styles.td}>{w.days}</td><td style={styles.td}>{w.avgH}h</td><td style={styles.td}>{w.projects}</td><td style={{ ...styles.td, color: w.overtime > 0 ? '#F59E0B' : C.textMuted }}>{w.overtime}h</td>
@@ -447,7 +447,7 @@ return (
                 </div>
                 <div style={styles.card}>
                     <div className="u-section-title u-mb-16">📋 Prisutnost radnika</div>
-                    <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <div className="u-overflow-x"><table aria-label="Pregled" style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead><tr><th style={styles.th}>Radnik</th><th style={styles.th}>Prisutan (dana)</th><th style={styles.th}>Odsutan</th><th style={styles.th}>Kašnjenja</th><th style={styles.th}>Stopa prisutnosti</th></tr></thead>
                         <tbody>{attendance.map(a => (
                             <tr key={a.name}><td style={{ ...styles.td, fontWeight: 600 }}>{a.name}</td><td style={{ ...styles.td, fontWeight: 700, color: C.green }}>{a.present}</td><td style={{ ...styles.td, color: a.absent > 3 ? C.red : C.textMuted }}>{a.absent}</td><td style={{ ...styles.td, color: a.late > 0 ? '#F59E0B' : C.textMuted }}>{a.late}</td>

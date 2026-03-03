@@ -150,7 +150,7 @@ export function VozilaPage({ workerFilterId }) {
                             <button onClick={() => setShowFuelForm(detailVehicle.id)} style={styles.btn}><Icon name="plus" size={14} /> Dodaj tankanje</button>
                         </div>
                         {fuelLogs.length === 0 ? <div style={{ color: C.textMuted, fontSize: 13, padding: 12 }}>Nema evidencije goriva</div> : (
-                            <div className="u-overflow-x"><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 500 }}>
+                            <div className="u-overflow-x"><table aria-label="Projekti" style={{ width: '100%', borderCollapse: 'collapse', minWidth: 500 }}>
                                 <thead><tr><th style={styles.th}>Datum</th><th style={styles.th}>Litara</th><th style={styles.th}>€/L</th><th style={styles.th}>Ukupno €</th><th style={styles.th}>km</th><th style={styles.th}>Lokacija</th><th style={styles.th}></th></tr></thead>
                                 <tbody>{fuelLogs.map(f => (
                                     <tr key={f.id}><td style={styles.td}>{fmtDate(f.date)}</td><td style={{ ...styles.td, fontWeight: 600 }}>{f.liters || '—'}</td><td style={styles.td}>{f.pricePerLiter || '—'}</td><td style={{ ...styles.td, fontWeight: 700, color: C.accent }}>{f.totalCost ? `${parseFloat(f.totalCost).toFixed(2)}€` : '—'}</td><td style={styles.td}>{f.km ? Number(f.km).toLocaleString() : '—'}</td><td style={styles.td}>{f.location || '—'}</td><td style={styles.td}>{!isWorker && <button onClick={() => deleteFuelLog(detailVehicle.id, f.id)} style={styles.btnDanger}><Icon name="trash" size={12} /></button>}</td></tr>
