@@ -53,12 +53,36 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
         }
         try {
             const { pin: _pin, assignedProjects: _ap, ...workerFields } = form;
+
+            // Helper: provision Firebase Auth account for the worker
+            const provisionFirebaseAuth = async (username: string, password: string, displayName: string) => {
+                try {
+                    const auth = (await import('../context/firebaseCore')).getAuth();
+                    if (!auth?.currentUser) return;
+                    const token = await auth.currentUser.getIdToken();
+                    const resp = await fetch('/api/admin/create-user', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ username, password, displayName }),
+                    });
+                    const data = await resp.json();
+                    if (!resp.ok) console.warn('[Worker] Firebase Auth provision failed:', data.error);
+                    else console.log(`[Worker] Firebase Auth account ${data.action} for ${username}`);
+                } catch (err) {
+                    console.warn('[Worker] Firebase Auth provision error:', err);
+                }
+            };
+
             if (editId) {
                 await updateDoc('workers', editId, { ...workerFields, updatedAt: new Date().toISOString() });
                 const existingUser = users.find(u => u.id === editId);
                 if (existingUser) {
-                    const userUpdate = { name: form.name, username: form.username, role: form.role, active: form.active, assignedProjects: form.role === 'leader' ? form.assignedProjects : [] };
-                    if (form.pin && form.pin.length >= 4) userUpdate.pin = await hashPin(form.pin);
+                    const userUpdate: Record<string, unknown> = { name: form.name, username: form.username, role: form.role, active: form.active, assignedProjects: form.role === 'leader' ? form.assignedProjects : [] };
+                    if (form.pin && form.pin.length >= 4) {
+                        userUpdate.pin = await hashPin(form.pin);
+                        // Also update Firebase Auth password
+                        if (form.username) await provisionFirebaseAuth(form.username, form.pin, form.name);
+                    }
                     await updateDoc('users', editId, userUpdate);
                 }
             } else {
@@ -67,12 +91,14 @@ export function WorkersPage({ leaderProjectIds, leaderWorkerIds, defaultDetailId
                 if (form.username && form.pin) {
                     const hashedPin = await hashPin(form.pin);
                     await addDoc('users', { id, name: form.name, username: form.username, pin: hashedPin, role: form.role, active: form.active, workerId: id, assignedProjects: form.role === 'leader' ? form.assignedProjects : [] });
+                    // Create Firebase Auth account so worker can log in
+                    await provisionFirebaseAuth(form.username, form.pin, form.name);
                 }
             }
             setShowForm(false);
         } catch (e) {
             console.error('Greška pri spremanju radnika:', e);
-            alert('Greška pri spremanju: ' + (e.message || 'Nepoznata greška'));
+            alert('Greška pri spremanju: ' + ((e as Error).message || 'Nepoznata greška'));
         }
     };
 
