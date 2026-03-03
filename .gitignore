@@ -16,3 +16,4 @@ FIRESTORE_RULES.js
 fix_theme.py
 netlify.toml
 capacitor.config.json
+coverage/
