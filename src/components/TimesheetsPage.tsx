@@ -4,6 +4,7 @@ import { useApp, add as addDoc, update as updateDoc, remove as removeDoc } from 
 import { Icon, Modal, Field, Input, Select, StatusBadge, Pagination, usePagination, useIsMobile } from './ui/SharedComponents';
 import { C, styles, genId, today, fmtDate, diffMins, fmtHours, compressImage } from '../utils/helpers';
 import { BulkActionBar } from './ui/BulkActionBar';
+import './timesheets.css';
 
 export function TimesheetsPage() {
     const confirm = useConfirm();
@@ -180,7 +181,7 @@ export function TimesheetsPage() {
         <>
             <div>
                 {/* Header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
+                <div className="ts__header">
                     <div>
                         <div className="u-fs-22 u-fw-800 u-color-text"> Radni sati</div>
                         <div className="u-fs-13 u-text-muted">Upravljanje evidencijom radnog vremena</div>
@@ -193,62 +194,62 @@ export function TimesheetsPage() {
                 </div>
 
                 {/* Stats */}
-                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(5, 1fr)', gap: 12, marginBottom: 20 }}>
+                <div className={`ts__stats ${isMobile ? 'ts__stats--mobile' : 'ts__stats--desktop'}`}>
                     <div style={{ ...styles.card, textAlign: 'center', padding: '14px 12px' }}>
                         <div className="u-stat-label">Ukupno sati</div>
-                        <div style={{ fontSize: 24, fontWeight: 800, color: C.accent }}>{(totalFiltered / 60).toFixed(1)}h</div>
+                        <div className="ts__stat-value" style={{ color: C.accent }}>{(totalFiltered / 60).toFixed(1)}h</div>
                     </div>
                     <div style={{ ...styles.card, textAlign: 'center', padding: '14px 12px' }}>
                         <div className="u-stat-label">Unosa</div>
-                        <div style={{ fontSize: 24, fontWeight: 800, color: C.blue }}>{filtered.length}</div>
+                        <div className="ts__stat-value" style={{ color: C.blue }}>{filtered.length}</div>
                     </div>
                     <div style={{ ...styles.card, textAlign: 'center', padding: '14px 12px' }}>
                         <div className="u-stat-label">Odobreno</div>
-                        <div style={{ fontSize: 24, fontWeight: 800, color: C.green }}>{approvedCount}</div>
+                        <div className="ts__stat-value" style={{ color: C.green }}>{approvedCount}</div>
                     </div>
                     <div style={{ ...styles.card, textAlign: 'center', padding: '14px 12px' }}>
                         <div className="u-stat-label">Na čekanju</div>
-                        <div style={{ fontSize: 24, fontWeight: 800, color: C.yellow }}>{pendingCount}</div>
+                        <div className="ts__stat-value" style={{ color: C.yellow }}>{pendingCount}</div>
                     </div>
                     <div style={{ ...styles.card, textAlign: 'center', padding: '14px 12px' }}>
                         <div className="u-stat-label">Prosj./dan</div>
-                        <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--purple)' }}>{avgPerDay}h</div>
+                        <div className="ts__stat-value" style={{ color: 'var(--purple)' }}>{avgPerDay}h</div>
                     </div>
                 </div>
 
                 {/* Filters */}
-                <div style={{ ...styles.card, marginBottom: 20, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-                    <div style={{ position: 'relative', flex: 1, minWidth: 140 }}>
+                <div style={styles.card} className="ts__filters">
+                    <div className="ts__search-wrap">
                         <Input placeholder="Traži radnika, projekt..." value={search} onChange={e => setSearch(e.target.value)} className="u-pl-36" />
-                        <div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: C.textMuted }}><Icon name="search" size={14} /></div>
+                        <div className="ts__search-icon"><Icon name="search" size={14} /></div>
                     </div>
-                    <Select value={filterWorker} onChange={e => setFilterWorker(e.target.value)} style={{ width: 150 }}>
+                    <Select value={filterWorker} onChange={e => setFilterWorker(e.target.value)} className="ts__filter-select">
                         <option value="all">Svi radnici</option>
                         {activeWorkers.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
                     </Select>
-                    <Select value={filterProject} onChange={e => setFilterProject(e.target.value)} style={{ width: 150 }}>
+                    <Select value={filterProject} onChange={e => setFilterProject(e.target.value)} className="ts__filter-select">
                         <option value="all">Svi projekti</option>
                         {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                     </Select>
-                    <Select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ width: 130 }}>
+                    <Select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="ts__filter-status">
                         <option value="all">Svi statusi</option>
                         <option value="na čekanju">Na čekanju</option>
                         <option value="odobren">Odobren</option>
                         <option value="odbijen">Odbijen</option>
                     </Select>
-                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                        <Input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} style={{ width: 130 }} />
-                        <span style={{ color: C.textMuted, fontSize: 12 }}>—</span>
-                        <Input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} style={{ width: 130 }} />
+                    <div className="ts__date-range">
+                        <Input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="ts__date-input" />
+                        <span className="ts__date-sep">—</span>
+                        <Input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="ts__date-input" />
                     </div>
                 </div>
 
                 {/* Pending banner */}
                 {pendingCount > 0 && (
-                    <div style={{ ...styles.card, background: 'rgba(234,179,8,0.06)', borderColor: 'rgba(234,179,8,0.25)', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12, padding: '14px 18px' }}>
-                        <div style={{ fontSize: 20 }}>⏳</div>
+                    <div style={styles.card} className="ts__pending-banner">
+                        <div className="ts__pending-icon">⏳</div>
                         <div>
-                            <div style={{ fontWeight: 700, color: C.yellow, fontSize: 14 }}>{pendingCount} unos{pendingCount > 1 ? 'a' : ''} čeka odobrenje</div>
+                            <div className="ts__pending-title">{pendingCount} unos{pendingCount > 1 ? 'a' : ''} čeka odobrenje</div>
                             <div className="u-fs-12 u-text-muted">Pregledajte i odobrite/odbijte unose radnika</div>
                         </div>
                         <button onClick={() => { setFilterStatus('na čekanju'); }} style={{ ...styles.btnSmall, marginLeft: 'auto', color: C.yellow, borderColor: 'rgba(180,83,9,0.3)' }}>Prikaži sve</button>
@@ -256,8 +257,8 @@ export function TimesheetsPage() {
                 )}
 
                 {/* Table */}
-                <div style={{ ...styles.card, padding: 0, overflow: 'hidden' }}>
-                    <div style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={styles.card} className="ts__table-card">
+                    <div className="ts__table-header">
                         <div className="u-section-title">Pregled ({filtered.length})</div>
                         <div className="u-fs-12 u-text-muted">{(totalFiltered / 60).toFixed(1)}h ukupno</div>
                     </div>
@@ -293,11 +294,11 @@ export function TimesheetsPage() {
                                             <td style={{ ...styles.td, whiteSpace: 'nowrap' }}>{fmtDate(t.date)}</td>
                                             <td style={styles.td}>
                                                 <div className="u-flex-center u-gap-8">
-                                                    <div style={{ width: 28, height: 28, borderRadius: '50%', background: C.accentLight, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: C.accent, flexShrink: 0 }}>{w?.name?.charAt(0)}</div>
-                                                    <span style={{ fontWeight: 600, fontSize: 13 }}>{w?.name || '—'}</span>
+                                                    <div className="ts__avatar">{w?.name?.charAt(0)}</div>
+                                                    <span className="ts__worker-name">{w?.name || '—'}</span>
                                                 </div>
                                             </td>
-                                            <td style={{ ...styles.td, fontSize: 13, maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p?.name || '—'}</td>
+                                            <td style={styles.td} className="ts__project-cell">{p?.name || '—'}</td>
                                             <td style={{ ...styles.td, fontSize: 13 }}>{t.startTime}</td>
                                             <td style={{ ...styles.td, fontSize: 13 }}>{t.endTime}</td>
                                             <td style={{ ...styles.td, fontSize: 12, color: C.textMuted }}>{t.breakMins || 0}m</td>
@@ -305,7 +306,7 @@ export function TimesheetsPage() {
                                             <td style={{ ...styles.td, fontSize: 12 }}>{typeLabel[t.type] || ''} {t.type || 'normalan'}</td>
                                             <td style={styles.td}><StatusBadge status={t.status} /></td>
                                             <td style={styles.td}>
-                                                <div style={{ display: 'flex', gap: 3 }}>
+                                                <div className="ts__actions">
                                                     {isPending && <>
                                                         <button onClick={() => approve(t)} style={{ ...styles.btnSmall, background: 'rgba(34,197,94,0.12)', color: C.green, border: '1px solid rgba(34,197,94,0.25)', padding: '4px 8px' }} title="Odobri"><Icon name="check" size={13} /></button>
                                                         <button onClick={() => reject(t)} style={{ ...styles.btnSmall, background: 'rgba(239,68,68,0.1)', color: C.red, border: '1px solid rgba(239,68,68,0.2)', padding: '4px 8px' }} title="Odbij"><Icon name="close" size={13} /></button>
@@ -320,7 +321,7 @@ export function TimesheetsPage() {
                                 })}
                             </tbody>
                         </table>
-                        {filtered.length === 0 && <div style={{ padding: 40, textAlign: 'center', color: C.textMuted }}>Nema unosa za odabrane filtere</div>}
+                        {filtered.length === 0 && <div className="ts__empty">Nema unosa za odabrane filtere</div>}
                     </div>
                     {filtered.length > 0 && <Pagination {...pg} totalItems={filtered.length} label="unosa" />}
                 </div>
@@ -334,7 +335,7 @@ export function TimesheetsPage() {
                             const mins = diffMins(detailTs.startTime, detailTs.endTime) - (detailTs.breakMins || 0);
                             return (
                                 <div>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+                                    <div className="ts__detail-grid">
                                         <div><span style={styles.label}>Radnik</span><div className="u-fw-600">{w?.name || '—'}</div></div>
                                         <div><span style={styles.label}>Projekt</span><div className="u-fw-600">{p?.name || '—'}</div></div>
                                         <div><span style={styles.label}>Datum</span><div>{fmtDate(detailTs.date)}</div></div>
@@ -344,14 +345,14 @@ export function TimesheetsPage() {
                                         <div><span style={styles.label}>Pauza</span><div>{detailTs.breakMins || 0} min</div></div>
                                         <div><span style={styles.label}>Status</span><StatusBadge status={detailTs.status} /></div>
                                     </div>
-                                    {detailTs.description && <div className="u-mb-12"><span style={styles.label}>Opis rada</span><div style={{ padding: '10px 14px', borderRadius: 8, background: C.bgElevated, fontSize: 13 }}>{detailTs.description}</div></div>}
-                                    {detailTs.gpsLocation && <div className="u-mb-12"><span style={styles.label}>GPS Lokacija</span><div style={{ fontSize: 13, color: C.accent }}>📍 {detailTs.gpsLocation}</div></div>}
-                                    {detailTs.notes && <div className="u-mb-12"><span style={styles.label}>Napomene</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(245,158,11,0.08)', fontSize: 13, color: C.yellow }}>{detailTs.notes}</div></div>}
-                                    {detailTs.rejectReason && <div className="u-mb-12"><span style={styles.label}>Razlog odbijanja</span><div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(239,68,68,0.1)', fontSize: 13, color: C.red }}>{detailTs.rejectReason}</div></div>}
+                                    {detailTs.description && <div className="u-mb-12"><span style={styles.label}>Opis rada</span><div className="ts__detail-desc">{detailTs.description}</div></div>}
+                                    {detailTs.gpsLocation && <div className="u-mb-12"><span style={styles.label}>GPS Lokacija</span><div className="ts__detail-gps">📍 {detailTs.gpsLocation}</div></div>}
+                                    {detailTs.notes && <div className="u-mb-12"><span style={styles.label}>Napomene</span><div className="ts__detail-notes">{detailTs.notes}</div></div>}
+                                    {detailTs.rejectReason && <div className="u-mb-12"><span style={styles.label}>Razlog odbijanja</span><div className="ts__detail-reject">{detailTs.rejectReason}</div></div>}
                                     {detailTs.source && <div className="u-fs-12 u-text-muted">Izvor: {detailTs.source === 'admin' ? 'Admin unos' : 'Radnički unos'}</div>}
                                     {detailTs.invoiceFile && <div className="u-mt-12"><span style={styles.label}>Priloženi račun</span><div style={{ marginTop: 4 }}><a href={detailTs.invoiceFile.data} download={detailTs.invoiceFile.name} style={styles.btnSmall}><Icon name="download" size={14} /> {detailTs.invoiceFile.name}</a></div></div>}
                                     {detailTs.status === 'na čekanju' && (
-                                        <div style={{ display: 'flex', gap: 12, marginTop: 20, borderTop: `1px solid ${C.border}`, paddingTop: 16 }}>
+                                        <div className="ts__detail-actions">
                                             <button onClick={() => { approve(detailTs); setDetailId(null); }} style={{ ...styles.btn, background: C.green, flex: 1, justifyContent: 'center' }}><Icon name="check" size={16} /> Odobri</button>
                                             <button onClick={() => { reject(detailTs); setDetailId(null); }} style={{ ...styles.btn, background: C.red, flex: 1, justifyContent: 'center' }}><Icon name="close" size={16} /> Odbij</button>
                                         </div>
@@ -365,7 +366,7 @@ export function TimesheetsPage() {
                 {/* Add/Edit Modal */}
                 {showForm && (
                     <Modal title={editId ? 'Uredi radne sate' : 'Dodaj radne sate'} onClose={() => setShowForm(false)} wide>
-                        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }} className="u-gap-16">
+                        <div className={`ts__form-grid ${isMobile ? 'ts__form-grid--mobile' : 'ts__form-grid--desktop'} u-gap-16`}>
                             <Field label="Radnik" required>
                                 <Select value={form.workerId} onChange={e => update('workerId', e.target.value)}>
                                     <option value="">— Odaberi radnika —</option>
@@ -393,9 +394,9 @@ export function TimesheetsPage() {
                                 </Select>
                             </Field>
                         </div>
-                        <div style={{ background: C.accentLight, borderRadius: 10, padding: '12px 16px', marginTop: 8, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
-                            <div style={{ fontSize: 11, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Neto sati:</div>
-                            <div style={{ fontSize: 18, fontWeight: 800, color: C.accent }}>{((diffMins(form.startTime, form.endTime) - (form.breakMins || 0)) / 60).toFixed(1)}h</div>
+                        <div className="ts__net-hours">
+                            <div className="ts__net-label">Neto sati:</div>
+                            <div className="ts__net-value">{((diffMins(form.startTime, form.endTime) - (form.breakMins || 0)) / 60).toFixed(1)}h</div>
                         </div>
                         <Field label="Opis rada"><Input value={form.description} onChange={e => update('description', e.target.value)} placeholder="Što je radnik radio..." /></Field>
                         <Field label="Napomene"><Input value={form.notes} onChange={e => update('notes', e.target.value)} placeholder="Dodatne napomene..." /></Field>

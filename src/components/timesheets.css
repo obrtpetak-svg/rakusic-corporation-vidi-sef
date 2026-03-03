@@ -1,0 +1,244 @@
+/* ═══════════════════════════════════════════════════════════════
+   TimesheetsPage — CSS Extracted from inline styles
+   BEM-style naming: .ts__block--modifier
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Header ── */
+.ts__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* ── Stats Grid ── */
+.ts__stats {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.ts__stats--desktop {
+    grid-template-columns: repeat(5, 1fr);
+}
+
+.ts__stats--mobile {
+    grid-template-columns: 1fr 1fr;
+}
+
+.ts__stat-value {
+    font-size: 24px;
+    font-weight: 800;
+}
+
+/* ── Filters ── */
+.ts__filters {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.ts__search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 140px;
+}
+
+.ts__search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+}
+
+.ts__filter-select {
+    width: 150px;
+}
+
+.ts__filter-status {
+    width: 130px;
+}
+
+.ts__date-range {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.ts__date-sep {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.ts__date-input {
+    width: 130px;
+}
+
+/* ── Pending Banner ── */
+.ts__pending-banner {
+    background: rgba(234, 179, 8, 0.06);
+    border-color: rgba(234, 179, 8, 0.25);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+}
+
+.ts__pending-icon {
+    font-size: 20px;
+}
+
+.ts__pending-title {
+    font-weight: 700;
+    color: var(--yellow, #EAB308);
+    font-size: 14px;
+}
+
+/* ── Table Container ── */
+.ts__table-card {
+    padding: 0;
+    overflow: hidden;
+}
+
+.ts__table-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ── Sticky Table Headers ── */
+.ts__th-sticky {
+    position: sticky;
+    top: 0;
+    background: var(--bg-elevated);
+    z-index: 1;
+}
+
+/* ── Row Elements ── */
+.ts__avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--accent);
+    flex-shrink: 0;
+}
+
+.ts__worker-name {
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.ts__project-cell {
+    font-size: 13px;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ts__actions {
+    display: flex;
+    gap: 3px;
+}
+
+/* ── Empty State ── */
+.ts__empty {
+    padding: 40px;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+/* ── Detail Modal Grid ── */
+.ts__detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.ts__detail-desc {
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: var(--bg-elevated);
+    font-size: 13px;
+}
+
+.ts__detail-gps {
+    font-size: 13px;
+    color: var(--accent);
+}
+
+.ts__detail-notes {
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: rgba(245, 158, 11, 0.08);
+    font-size: 13px;
+    color: var(--yellow, #EAB308);
+}
+
+.ts__detail-reject {
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: rgba(239, 68, 68, 0.1);
+    font-size: 13px;
+    color: var(--red, #EF4444);
+}
+
+.ts__detail-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+}
+
+/* ── Form Modal ── */
+.ts__form-grid {
+    display: grid;
+}
+
+.ts__form-grid--desktop {
+    grid-template-columns: 1fr 1fr;
+}
+
+.ts__form-grid--mobile {
+    grid-template-columns: 1fr;
+}
+
+.ts__net-hours {
+    background: var(--accent-light);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ts__net-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.ts__net-value {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--accent);
+}
