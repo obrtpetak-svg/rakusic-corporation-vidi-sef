@@ -2,14 +2,17 @@
 // Provides exportToExcel() for any data table → .xlsx download
 import * as XLSX from 'xlsx';
 
-/**
- * Export array of objects to Excel (.xlsx)
- * @param {Object[]} data - Array of row objects
- * @param {string} filename - Name without extension
- * @param {string} sheetName - Sheet tab name
- * @param {Object[]} columns - Optional [{key, label, width}] to control column order/names
- */
-export function exportToExcel(data, filename = 'export', sheetName = 'Podaci', columns = null) {
+type RowData = Record<string, unknown>;
+interface ColumnDef { key: string; label?: string; width?: number; }
+interface EntityRow { id: string;[key: string]: unknown; }
+
+ * Export array of objects to Excel(.xlsx)
+    * @param { Object[] } data - Array of row objects
+        * @param { string } filename - Name without extension
+            * @param { string } sheetName - Sheet tab name
+                * @param { Object[] } columns - Optional[{ key, label, width }] to control column order / names
+                    */
+export function exportToExcel(data: RowData[], filename = 'export', sheetName = 'Podaci', columns: ColumnDef[] | null = null) {
     if (!data || data.length === 0) {
         alert('Nema podataka za export');
         return;
@@ -21,13 +24,13 @@ export function exportToExcel(data, filename = 'export', sheetName = 'Podaci', c
     if (columns) {
         // Map data using column definitions
         exportData = data.map(row => {
-            const mapped = {};
-            columns.forEach(col => {
+            const mapped: RowData = {};
+            columns.forEach((col: ColumnDef) => {
                 mapped[col.label || col.key] = row[col.key] ?? '';
             });
             return mapped;
         });
-        colWidths = columns.map(col => ({ wch: col.width || 18 }));
+        colWidths = columns.map((col: ColumnDef) => ({ wch: col.width || 18 }));
     } else {
         exportData = data;
         const keys = Object.keys(data[0]);
@@ -45,10 +48,10 @@ export function exportToExcel(data, filename = 'export', sheetName = 'Podaci', c
 /**
  * Export timesheets for a specific period
  */
-export function exportTimesheets(timesheets, workers, projects, dateFrom, dateTo) {
-    const data = timesheets.map(t => {
-        const w = workers.find(x => x.id === t.workerId);
-        const p = projects.find(x => x.id === t.projectId);
+export function exportTimesheets(timesheets: EntityRow[], workers: EntityRow[], projects: EntityRow[], dateFrom: string, dateTo: string) {
+    const data = timesheets.map((t: EntityRow) => {
+        const w = workers.find((x: EntityRow) => x.id === t.workerId);
+        const p = projects.find((x: EntityRow) => x.id === t.projectId);
         const start = t.startTime || '';
         const end = t.endTime || '';
         const breakMins = t.breakMins || 0;
@@ -83,8 +86,8 @@ export function exportTimesheets(timesheets, workers, projects, dateFrom, dateTo
 /**
  * Export workers summary for a period
  */
-export function exportWorkersSummary(hoursByWorker, dateFrom, dateTo) {
-    const data = hoursByWorker.map(w => ({
+export function exportWorkersSummary(hoursByWorker: RowData[], dateFrom: string, dateTo: string) {
+    const data = hoursByWorker.map((w: RowData) => ({
         'Radnik': w.name,
         'Ukupno sati': w.sati,
         'Normalan': w.normalan || 0,
@@ -101,10 +104,10 @@ export function exportWorkersSummary(hoursByWorker, dateFrom, dateTo) {
 /**
  * Export invoices
  */
-export function exportInvoices(invoices, workers, projects) {
-    const data = invoices.map(i => {
-        const w = workers.find(x => x.id === i.workerId);
-        const p = projects.find(x => x.id === i.projectId);
+export function exportInvoices(invoices: EntityRow[], workers: EntityRow[], projects: EntityRow[]) {
+    const data = invoices.map((i: EntityRow) => {
+        const w = workers.find((x: EntityRow) => x.id === i.workerId);
+        const p = projects.find((x: EntityRow) => x.id === i.projectId);
         return {
             'Br. računa': i.invoiceNumber || '',
             'Dobavljač': i.supplier || w?.name || '—',
@@ -122,13 +125,13 @@ export function exportInvoices(invoices, workers, projects) {
 /**
  * Export projects overview
  */
-export function exportProjects(projects, workers) {
-    const data = projects.filter(p => p.status !== 'obrisan').map(p => ({
+export function exportProjects(projects: EntityRow[], workers: EntityRow[]) {
+    const data = projects.filter((p: EntityRow) => p.status !== 'obrisan').map((p: EntityRow) => ({
         'Naziv': p.name || '',
         'Lokacija': p.location || '',
         'Status': p.status || '',
-        'Radnici': (p.workers || []).map(wId => workers.find(w => w.id === wId)?.name || '?').join(', '),
-        'Broj radnika': (p.workers || []).length,
+        'Radnici': ((p.workers as string[]) || []).map((wId: string) => workers.find((w: EntityRow) => w.id === wId)?.name || '?').join(', '),
+        'Broj radnika': ((p.workers as string[]) || []).length,
         'Početak': p.startDate || '',
         'Završetak': p.endDate || '',
     }));
