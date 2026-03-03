@@ -12,12 +12,14 @@ const STORE_NAME = 'pendingWrites';
 const MAX_BATCH = 10;
 const MAX_RETRIES = 5;
 
-let _db = null;
+interface SyncEntry { id?: number; type: string; payload: Record<string, unknown>; dedupKey: string; createdAt: number; retries: number; }
+
+let _db: IDBDatabase | null = null;
 
 // ── Open IndexedDB ──
-function openDB() {
+function openDB(): Promise<IDBDatabase> {
     if (_db) return Promise.resolve(_db);
-    return new Promise((resolve, reject) => {
+    return new Promise<IDBDatabase>((resolve, reject) => {
         const req = indexedDB.open(DB_NAME, DB_VERSION);
         req.onupgradeneeded = () => {
             const db = req.result;
@@ -26,7 +28,7 @@ function openDB() {
                 store = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
                 store.createIndex('createdAt', 'createdAt');
             } else {
-                store = req.transaction.objectStore(STORE_NAME);
+                store = req.transaction!.objectStore(STORE_NAME);
             }
             // H-8: Index for dedup lookups
             if (!store.indexNames.contains('typeWorker')) {
@@ -39,7 +41,7 @@ function openDB() {
 }
 
 // ── Enqueue a failed write (with deduplication) ──
-export async function enqueue(type, payload) {
+export async function enqueue(type: string, payload: Record<string, unknown>) {
     try {
         const db = await openDB();
         const dedupKey = `${type}:${payload?.workerId || 'unknown'}`;
@@ -60,7 +62,7 @@ export async function enqueue(type, payload) {
 
         if (existing) {
             // Replace existing entry (keep same id, update payload)
-            entry.id = existing.id;
+            (entry as SyncEntry & { id: number }).id = (existing as SyncEntry).id!;
             store.put(entry);
             log(`[SyncQueue] Replaced existing ${type} for worker ${payload?.workerId}`);
         } else {
@@ -90,13 +92,13 @@ export async function getPendingCount() {
 }
 
 // ── Flush queue — process pending writes ──
-export async function flush(writeFn) {
+export async function flush(writeFn: (type: string, payload: Record<string, unknown>) => Promise<void>) {
     if (!navigator.onLine) return 0;
     try {
         const db = await openDB();
         const tx = db.transaction(STORE_NAME, 'readonly');
         const store = tx.objectStore(STORE_NAME);
-        const items = await getAllFromStore(store, MAX_BATCH);
+        const items = await getAllFromStore(store, MAX_BATCH) as SyncEntry[];
         if (!items.length) return 0;
 
         let processed = 0;
@@ -105,14 +107,14 @@ export async function flush(writeFn) {
                 await writeFn(item.type, item.payload);
                 // Success — remove from queue
                 const delTx = db.transaction(STORE_NAME, 'readwrite');
-                delTx.objectStore(STORE_NAME).delete(item.id);
+                delTx.objectStore(STORE_NAME).delete(item.id!);
                 await txComplete(delTx);
                 processed++;
             } catch (err) {
                 // Increment retry count, remove if maxed out
                 const updTx = db.transaction(STORE_NAME, 'readwrite');
                 if (item.retries >= MAX_RETRIES) {
-                    updTx.objectStore(STORE_NAME).delete(item.id);
+                    updTx.objectStore(STORE_NAME).delete(item.id!);
                     warn(`[SyncQueue] Dropped item after ${MAX_RETRIES} retries:`, item.type);
                 } else {
                     updTx.objectStore(STORE_NAME).put({ ...item, retries: item.retries + 1 });
@@ -130,7 +132,7 @@ export async function flush(writeFn) {
 
 // ── Auto-flush on online event ──
 let _autoFlushBound = false;
-export function startAutoFlush(writeFn) {
+export function startAutoFlush(writeFn: (type: string, payload: Record<string, unknown>) => Promise<void>) {
     if (_autoFlushBound) return;
     _autoFlushBound = true;
     const doFlush = () => {
@@ -142,26 +144,26 @@ export function startAutoFlush(writeFn) {
 }
 
 // ── Helpers ──
-function txComplete(tx) {
+function txComplete(tx: IDBTransaction) {
     return new Promise((resolve, reject) => {
         tx.oncomplete = resolve;
         tx.onerror = () => reject(tx.error);
     });
 }
 
-function idbRequest(req) {
+function idbRequest(req: IDBRequest) {
     return new Promise((resolve, reject) => {
         req.onsuccess = () => resolve(req.result);
         req.onerror = () => reject(req.error);
     });
 }
 
-function getAllFromStore(store, limit) {
+function getAllFromStore(store: IDBObjectStore, limit: number) {
     return new Promise((resolve) => {
-        const items = [];
+        const items: Record<string, unknown>[] = [];
         const req = store.openCursor();
-        req.onsuccess = (e) => {
-            const cursor = e.target.result;
+        req.onsuccess = (e: Event) => {
+            const cursor = (e.target as IDBRequest).result;
             if (cursor && items.length < limit) {
                 items.push(cursor.value);
                 cursor.continue();

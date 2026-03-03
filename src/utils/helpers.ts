@@ -117,7 +117,7 @@ export function compressImage(file: File, maxSize = 1200, quality = 0.75): Promi
 
 export async function uploadToStorage(dataUrl: string, storagePath: string): Promise<string> {
     try {
-        const win = window as Record<string, unknown>;
+        const win = window as unknown as Record<string, unknown>;
         const fb = win.firebase as { storage?: () => { ref: (p: string) => { put: (b: Blob) => Promise<void>; getDownloadURL: () => Promise<string> } } } | undefined;
         if (!fb?.storage) {
             console.warn('[uploadToStorage] Firebase Storage not available, using base64 fallback');

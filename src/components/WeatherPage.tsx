@@ -3,6 +3,14 @@ import { useApp, add as addDoc, update as updateDoc, remove as removeDoc } from 
 import { Icon, Modal, Field, Input, Select, useIsMobile } from './ui/SharedComponents';
 import { C, styles, genId } from '../utils/helpers';
 
+// ── Types ──
+interface DayData { date: string; label: string; max: number; min: number; code: number; precip: number; wind: number; }
+interface WeatherRule { id: string; projectId: string; activity: string; minTemp: number; maxRain: number; maxWind: number; enabled: boolean; }
+interface AlertItem { project: { id: string; name: string;[k: string]: unknown }; day: DayData; score: number; issues: string[]; daysAhead: number; }
+interface AiInsight { project: string; text: string; avgRainy: string; avgSunny: string; }
+type ActivityKey = keyof typeof ACTIVITY_PRESETS;
+interface RuleFormState { projectId: string; activities: string[]; customThresholds: Record<string, { minTemp?: number; maxRain?: number; maxWind?: number }>; }
+
 // ── WMO Weather Code Mapping ──
 const WMO = {
     0: { l: 'Vedro', i: '', g: ['#FF9500', '#FF6B00'] }, 1: { l: 'Pretežno vedro', i: '', g: ['#FFB347', '#FF8C00'] },
@@ -15,7 +23,7 @@ const WMO = {
     75: { l: 'Jak snijeg', i: '', g: ['#BCCCE0', '#9BAFC4'] }, 80: { l: 'Pljuskovi', i: '', g: ['#667EEA', '#764BA2'] },
     82: { l: 'Obilni pljuskovi', i: '', g: ['#341F97', '#5F27CD'] }, 95: { l: 'Grmljavina', i: '', g: ['#1B1464', '#6C5CE7'] },
 };
-const getWmo = (c) => WMO[c] || { l: 'Nepoznato', i: '🌡️', g: ['#636E72', '#2D3436'] };
+const getWmo = (c: number) => WMO[c as keyof typeof WMO] || { l: 'Nepoznato', i: '🌡️', g: ['#636E72', '#2D3436'] };
 
 // ── Construction Alert Thresholds Defaults ──
 const ACTIVITY_PRESETS = {
@@ -28,7 +36,7 @@ const ACTIVITY_PRESETS = {
 };
 
 // ── Open-Meteo API ──
-const fetchWeather = async (lat, lng, days) => {
+const fetchWeather = async (lat: number, lng: number, days: number) => {
     try {
         const p = new URLSearchParams({
             latitude: String(lat), longitude: String(lng),
@@ -42,7 +50,7 @@ const fetchWeather = async (lat, lng, days) => {
         return await r.json();
     } catch (e) { console.error('[Weather] Forecast fetch failed:', e); return null; }
 };
-const fetchHistorical = async (lat, lng, daysBack) => {
+const fetchHistorical = async (lat: number, lng: number, daysBack: number) => {
     const end = new Date(), start = new Date();
     start.setDate(start.getDate() - daysBack);
     try {
@@ -59,11 +67,11 @@ const fetchHistorical = async (lat, lng, daysBack) => {
 };
 
 // ── Work Suitability Score Calculator ──
-function calcWorkScore(dayData, rules) {
-    if (!dayData || !rules?.length) return { score: 85, issues: [] };
-    let worst = 100; const issues = [];
+function calcWorkScore(dayData: DayData, rules: WeatherRule[]) {
+    if (!dayData || !rules?.length) return { score: 85, issues: [] as string[] };
+    let worst = 100; const issues: string[] = [];
     for (const r of rules) {
-        const preset = ACTIVITY_PRESETS[r.activity];
+        const preset = ACTIVITY_PRESETS[r.activity as ActivityKey];
         if (!preset) continue;
         const minT = r.minTemp ?? preset.minTemp;
         const maxR = r.maxRain ?? preset.maxRain;
@@ -80,7 +88,7 @@ function calcWorkScore(dayData, rules) {
 }
 
 // ── SVG Mini Temp Chart ──
-function TempChart({ data, height = 100 }) {
+function TempChart({ data, height = 100 }: { data: DayData[]; height?: number }) {
     if (!data?.length) return null;
     const maxT = Math.max(...data.map(d => d.max)), minT = Math.min(...data.map(d => d.min));
     const range = (maxT - minT) || 1, pad = 20, w = Math.max(data.length * 44, 300), h = height;
@@ -103,7 +111,7 @@ function TempChart({ data, height = 100 }) {
 }
 
 // ── Work Score Ring ──
-function ScoreRing({ score, size = 64 }) {
+function ScoreRing({ score, size = 64 }: { score: number; size?: number }) {
     const r = (size - 8) / 2, circ = 2 * Math.PI * r, offset = circ * (1 - score / 100);
     const color = score >= 80 ? '#10B981' : score >= 50 ? '#F59E0B' : '#EF4444';
     return (
@@ -117,7 +125,7 @@ function ScoreRing({ score, size = 64 }) {
 }
 
 // ══════════════════════════════════════════════════════════════════════
-export function WeatherPage({ leaderProjectIds, workerFilterId }) {
+export function WeatherPage({ leaderProjectIds, workerFilterId }: { leaderProjectIds?: string[]; workerFilterId?: string }) {
     const { projects, timesheets, weatherRules, addAuditLog, loadWeatherRules } = useApp();
     const isMobile = useIsMobile();
     const [period, setPeriod] = useState(7);
@@ -129,7 +137,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
     const [expandedProject, setExpandedProject] = useState(null);
     const [tab, setTab] = useState('weather'); // weather | planner | alerts | settings
     const [showRuleModal, setShowRuleModal] = useState(false);
-    const [ruleForm, setRuleForm] = useState({ projectId: '', activities: [], customThresholds: {} });
+    const [ruleForm, setRuleForm] = useState<RuleFormState>({ projectId: '', activities: [], customThresholds: {} });
 
     const geoProjects = useMemo(() => {
         let list = projects.filter(p => p.siteLat && p.siteLng && p.status === 'aktivan');
@@ -170,7 +178,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
 
     useEffect(() => { loadWeather(); }, [loadWeather]);
 
-    const getDailyData = (pid) => {
+    const getDailyData = (pid: string): DayData[] => {
         const wd = weatherData[pid]; if (!wd) return [];
         const d = wd.type === 'forecast' ? wd.data?.daily : wd.historical?.daily;
         if (!d) return [];
@@ -180,21 +188,21 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
             precip: d.precipitation_sum[i] || 0, wind: d.wind_speed_10m_max?.[i] || 0,
         }));
     };
-    const getCurrent = (pid) => {
+    const getCurrent = (pid: string) => {
         const wd = weatherData[pid];
         return (wd?.type === 'forecast' ? wd.data : wd?.forecast)?.current || null;
     };
-    const getHourly = (pid) => {
+    const getHourly = (pid: string) => {
         const wd = weatherData[pid];
         return (wd?.type === 'forecast' ? wd.data : wd?.forecast)?.hourly?.temperature_2m?.slice(0, 24) || [];
     };
 
     // ── Rules for a project ──
-    const getRulesForProject = (pid) => (weatherRules || []).filter(r => r.projectId === pid);
+    const getRulesForProject = (pid: string): WeatherRule[] => (weatherRules || []).filter((r: WeatherRule) => r.projectId === pid);
 
     // ── Generate alerts for all projects ──
     const alerts = useMemo(() => {
-        const result = [];
+        const result: AlertItem[] = [];
         geoProjects.forEach(p => {
             const daily = getDailyData(p.id);
             const rules = getRulesForProject(p.id);
@@ -214,7 +222,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
     // ── AI Insight: Weather × Productivity ──
     const aiInsights = useMemo(() => {
         if (!timesheets?.length) return [];
-        const insights = [];
+        const insights: AiInsight[] = [];
         // Calculate avg hours on rainy vs sunny days per project
         geoProjects.forEach(p => {
             const daily = getDailyData(p.id);
@@ -228,8 +236,8 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
             const sunnyCount = projTS.filter(t => sunnyDays.includes(t.date)).length || 1;
             const avgR = rainyHours / rainyCount, avgS = sunnyHours / sunnyCount;
             if (avgS > 0 && avgR > 0 && Math.abs(avgS - avgR) > 0.5) {
-                const diff = ((avgS - avgR) / avgS * 100).toFixed(0);
-                if (diff > 0) insights.push({ project: p.name, text: `Kišnih dana produktivnost pada ${diff}%`, avgRainy: avgR.toFixed(1), avgSunny: avgS.toFixed(1) });
+                const diff = Number(((avgS - avgR) / avgS * 100).toFixed(0));
+                if (diff > 0) insights.push({ project: p.name as string, text: `Kišnih dana produktivnost pada ${diff}%`, avgRainy: avgR.toFixed(1), avgSunny: avgS.toFixed(1) });
             }
         });
         return insights;
@@ -240,7 +248,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
         if (!ruleForm.projectId || !ruleForm.activities.length) return alert('Odaberite projekt i aktivnosti');
         for (const act of ruleForm.activities) {
             const existing = (weatherRules || []).find(r => r.projectId === ruleForm.projectId && r.activity === act);
-            const preset = ACTIVITY_PRESETS[act];
+            const preset = ACTIVITY_PRESETS[act as ActivityKey];
             const doc = {
                 id: existing?.id || genId(),
                 projectId: ruleForm.projectId, activity: act,
@@ -255,7 +263,7 @@ export function WeatherPage({ leaderProjectIds, workerFilterId }) {
         await addAuditLog('WEATHER_RULES_UPDATED', `Pravila postavljena za ${projects.find(p => p.id === ruleForm.projectId)?.name}`);
         setShowRuleModal(false);
     };
-    const deleteRule = async (id) => { await removeDoc('weatherRules', id); };
+    const deleteRule = async (id: string) => { await removeDoc('weatherRules', id); };
 
     const periods = [
         { v: 3, l: '3d', s: 'Prognoza' }, { v: 7, l: '7d', s: 'Prognoza' }, { v: 14, l: '14d', s: 'Prognoza' },

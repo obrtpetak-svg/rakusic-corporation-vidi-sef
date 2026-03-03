@@ -53,17 +53,17 @@ export function exportTimesheets(timesheets: EntityRow[], workers: EntityRow[], 
     const data = timesheets.map((t: EntityRow) => {
         const w = workers.find((x: EntityRow) => x.id === t.workerId);
         const p = projects.find((x: EntityRow) => x.id === t.projectId);
-        const start = t.startTime || '';
-        const end = t.endTime || '';
-        const breakMins = t.breakMins || 0;
+        const start = (t.startTime as string) || '';
+        const end = (t.endTime as string) || '';
+        const breakMins = (t.breakMins as number) || 0;
         // Calculate duration
-        let durationH = 0;
+        let durationH: number = 0;
         if (start && end) {
             const [sh, sm] = start.split(':').map(Number);
             const [eh, em] = end.split(':').map(Number);
             let diff = eh * 60 + em - (sh * 60 + sm);
             if (diff < 0) diff += 1440;
-            durationH = ((diff - breakMins) / 60).toFixed(1);
+            durationH = parseFloat(((diff - breakMins) / 60).toFixed(1));
         }
         return {
             'Radnik': w?.name || '—',
@@ -72,7 +72,7 @@ export function exportTimesheets(timesheets: EntityRow[], workers: EntityRow[], 
             'Početak': start,
             'Završetak': end,
             'Pauza (min)': breakMins,
-            'Neto sati': parseFloat(durationH),
+            'Neto sati': durationH,
             'Tip': t.type || 'normalan',
             'Status': t.status || '',
             'Opis': t.description || '',
@@ -114,7 +114,7 @@ export function exportInvoices(invoices: EntityRow[], workers: EntityRow[], proj
             'Dobavljač': i.supplier || w?.name || '—',
             'Projekt': p?.name || '—',
             'Datum': i.date || '',
-            'Iznos (€)': parseFloat(i.amount) || 0,
+            'Iznos (€)': parseFloat(String(i.amount)) || 0,
             'Status': i.status || '',
             'Opis': i.description || '',
         };

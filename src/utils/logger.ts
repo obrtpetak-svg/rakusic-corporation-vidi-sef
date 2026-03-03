@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 /**
  * Dev-only logger — strips all log output in production builds.
  * Vite's tree-shaking removes dead code when import.meta.env.DEV === false.
