@@ -228,7 +228,7 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                                             {(record?.photos || []).length > 0 && (
                                                 <div style={{ display: 'flex', gap: 4, marginTop: 6, flexWrap: 'wrap' }}>
                                                     {record.photos.map(p => (
-                                                        <img key={p.id} src={p.data} alt="" onClick={() => { const w = window.open(); w?.document.write(`<img src="${p.data}" style="max-width:100%;height:auto">`); }} style={{ width: 48, height: 48, borderRadius: 6, objectFit: 'cover', cursor: 'pointer', border: `1px solid ${C.border}` }} />
+                                                        <img loading="lazy" key={p.id} src={p.data} alt="" onClick={() => { const w = window.open(); w?.document.write(`<img loading="lazy" src="${p.data}" style="max-width:100%;height:auto">`); }} style={{ width: 48, height: 48, borderRadius: 6, objectFit: 'cover', cursor: 'pointer', border: `1px solid ${C.border}` }} />
                                                     ))}
                                                 </div>
                                             )}
@@ -517,8 +517,8 @@ export function ProizvodnyaDetailView({ detailOrder, actions, canManage, project
                                 {files.map(f => (
                                     <div key={f.id} style={{ border: `1px solid ${C.border}`, borderRadius: 10, overflow: 'hidden', background: 'var(--bg)' }}>
                                         {f.type?.startsWith('image/') ? (
-                                            <div style={{ height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: 'rgba(128,128,128,0.06)' }} onClick={() => { const w = window.open(); w.document.write(`<img src="${f.data}" style="max-width:100%;height:auto">`); }}>
-                                                <img src={f.data} alt={f.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'cover' }} />
+                                            <div style={{ height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: 'rgba(128,128,128,0.06)' }} onClick={() => { const w = window.open(); w.document.write(`<img loading="lazy" src="${f.data}" style="max-width:100%;height:auto">`); }}>
+                                                <img loading="lazy" src={f.data} alt={f.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'cover' }} />
                                             </div>
                                         ) : (
                                             <div style={{ height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(128,128,128,0.06)' }}>

@@ -241,8 +241,8 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                             {projectFiles.map(f => (
                                 <div key={f.id} className="proj__file-card">
                                     {f.type?.startsWith('image/') ? (
-                                        <div className="proj__file-preview proj__file-preview--clickable" onClick={() => { const w = window.open(); w.document.write(`<img src="${f.data}" style="max-width:100%;height:auto">`); }}>
-                                            <img src={f.data} alt={f.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'cover' }} />
+                                        <div className="proj__file-preview proj__file-preview--clickable" onClick={() => { const w = window.open(); w.document.write(`<img loading="lazy" src="${f.data}" style="max-width:100%;height:auto">`); }}>
+                                            <img loading="lazy" src={f.data} alt={f.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'cover' }} />
                                         </div>
                                     ) : (
                                         <div className="proj__file-preview">
@@ -620,7 +620,7 @@ export function ProjectsPage({ workerFilterId, leaderProjectIds, onNavigate }) {
                         <div className="proj__file-list">
                             {(form.files || []).map(f => (
                                 <div key={f.id} className="proj__file-chip">
-                                    {f.type?.startsWith('image/') ? <img src={f.data} alt="" style={{ width: 24, height: 24, borderRadius: 4, objectFit: 'cover' }} /> : <Icon name="file" size={14} />}
+                                    {f.type?.startsWith('image/') ? <img loading="lazy" src={f.data} alt="" style={{ width: 24, height: 24, borderRadius: 4, objectFit: 'cover' }} /> : <Icon name="file" size={14} />}
                                     <span className="proj__file-chip-name">{f.name}</span>
                                     <button onClick={() => removeFile(f.id)} style={{ background: 'none', border: 'none', color: C.red, cursor: 'pointer', fontSize: 14, padding: 0 }}>✕</button>
                                 </div>

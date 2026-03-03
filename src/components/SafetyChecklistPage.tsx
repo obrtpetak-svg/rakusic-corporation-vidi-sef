@@ -147,7 +147,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
                 <div class="item-text">${item.text}${a?.note ? `<br><small style="color:#F59E0B">📝 ${a.note}</small>` : ''}</div></div>`;
         }).join('') : ''}
             ${checklist.notes ? `<div style="margin-top:16px;padding:10px;background:#FFF7ED;border-radius:8px"><strong>Napomene:</strong><br>${checklist.notes}</div>` : ''}
-            ${checklist.signature ? `<div style="margin-top:16px"><strong>Potpis:</strong><br><img src="${checklist.signature}" class="sig" style="max-width:300px;height:auto"/></div>` : ''}
+            ${checklist.signature ? `<div style="margin-top:16px"><strong>Potpis:</strong><br><img loading="lazy" src="${checklist.signature}" class="sig" style="max-width:300px;height:auto"/></div>` : ''}
             </body></html>`;
         const win = window.open('', '_blank'); win.document.write(html); win.document.close(); win.print();
     };
@@ -365,7 +365,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
                     </div>
 
                     {detail.notes && <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(245,158,11,0.08)', fontSize: 13, marginBottom: 12 }}><strong>Napomene:</strong> {detail.notes}</div>}
-                    {detail.signature && <div className="u-mb-12"><span style={styles.label}>✍️ Potpis</span><img src={detail.signature} alt="Potpis" style={{ maxWidth: 300, height: 'auto', border: `1px solid ${C.border}`, borderRadius: 8, marginTop: 4 }} /></div>}
+                    {detail.signature && <div className="u-mb-12"><span style={styles.label}>✍️ Potpis</span><img loading="lazy" src={detail.signature} alt="Potpis" style={{ maxWidth: 300, height: 'auto', border: `1px solid ${C.border}`, borderRadius: 8, marginTop: 4 }} /></div>}
                     <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
                         <button onClick={() => exportPDF(detail)} style={styles.btnSecondary}>📄 PDF</button>
                     </div>
@@ -498,7 +498,7 @@ export function SafetyChecklistPage({ workerFilterId, leaderProjectIds }) {
                                 <span style={styles.label}>✍️ Digitalni potpis {fillForm.signature ? '✅' : '(obvezan)'}</span>
                                 {fillForm.signature ? (
                                     <div style={{ marginTop: 6 }}>
-                                        <img src={fillForm.signature} alt="Potpis" style={{ maxWidth: 250, height: 'auto', border: `1px solid ${C.border}`, borderRadius: 8 }} />
+                                        <img loading="lazy" src={fillForm.signature} alt="Potpis" style={{ maxWidth: 250, height: 'auto', border: `1px solid ${C.border}`, borderRadius: 8 }} />
                                         <button onClick={() => setFillForm(f => ({ ...f, signature: null }))} style={{ ...styles.btnSmall, marginTop: 4, fontSize: 11 }}>🗑️ Ponovi potpis</button>
                                     </div>
                                 ) : (

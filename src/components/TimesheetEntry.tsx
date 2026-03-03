@@ -160,7 +160,7 @@ export function TimesheetEntry() {
                         {invoiceFile && <button onClick={() => setInvoiceFile(null)} style={{ background: 'none', border: 'none', color: C.red, cursor: 'pointer', fontSize: 12 }}>✕ Ukloni</button>}
                     </div>
                     {invoiceFile && invoiceFile.type?.startsWith('image/') && (
-                        <img src={invoiceFile.data} alt="Preview" style={{ marginTop: 8, maxWidth: 200, maxHeight: 150, borderRadius: 8, border: `1px solid ${C.border}` }} />
+                        <img loading="lazy" src={invoiceFile.data} alt="Preview" style={{ marginTop: 8, maxWidth: 200, maxHeight: 150, borderRadius: 8, border: `1px solid ${C.border}` }} />
                     )}
                 </Field>
 

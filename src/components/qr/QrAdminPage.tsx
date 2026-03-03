@@ -72,7 +72,7 @@ export function QrAdminPage() {
         const canvas = document.createElement('canvas');
         renderPosterToCanvas(canvas, project, companyName);
         const win = window.open('', '_blank');
-        win.document.write(`<html><head><title>QR Poster - ${project.name}</title><style>@page{size:A4;margin:0}body{margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#fff}</style></head><body><img src="${canvas.toDataURL('image/png')}" style="max-width:100%;height:auto" onload="setTimeout(()=>window.print(),300)"></body></html>`);
+        win.document.write(`<html><head><title>QR Poster - ${project.name}</title><style>@page{size:A4;margin:0}body{margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#fff}</style></head><body><img loading="lazy" src="${canvas.toDataURL('image/png')}" style="max-width:100%;height:auto" onload="setTimeout(()=>window.print(),300)"></body></html>`);
         win.document.close();
     }, [project, companyName]);
 

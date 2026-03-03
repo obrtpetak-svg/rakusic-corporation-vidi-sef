@@ -98,7 +98,7 @@ export function ObavezePage({ workerFilterId }) {
                                     <div style={{ display: 'flex', gap: 6, marginTop: 6, flexWrap: 'wrap' }}>
                                         {(o.files || []).map(f => (
                                             f.type?.startsWith('image/') ? (
-                                                <img key={f.id} src={f.data} alt={f.name} onClick={() => { const w = window.open(); w.document.write(`<img src="${f.data}" style="max-width:100%;height:auto">`); }} style={{ width: 48, height: 48, borderRadius: 6, objectFit: 'cover', cursor: 'pointer', border: `1px solid ${C.border}` }} />
+                                                <img loading="lazy" key={f.id} src={f.data} alt={f.name} onClick={() => { const w = window.open(); w.document.write(`<img loading="lazy" src="${f.data}" style="max-width:100%;height:auto">`); }} style={{ width: 48, height: 48, borderRadius: 6, objectFit: 'cover', cursor: 'pointer', border: `1px solid ${C.border}` }} />
                                             ) : (
                                                 <a key={f.id} href={f.data} download={f.name} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', borderRadius: 6, background: C.bgElevated, border: `1px solid ${C.border}`, fontSize: 11, color: C.textDim, textDecoration: 'none' }}><Icon name="file" size={12} /> {f.name}</a>
                                             )
@@ -158,7 +158,7 @@ export function ObavezePage({ workerFilterId }) {
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
                             {(form.files || []).map(f => (
                                 <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 6, background: C.bgElevated, border: `1px solid ${C.border}`, fontSize: 12 }}>
-                                    {f.type?.startsWith('image/') ? <img src={f.data} alt="" style={{ width: 20, height: 20, borderRadius: 3, objectFit: 'cover' }} /> : <Icon name="file" size={12} />}
+                                    {f.type?.startsWith('image/') ? <img loading="lazy" src={f.data} alt="" style={{ width: 20, height: 20, borderRadius: 3, objectFit: 'cover' }} /> : <Icon name="file" size={12} />}
                                     <span style={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: C.textDim }}>{f.name}</span>
                                     <button onClick={() => removeFile(f.id)} style={{ background: 'none', border: 'none', color: C.red, cursor: 'pointer', fontSize: 14, padding: 0 }}>✕</button>
                                 </div>

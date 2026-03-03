@@ -422,7 +422,7 @@ export function Layout() {
                 {/* Logo */}
                 <div style={{ padding: '20px 20px 16px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div className="u-flex-center u-gap-12">
-                        <img src="/icon-192.png" alt="Logo" style={{ width: 38, height: 38, borderRadius: 10, flexShrink: 0 }} />
+                        <img loading="lazy" src="/icon-192.png" alt="Logo" style={{ width: 38, height: 38, borderRadius: 10, flexShrink: 0 }} />
                         <div>
                             <div style={{ fontSize: 14, fontWeight: 800, color: C.text }}>{companyProfile?.companyName || 'Vi-Di-Sef'}</div>
                             <a href="https://www.vi-di.me" target="_blank" rel="noopener noreferrer" style={{ fontSize: 10, color: C.accent, fontWeight: 600, textDecoration: 'none', display: 'block', marginTop: 2 }}>www.Vi-Di.me</a>

@@ -297,7 +297,7 @@ export function DailyLogPage({ workerFilterId, leaderProjectIds }) {
                     ${l.issues ? `<div class="field"><div class="field-label">⚠️ Problemi</div>${l.issues}</div>` : ''}
                     ${l.safetyNotes ? `<div class="field"><div class="field-label">🛡️ Sigurnost</div>${l.safetyNotes}</div>` : ''}
                     ${l.notes ? `<div class="field"><div class="field-label">Napomene</div>${l.notes}</div>` : ''}
-                    ${(l.photos || []).length > 0 ? `<div class="photos">${l.photos.map(ph => `<img src="${ph.data}" />`).join('')}</div>` : ''}
+                    ${(l.photos || []).length > 0 ? `<div class="photos">${l.photos.map(ph => `<img loading="lazy" src="${ph.data}" />`).join('')}</div>` : ''}
                     <div style="font-size:11px;color:#999;margin-top:8px">Autor: ${l.createdBy || '?'}</div>
                 </div>`;
         }).join('')}
@@ -407,7 +407,7 @@ export function DailyLogPage({ workerFilterId, leaderProjectIds }) {
                             {photoCount > 0 && (
                                 <div style={{ display: 'flex', gap: 6, marginTop: 10, overflowX: 'auto' }}>
                                     {(log.photos || []).slice(0, 4).map((ph, i) => (
-                                        <img key={i} src={ph.data} alt={`Foto ${i + 1}`} style={{ width: 60, height: 45, objectFit: 'cover', borderRadius: 6, border: `1px solid ${C.border}`, flexShrink: 0 }} />
+                                        <img loading="lazy" key={i} src={ph.data} alt={`Foto ${i + 1}`} style={{ width: 60, height: 45, objectFit: 'cover', borderRadius: 6, border: `1px solid ${C.border}`, flexShrink: 0 }} />
                                     ))}
                                     {photoCount > 4 && <div style={{ width: 60, height: 45, borderRadius: 6, background: C.bgElevated, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: C.textMuted, fontWeight: 700, flexShrink: 0 }}>+{photoCount - 4}</div>}
                                 </div>
@@ -443,7 +443,7 @@ export function DailyLogPage({ workerFilterId, leaderProjectIds }) {
                             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: 8, marginTop: 8 }}>
                                 {detailLog.photos.map((ph, i) => (
                                     <a key={i} href={ph.data} target="_blank" rel="noopener noreferrer">
-                                        <img src={ph.data} alt={ph.name || `Foto ${i + 1}`} style={{ width: '100%', height: 140, objectFit: 'cover', borderRadius: 8, border: `1px solid ${C.border}`, cursor: 'pointer' }} />
+                                        <img loading="lazy" src={ph.data} alt={ph.name || `Foto ${i + 1}`} style={{ width: '100%', height: 140, objectFit: 'cover', borderRadius: 8, border: `1px solid ${C.border}`, cursor: 'pointer' }} />
                                     </a>
                                 ))}
                             </div>
@@ -540,14 +540,14 @@ export function DailyLogPage({ workerFilterId, leaderProjectIds }) {
                             {/* Existing photos */}
                             {(form.photos || []).map((ph, i) => (
                                 <div key={`ex-${i}`} className="u-relative">
-                                    <img src={ph.data} alt={`Foto ${i + 1}`} style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 8, border: `1px solid ${C.border}` }} />
+                                    <img loading="lazy" src={ph.data} alt={`Foto ${i + 1}`} style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 8, border: `1px solid ${C.border}` }} />
                                     <button onClick={() => removeExistingPhoto(i)} style={{ position: 'absolute', top: -6, right: -6, width: 20, height: 20, borderRadius: '50%', background: C.red, color: '#fff', border: 'none', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
                                 </div>
                             ))}
                             {/* New photos */}
                             {photoQueue.map((ph, i) => (
                                 <div key={`new-${i}`} className="u-relative">
-                                    <img src={ph.data} alt={`Nova ${i + 1}`} style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 8, border: `2px solid ${C.green}` }} />
+                                    <img loading="lazy" src={ph.data} alt={`Nova ${i + 1}`} style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 8, border: `2px solid ${C.green}` }} />
                                     <button onClick={() => removePhoto(i)} style={{ position: 'absolute', top: -6, right: -6, width: 20, height: 20, borderRadius: '50%', background: C.red, color: '#fff', border: 'none', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
                                 </div>
                             ))}

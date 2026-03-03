@@ -108,7 +108,7 @@ export function AppLogin() {
             <div style={{ width: '100%', maxWidth: 420, padding: '0 16px' }}>
                 <div style={{ textAlign: 'center', marginBottom: 24 }}>
                     <div style={{ fontSize: 26, fontWeight: 900, color: '#F1F5F9', letterSpacing: '0.02em' }}>RAKUŠIĆ corporation</div>
-                    <img src="/icon-192.png" alt="Rakušić Corporation" style={{ width: 72, height: 72, borderRadius: 20, marginTop: 16, marginBottom: 8 }} />
+                    <img loading="lazy" src="/icon-192.png" alt="Rakušić Corporation" style={{ width: 72, height: 72, borderRadius: 20, marginTop: 16, marginBottom: 8 }} />
                     <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 4 }}>Operativni centar upravljanja</div>
                     <a href="https://vi-di-sef.com" target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: C.accent, fontWeight: 600, textDecoration: 'none', marginTop: 8, display: 'inline-block' }}>powered by Vi-Di-Sef</a>
                 </div>

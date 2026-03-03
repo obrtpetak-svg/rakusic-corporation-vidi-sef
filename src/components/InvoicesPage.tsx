@@ -221,7 +221,7 @@ export function InvoicesPage({ workerFilterId }) {
                         <div className="u-mb-12">
                             <span style={styles.label}>Priložena datoteka</span>
                             {detailInv.file.type?.startsWith('image/') ? (
-                                <img src={detailInv.file.data} alt="Račun" style={{ maxWidth: '100%', maxHeight: 400, borderRadius: 8, border: `1px solid ${C.border}`, marginTop: 8 }} />
+                                <img loading="lazy" src={detailInv.file.data} alt="Račun" style={{ maxWidth: '100%', maxHeight: 400, borderRadius: 8, border: `1px solid ${C.border}`, marginTop: 8 }} />
                             ) : (
                                 <a href={detailInv.file.data} download={detailInv.file.name} style={{ ...styles.btnSmall, display: 'inline-flex', marginTop: 8 }}><Icon name="download" size={14} /> {detailInv.file.name}</a>
                             )}
@@ -274,7 +274,7 @@ export function InvoicesPage({ workerFilterId }) {
                             <label style={{ ...styles.btnSmall, cursor: 'pointer' }}><Icon name="upload" size={14} /> {fileData ? fileData.name : 'Odaberi datoteku'}<input type="file" accept="image/*,application/pdf" onChange={handleFile} style={{ display: 'none' }} /></label>
                             {fileData && <button onClick={() => setFileData(null)} style={{ background: 'none', border: 'none', color: C.red, cursor: 'pointer', fontSize: 12 }}>✕ Ukloni</button>}
                         </div>
-                        {fileData && fileData.type?.startsWith('image/') && <img src={fileData.data} alt="Preview" style={{ marginTop: 8, maxWidth: 200, maxHeight: 150, borderRadius: 8, border: `1px solid ${C.border}` }} />}
+                        {fileData && fileData.type?.startsWith('image/') && <img loading="lazy" src={fileData.data} alt="Preview" style={{ marginTop: 8, maxWidth: 200, maxHeight: 150, borderRadius: 8, border: `1px solid ${C.border}` }} />}
                     </Field>
                     <div className="u-flex-end">
                         <button onClick={() => setShowForm(false)} style={styles.btnSecondary}>Odustani</button>
